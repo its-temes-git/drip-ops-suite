@@ -86,15 +86,36 @@ export const ItemDrawer = ({
             className="fixed right-0 top-0 z-[71] flex h-full w-full max-w-[480px] flex-col overflow-y-auto bg-card border-l border-border"
           >
             <div className="flex items-center justify-between p-4">
+              <button
+                onClick={onClose}
+                aria-label="Back"
+                className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-off-white transition-colors hover:border-primary hover:text-primary"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
               <span className="text-xs tracking-[0.3em] text-muted-foreground">ITEM DETAILS</span>
-              <button onClick={onClose} aria-label="Close">
+              <button onClick={onClose} aria-label="Close" className="text-off-white hover:text-primary">
                 <X className="h-5 w-5" />
               </button>
             </div>
 
-            <div className="aspect-[4/5] w-full overflow-hidden bg-secondary">
+            <div className="relative aspect-[4/5] w-full overflow-hidden bg-secondary">
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="font-display text-7xl text-muted-foreground/40">
+                  {item.brand.charAt(0)}
+                </span>
+                <span className="mt-2 text-[10px] tracking-[0.3em] text-muted-foreground">
+                  {item.brand.toUpperCase()}
+                </span>
+              </div>
               {item.image && (
-                <img src={item.image} alt={item.name} className="h-full w-full object-cover" loading="lazy" />
+                <img
+                  src={item.image}
+                  alt={item.name}
+                  className="relative h-full w-full object-cover"
+                  loading="lazy"
+                  onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
+                />
               )}
             </div>
 
@@ -107,17 +128,22 @@ export const ItemDrawer = ({
 
               <div className="mt-6">
                 <p className="mb-2 text-[10px] tracking-[0.3em] text-muted-foreground">COLOR</p>
-                <div className="flex gap-2">
-                  {[item.color].map((c, i) => (
+                <div className="flex flex-wrap gap-3">
+                  {parseColors(item.color).map((c, i) => (
                     <button
-                      key={c}
+                      key={c.label + i}
                       onClick={() => setColor(i)}
-                      className={`flex items-center gap-2 border px-3 py-1.5 text-xs ${
-                        color === i ? "border-primary text-primary" : "border-border text-off-white"
-                      }`}
+                      className="flex items-center gap-2 text-xs text-off-white"
                     >
-                      <span className="h-2 w-2 rounded-full bg-off-white" />
-                      {c}
+                      <span
+                        className={`h-7 w-7 rounded-full border transition-all ${
+                          color === i
+                            ? "border-primary ring-2 ring-primary/40 ring-offset-2 ring-offset-card"
+                            : "border-border"
+                        }`}
+                        style={{ background: c.hex }}
+                      />
+                      <span className={color === i ? "text-primary" : ""}>{c.label}</span>
                     </button>
                   ))}
                 </div>
