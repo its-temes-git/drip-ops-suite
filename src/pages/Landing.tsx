@@ -1,11 +1,17 @@
 import { motion } from "framer-motion";
 import { Link } from "react-router-dom";
-import { Lock, ShoppingBag } from "lucide-react";
+import { Lock, ShoppingBag, ArrowLeft } from "lucide-react";
 import { BrandMarquee } from "@/components/BrandMarquee";
 
 const Landing = () => {
   return (
     <div className="grain diagonal-lines relative min-h-screen overflow-hidden bg-background text-off-white">
+      <Link
+        to="/"
+        className="absolute left-6 top-6 z-20 inline-flex items-center gap-2 text-[10px] tracking-[0.3em] text-muted-foreground transition-colors hover:text-primary md:left-10 md:top-8"
+      >
+        <ArrowLeft className="h-3 w-3" /> BACK TO SITE
+      </Link>
       <div className="relative z-10 flex min-h-screen flex-col px-6 py-10 md:px-12">
         <motion.div
           initial={{ opacity: 0, y: 30 }}

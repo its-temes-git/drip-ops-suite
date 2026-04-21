@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
+import { ArrowLeft } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
 
@@ -23,7 +24,19 @@ const SalesLogin = () => {
   };
 
   return (
-    <div className="grain flex min-h-screen items-center justify-center bg-charcoal px-6">
+    <div className="grain relative flex min-h-screen items-center justify-center bg-charcoal px-6">
+      <Link
+        to="/login"
+        className="absolute left-6 top-6 z-20 inline-flex items-center gap-2 text-[10px] tracking-[0.3em] text-muted-foreground transition-colors hover:text-primary md:left-10 md:top-8"
+      >
+        <ArrowLeft className="h-3 w-3" /> BACK
+      </Link>
+      <Link
+        to="/"
+        className="absolute right-6 top-6 z-20 text-[10px] tracking-[0.3em] text-muted-foreground transition-colors hover:text-primary md:right-10 md:top-8"
+      >
+        HOME →
+      </Link>
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
