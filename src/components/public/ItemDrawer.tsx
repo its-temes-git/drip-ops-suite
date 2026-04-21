@@ -1,11 +1,42 @@
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Send, Phone, Share2, MapPin } from "lucide-react";
+import { X, Send, Phone, Share2, MapPin, ArrowLeft } from "lucide-react";
 import { InventoryItem } from "@/data/inventory";
 import { useState } from "react";
 import { toast } from "sonner";
 
 const ALL_SIZES_TOPS = ["XS","S","M","L","XL","XXL"];
 const ALL_SIZES_SHOES = ["38","39","40","41","42","43","44","45"];
+
+const COLOR_MAP: Record<string, string> = {
+  black: "#0a0a0a",
+  white: "#f0ede8",
+  cream: "#efe6d2",
+  gray: "#8a8a8a",
+  grey: "#8a8a8a",
+  silver: "#c8c8cc",
+  red: "#d4341f",
+  pink: "#ff8fb3",
+  blue: "#2b6cb0",
+  navy: "#0f1e3d",
+  royal: "#1c3fa8",
+  green: "#2f8f4a",
+  camo: "#5a6b3a",
+  brown: "#5a3a25",
+  wheat: "#c9a36b",
+  indigo: "#2b3a7a",
+  vintage: "#6b5a48",
+  washed: "#2a2a2a",
+  cleveland: "#7a1f2b",
+  classic: "#b89968",
+};
+
+const parseColors = (color: string) => {
+  const parts = color.split(/[\/,]/).map((p) => p.trim()).filter(Boolean);
+  return parts.map((label) => {
+    const key = Object.keys(COLOR_MAP).find((k) => label.toLowerCase().includes(k));
+    return { label, hex: key ? COLOR_MAP[key] : "#8a8a8a" };
+  });
+};
 
 const describe = (item: InventoryItem) => {
   return `Authentic ${item.brand} ${item.name}. Original import. Available exclusively at Sawkem Fashion, Summit Branch — Addis Ababa.`;
