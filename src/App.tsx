@@ -9,6 +9,11 @@ import NotFound from "./pages/NotFound";
 import OwnerLogin from "./pages/OwnerLogin";
 import SalesLogin from "./pages/SalesLogin";
 import { OwnerLayout } from "./components/owner/OwnerLayout";
+import { PublicLayout } from "./components/public/PublicLayout";
+import HomePage from "./pages/public/Home";
+import ShopPage from "./pages/public/Shop";
+import AboutPage from "./pages/public/About";
+import ContactPage from "./pages/public/Contact";
 import Dashboard from "./pages/owner/Dashboard";
 import Inventory from "./pages/owner/Inventory";
 import Analytics from "./pages/owner/Analytics";
@@ -39,9 +44,20 @@ const App = () => (
         <CustomCursor />
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Index />} />
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<HomePage />} />
+              <Route path="/shop" element={<ShopPage />} />
+              <Route path="/about" element={<AboutPage />} />
+              <Route path="/contact" element={<ContactPage />} />
+            </Route>
+            <Route path="/login" element={<Index />} />
             <Route path="/login/owner" element={<OwnerLogin />} />
             <Route path="/login/sales" element={<SalesLogin />} />
+            <Route path="/owner-login" element={<OwnerLogin />} />
+            <Route path="/sales-login" element={<SalesLogin />} />
+            <Route path="/dashboard" element={<OwnerLayout />}>
+              <Route index element={<Dashboard />} />
+            </Route>
             <Route path="/owner" element={<OwnerLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="inventory" element={<Inventory />} />
