@@ -3,6 +3,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AppProvider } from "@/context/AppContext";
+import { CustomCursor } from "@/components/CustomCursor";
 
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
@@ -41,6 +42,7 @@ const App = () => (
             },
           }}
         />
+        <CustomCursor />
         <BrowserRouter>
           <Routes>
             <Route element={<PublicLayout />}>
