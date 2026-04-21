@@ -3,6 +3,7 @@ import { NavLink, Outlet, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { LayoutGrid, Box, BarChart3, Zap, AlertTriangle, User, Settings, LogOut } from "lucide-react";
 import { useApp } from "@/context/AppContext";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const navItems = [
   { to: "/owner", label: "DASHBOARD", icon: LayoutGrid, end: true },
@@ -76,6 +77,9 @@ export const OwnerLayout = () => {
         transition={{ duration: 0.4 }}
         className="ml-16 flex-1 p-6 md:p-10"
       >
+        <div className="fixed right-6 top-6 z-30">
+          <ThemeToggle />
+        </div>
         <Outlet />
       </motion.main>
     </div>

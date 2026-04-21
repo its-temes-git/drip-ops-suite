@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import { Menu, X, Send } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const links = [
   { to: "/", label: "HOME" },
@@ -72,6 +73,7 @@ export const PublicNav = () => {
           </nav>
 
           <div className="hidden items-center gap-5 md:flex">
+            <ThemeToggle />
             <a
               href="https://t.me/sawkemcollection"
               target="_blank"
