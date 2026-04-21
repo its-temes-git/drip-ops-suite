@@ -59,6 +59,66 @@
     --background: 0 0% 3%;
     --foreground: 40 22% 92%;
   }
+
+  .light {
+    --background: 40 22% 96%;
+    --foreground: 0 0% 8%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 0 0% 8%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 0 0% 8%;
+
+    --primary: 81 70% 42%;
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 40 15% 90%;
+    --secondary-foreground: 0 0% 8%;
+
+    --muted: 40 12% 88%;
+    --muted-foreground: 0 0% 38%;
+
+    --accent: 81 70% 42%;
+    --accent-foreground: 0 0% 100%;
+
+    --destructive: 0 75% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --warning: 32 90% 48%;
+    --warning-foreground: 0 0% 100%;
+
+    --border: 0 0% 82%;
+    --input: 0 0% 88%;
+    --ring: 81 70% 42%;
+
+    --charcoal: 40 15% 92%;
+    --off-white: 0 0% 8%;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 0 0% 8%;
+    --sidebar-primary: 81 70% 42%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 40 15% 92%;
+    --sidebar-accent-foreground: 0 0% 8%;
+    --sidebar-border: 0 0% 85%;
+    --sidebar-ring: 81 70% 42%;
+  }
+
+  .light .grain::before {
+    opacity: 0.05;
+    mix-blend-mode: multiply;
+  }
+
+  .light .diagonal-lines {
+    background-image: repeating-linear-gradient(
+      45deg,
+      transparent,
+      transparent 80px,
+      hsl(0 0% 0% / 0.04) 80px,
+      hsl(0 0% 0% / 0.04) 81px
+    );
+  }
 }
 
 @layer base {
