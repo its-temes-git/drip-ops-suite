@@ -17,7 +17,7 @@ const CATS: { key: Cat; label: string }[] = [
   { key: "Accessories", label: "ACCESSORIES & BAGS" },
 ];
 
-const SORTS = ["NEWEST", "PRICE LOW-HIGH", "PRICE HIGH-LOW", "BRAND A-Z"] as const;
+
 
 const ShopPage = () => {
   const { inventory } = useApp();
