@@ -43,13 +43,10 @@ const ShopPage = () => {
       const q = search.toLowerCase();
       list = list.filter((i) => `${i.brand} ${i.name}`.toLowerCase().includes(q));
     }
-    if (sort === "PRICE LOW-HIGH") list = [...list].sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
-    if (sort === "PRICE HIGH-LOW") list = [...list].sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
-    if (sort === "BRAND A-Z") list = [...list].sort((a, b) => a.brand.localeCompare(b.brand));
     return list;
-  }, [inventory, cat, search, sort]);
+  }, [inventory, cat, search]);
 
-  useEffect(() => { setPage(1); }, [cat, search, sort]);
+  useEffect(() => { setPage(1); }, [cat, search]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
