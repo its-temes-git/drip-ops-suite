@@ -115,34 +115,15 @@ const ShopPage = () => {
                   {it.image && (
                     <img src={it.image} alt={it.name} className="h-full w-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
                   )}
-                  <span className="absolute left-2 top-2 bg-primary px-2 py-0.5 text-[9px] tracking-[0.2em] text-primary-foreground">
-                    {it.brand.toUpperCase()}
-                  </span>
-                  <span
-                    className={`absolute right-2 top-2 px-2 py-0.5 text-[9px] tracking-[0.2em] ${
-                      oos
-                        ? "bg-destructive text-destructive-foreground"
-                        : low
-                        ? "bg-warning text-warning-foreground"
-                        : "border border-off-white text-off-white"
-                    }`}
-                  >
-                    {oos ? "OUT OF STOCK" : low ? "LOW STOCK" : "IN STOCK"}
-                  </span>
                   <div className="pointer-events-none absolute bottom-0 left-0 right-0 translate-y-full bg-primary px-3 py-2 text-center text-[10px] tracking-[0.3em] text-primary-foreground transition-transform group-hover:translate-y-0">
                     QUICK VIEW
                   </div>
                 </div>
                 <div className="p-3 md:p-4">
-                  <h3 className="font-display text-lg md:text-xl leading-tight">{it.name}</h3>
+                  <h3 className="font-display text-lg md:text-xl leading-tight">{it.brand} {it.name}</h3>
                   <div className="mt-1 flex items-center gap-1.5">
                     <span className="h-2 w-2 rounded-full bg-off-white" />
                     <span className="text-[10px] text-muted-foreground">{it.color}</span>
-                  </div>
-                  <div className="mt-2 flex flex-wrap gap-1">
-                    {it.sizes.slice(0, 5).map((s) => (
-                      <span key={s} className="border border-border px-1.5 py-0.5 text-[9px]">{s}</span>
-                    ))}
                   </div>
                   {it.price && (
                     <p className="mt-2 font-mono text-sm text-off-white">ETB {it.price.toLocaleString()}</p>
