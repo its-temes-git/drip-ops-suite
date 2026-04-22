@@ -17,13 +17,13 @@ const CATS: { key: Cat; label: string }[] = [
   { key: "Accessories", label: "ACCESSORIES & BAGS" },
 ];
 
-const SORTS = ["NEWEST", "PRICE LOW-HIGH", "PRICE HIGH-LOW", "BRAND A-Z"] as const;
+
 
 const ShopPage = () => {
   const { inventory } = useApp();
   const [cat, setCat] = useState<Cat>("ALL");
   const [search, setSearch] = useState("");
-  const [sort, setSort] = useState<(typeof SORTS)[number]>("NEWEST");
+  
   const [active, setActive] = useState<InventoryItem | null>(null);
   const [params, setParams] = useSearchParams();
   const [catsOpen, setCatsOpen] = useState(false);
@@ -43,13 +43,10 @@ const ShopPage = () => {
       const q = search.toLowerCase();
       list = list.filter((i) => `${i.brand} ${i.name}`.toLowerCase().includes(q));
     }
-    if (sort === "PRICE LOW-HIGH") list = [...list].sort((a, b) => (a.price ?? 0) - (b.price ?? 0));
-    if (sort === "PRICE HIGH-LOW") list = [...list].sort((a, b) => (b.price ?? 0) - (a.price ?? 0));
-    if (sort === "BRAND A-Z") list = [...list].sort((a, b) => a.brand.localeCompare(b.brand));
     return list;
-  }, [inventory, cat, search, sort]);
+  }, [inventory, cat, search]);
 
-  useEffect(() => { setPage(1); }, [cat, search, sort]);
+  useEffect(() => { setPage(1); }, [cat, search]);
 
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -57,8 +54,8 @@ const ShopPage = () => {
 
   return (
     <>
-      <section className="diagonal-lines px-6 py-12 md:px-12 md:py-20 border-b border-border">
-        <h1 className="font-display text-6xl md:text-[8rem] leading-none">EXPLORE COLLECTION</h1>
+      <section className="diagonal-lines px-6 py-6 md:px-12 md:py-10 border-b border-border">
+        <h1 className="font-display text-5xl md:text-7xl leading-none">EXPLORE COLLECTION</h1>
       </section>
 
       <div className="sticky top-16 z-30 backdrop-blur-md bg-background/90 border-b border-border">
@@ -85,15 +82,6 @@ const ShopPage = () => {
               <SlidersHorizontal className="h-3 w-3" />
               {cat === "ALL" ? "CATEGORIES" : CATS.find((c) => c.key === cat)?.label}
             </button>
-            <select
-              value={sort}
-              onChange={(e) => setSort(e.target.value as (typeof SORTS)[number])}
-              className="border border-border bg-card px-3 py-1.5 text-[10px] tracking-[0.2em]"
-            >
-              {SORTS.map((s) => (
-                <option key={s} value={s}>SORT: {s}</option>
-              ))}
-            </select>
           </div>
         </div>
         <AnimatePresence initial={false}>
