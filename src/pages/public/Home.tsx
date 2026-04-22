@@ -102,7 +102,7 @@ const HomePage = () => {
               style={{ letterSpacing: "2px" }}
             >
               6,874 followers • 51K+ likes on TikTok
-            </motion.p>
+            </div>
           </div>
 
           {/* RIGHT — image */}
