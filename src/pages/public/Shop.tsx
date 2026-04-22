@@ -1,10 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
 import { useSearchParams } from "react-router-dom";
-import { motion } from "framer-motion";
-import { Search } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Search, SlidersHorizontal, ChevronLeft, ChevronRight } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { InventoryItem } from "@/data/inventory";
 import { ItemDrawer } from "@/components/public/ItemDrawer";
+
+const PAGE_SIZE = 12;
 
 type Cat = "ALL" | "Shoes" | "Tops" | "Bottoms" | "Accessories";
 const CATS: { key: Cat; label: string }[] = [
