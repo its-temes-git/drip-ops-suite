@@ -52,6 +52,7 @@ export const ItemDrawer = ({
 }) => {
   const [size, setSize] = useState<string | null>(null);
   const [color, setColor] = useState(0);
+  const isMobile = useIsMobile();
 
   const isOOS = item && item.qty === 0;
   const isShoes = item?.category === "Shoes";
