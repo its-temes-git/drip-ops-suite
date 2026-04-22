@@ -32,6 +32,7 @@ const HomePage = () => {
         <div className="relative z-10 grid min-h-[calc(100vh-4rem)] grid-cols-1 items-center gap-10 px-6 py-12 md:px-12 lg:grid-cols-[55%_45%] lg:gap-0 lg:px-0 lg:py-0">
           {/* LEFT — text */}
           <div className="text-center lg:pl-[8%] lg:text-left">
+            <div className="inline-block rounded-xl bg-black/15 p-6 dark:bg-black/30 md:p-8">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -55,7 +56,7 @@ const HomePage = () => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.3 }}
               className="mt-4 font-mono text-[13px] uppercase text-[#b8ff57]"
-              style={{ letterSpacing: "6px" }}
+              style={{ letterSpacing: "6px", textShadow: "0 0 20px rgba(0,0,0,0.5)" }}
             >
               ADDIS ABABA
             </motion.p>
@@ -102,6 +103,7 @@ const HomePage = () => {
             >
               6,874 followers • 51K+ likes on TikTok
             </motion.p>
+            </div>
           </div>
 
           {/* RIGHT — image */}
