@@ -42,7 +42,7 @@ export const PublicNav = () => {
       >
         <div className="flex items-center justify-between px-6 py-4 md:px-10">
           <Link to="/" className="font-display text-3xl tracking-wide text-off-white">
-            SAWKEM
+            SAWKEM FASHION
           </Link>
 
           <nav className="hidden items-center gap-10 md:flex">
@@ -120,7 +120,7 @@ export const PublicNav = () => {
             className="fixed inset-0 z-[60] bg-background flex flex-col p-8"
           >
             <div className="flex items-center justify-between">
-              <span className="font-display text-3xl">SAWKEM</span>
+              <span className="font-display text-3xl">SAWKEM FASHION</span>
               <button onClick={() => setMobileOpen(false)} aria-label="Close menu">
                 <X className="h-6 w-6" />
               </button>

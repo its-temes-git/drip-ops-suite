@@ -204,6 +204,46 @@
     box-shadow: 0 0 0 1px hsl(var(--primary)), 0 0 20px hsl(var(--primary) / 0.3);
   }
 
+  /* Hero mesh gradient orb animations */
+  @keyframes float1 {
+    0%   { transform: translate(0px, 0px) scale(1); }
+    100% { transform: translate(60px, 40px) scale(1.1); }
+  }
+  @keyframes float2 {
+    0%   { transform: translate(0px, 0px) scale(1.05); }
+    100% { transform: translate(-50px, 60px) scale(0.95); }
+  }
+  @keyframes float3 {
+    0%   { transform: translate(0px, 0px) scale(1); }
+    100% { transform: translate(40px, -50px) scale(1.08); }
+  }
+  @keyframes float4 {
+    0%   { transform: translate(0px, 0px) scale(0.95); }
+    100% { transform: translate(-30px, 30px) scale(1.05); }
+  }
+  .hero-orb { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.75; pointer-events: none; }
+  .light .hero-orb { opacity: 0.45; }
+  .hero-orb-1 { width: 600px; height: 600px; top: -100px; left: -100px;
+    background: radial-gradient(circle, #b8ff57 0%, transparent 70%);
+    animation: float1 8s infinite alternate ease-in-out; }
+  .hero-orb-2 { width: 700px; height: 700px; top: -150px; right: -150px;
+    background: radial-gradient(circle, #6de8ff 0%, transparent 70%);
+    animation: float2 10s infinite alternate ease-in-out; }
+  .hero-orb-3 { width: 500px; height: 500px; bottom: -100px; left: 20%;
+    background: radial-gradient(circle, #ff6eb4 0%, transparent 70%);
+    animation: float3 12s infinite alternate ease-in-out; }
+  .hero-orb-4 { width: 400px; height: 400px; top: 30%; left: 40%;
+    background: radial-gradient(circle, #a78bfa 0%, transparent 70%);
+    animation: float4 9s infinite alternate ease-in-out; }
+
+  @keyframes scroll-line {
+    0%   { transform: scaleY(0); transform-origin: top; }
+    50%  { transform: scaleY(1); transform-origin: top; }
+    50.01% { transform-origin: bottom; }
+    100% { transform: scaleY(0); transform-origin: bottom; }
+  }
+  .scroll-line { animation: scroll-line 2s ease-in-out infinite; }
+
   /* Hide cursor on interactives — custom cursor handles it */
   a, button, [role="button"], input, textarea, select {
     cursor: none;
