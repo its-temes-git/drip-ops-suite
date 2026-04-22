@@ -26,6 +26,8 @@ const ShopPage = () => {
   const [sort, setSort] = useState<(typeof SORTS)[number]>("NEWEST");
   const [active, setActive] = useState<InventoryItem | null>(null);
   const [params, setParams] = useSearchParams();
+  const [catsOpen, setCatsOpen] = useState(false);
+  const [page, setPage] = useState(1);
 
   useEffect(() => {
     const id = params.get("item");
