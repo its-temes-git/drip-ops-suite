@@ -32,6 +32,7 @@ const HomePage = () => {
         <div className="relative z-10 grid min-h-[calc(100vh-4rem)] grid-cols-1 items-center gap-10 px-6 py-12 md:px-12 lg:grid-cols-[55%_45%] lg:gap-0 lg:px-0 lg:py-0">
           {/* LEFT — text */}
           <div className="text-center lg:pl-[8%] lg:text-left">
+            <div className="inline-block rounded-xl bg-black/15 p-6 dark:bg-black/30 md:p-8">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
