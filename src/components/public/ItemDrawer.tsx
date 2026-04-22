@@ -85,21 +85,7 @@ export const ItemDrawer = ({
             transition={{ type: "tween", duration: 0.35 }}
             className="fixed right-0 top-0 z-[71] flex h-full w-full max-w-[480px] flex-col overflow-y-auto bg-card border-l border-border"
           >
-            <div className="flex items-center justify-between p-4">
-              <button
-                onClick={onClose}
-                aria-label="Back"
-                className="flex h-9 w-9 items-center justify-center rounded-full border border-border text-off-white transition-colors hover:border-primary hover:text-primary"
-              >
-                <ArrowLeft className="h-4 w-4" />
-              </button>
-              <span className="text-xs tracking-[0.3em] text-muted-foreground">ITEM DETAILS</span>
-              <button onClick={onClose} aria-label="Close" className="text-off-white hover:text-primary">
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-
-            <div className="relative aspect-[4/5] w-full overflow-hidden bg-secondary">
+            <div className="relative aspect-square w-full overflow-hidden bg-secondary">
               <div className="absolute inset-0 flex flex-col items-center justify-center">
                 <span className="font-display text-7xl text-muted-foreground/40">
                   {item.brand.charAt(0)}
@@ -112,11 +98,26 @@ export const ItemDrawer = ({
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="relative h-full w-full object-cover"
+                  className="absolute inset-0 h-full w-full object-contain p-4"
                   loading="lazy"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                 />
               )}
+
+              <button
+                onClick={onClose}
+                aria-label="Back"
+                className="absolute left-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background/70 text-off-white backdrop-blur-md transition-colors hover:border-primary hover:text-primary"
+              >
+                <ArrowLeft className="h-4 w-4" />
+              </button>
+              <button
+                onClick={onClose}
+                aria-label="Close"
+                className="absolute right-3 top-3 z-10 flex h-9 w-9 items-center justify-center rounded-full border border-border bg-background/70 text-off-white backdrop-blur-md transition-colors hover:border-primary hover:text-primary"
+              >
+                <X className="h-4 w-4" />
+              </button>
             </div>
 
             <div className="flex-1 px-6 py-6">
