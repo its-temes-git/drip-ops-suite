@@ -3,6 +3,7 @@ import { X, Send, Phone, Share2, MapPin, ArrowLeft } from "lucide-react";
 import { InventoryItem } from "@/data/inventory";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ALL_SIZES_TOPS = ["XS","S","M","L","XL","XXL"];
 const ALL_SIZES_SHOES = ["38","39","40","41","42","43","44","45"];
@@ -51,6 +52,7 @@ export const ItemDrawer = ({
 }) => {
   const [size, setSize] = useState<string | null>(null);
   const [color, setColor] = useState(0);
+  const isMobile = useIsMobile();
 
   const isOOS = item && item.qty === 0;
   const isShoes = item?.category === "Shoes";
@@ -79,15 +81,31 @@ export const ItemDrawer = ({
             className="fixed inset-0 z-[70] bg-black/70 backdrop-blur-sm"
           />
           <motion.aside
-            initial={{ x: "100%" }}
-            animate={{ x: 0 }}
-            exit={{ x: "100%" }}
+            initial={isMobile ? { y: "100%" } : { x: "100%" }}
+            animate={isMobile ? { y: 0 } : { x: 0 }}
+            exit={isMobile ? { y: "100%" } : { x: "100%" }}
             transition={{ type: "tween", duration: 0.35 }}
-            className="fixed right-0 top-0 z-[71] flex h-full w-full max-w-[480px] flex-col overflow-y-auto bg-card border-l border-border"
+            className={
+              isMobile
+                ? "fixed inset-x-0 bottom-0 z-[71] flex h-[90vh] w-full flex-col overflow-y-auto rounded-t-2xl bg-card border-t border-border pb-[env(safe-area-inset-bottom)]"
+                : "fixed right-0 top-0 z-[71] flex h-full w-full max-w-[480px] flex-col overflow-y-auto bg-card border-l border-border"
+            }
           >
-            <div className="relative aspect-square w-full overflow-hidden bg-secondary">
+            {isMobile && (
+              <div className="sticky top-0 z-20 flex items-center justify-center bg-card/95 py-2 backdrop-blur-md">
+                <span className="h-1 w-10 rounded-full bg-muted-foreground/40" />
+              </div>
+            )}
+
+            <div
+              className="relative w-full shrink-0 overflow-hidden bg-[#111]"
+              style={{
+                aspectRatio: isMobile ? "16 / 9" : "3 / 4",
+                maxHeight: isMobile ? 220 : 420,
+              }}
+            >
               <div className="absolute inset-0 flex flex-col items-center justify-center">
-                <span className="font-display text-7xl text-muted-foreground/40">
+                <span className="font-display text-7xl text-primary/40">
                   {item.brand.charAt(0)}
                 </span>
                 <span className="mt-2 text-[10px] tracking-[0.3em] text-muted-foreground">
@@ -98,7 +116,7 @@ export const ItemDrawer = ({
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="absolute inset-0 h-full w-full object-contain p-4"
+                  className="absolute inset-0 block h-full w-full object-contain p-3"
                   loading="lazy"
                   onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = "none"; }}
                 />
