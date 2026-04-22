@@ -49,6 +49,12 @@ const ShopPage = () => {
     return list;
   }, [inventory, cat, search, sort]);
 
+  useEffect(() => { setPage(1); }, [cat, search, sort]);
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const currentPage = Math.min(page, totalPages);
+  const paginated = filtered.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
+
   return (
     <>
       <section className="diagonal-lines px-6 py-12 md:px-12 md:py-20 border-b border-border">
