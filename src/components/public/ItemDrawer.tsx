@@ -3,6 +3,7 @@ import { X, Send, Phone, Share2, MapPin, ArrowLeft } from "lucide-react";
 import { InventoryItem } from "@/data/inventory";
 import { useState } from "react";
 import { toast } from "sonner";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const ALL_SIZES_TOPS = ["XS","S","M","L","XL","XXL"];
 const ALL_SIZES_SHOES = ["38","39","40","41","42","43","44","45"];
