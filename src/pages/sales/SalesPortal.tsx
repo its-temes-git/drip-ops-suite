@@ -180,103 +180,113 @@ const RecordSaleModal = ({ item, onClose, onConfirm }: {
   const [color, setColor] = useState(colors[0]);
   const [size, setSize] = useState(item.sizes[0]);
   const [qty, setQty] = useState(1);
-  const [pin, setPin] = useState("");
   const [success, setSuccess] = useState(false);
 
-  const press = (n: string) => {
-    if (n === "C") return setPin("");
-    if (n === "<") return setPin((p) => p.slice(0, -1));
-    if (pin.length < 4) setPin((p) => p + n);
-  };
+  // ESC to close
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
 
   const confirm = () => {
-    if (pin !== "1234") return toast.error("INVALID PIN");
     setSuccess(true);
-    setTimeout(() => onConfirm({ color, size, qty }), 800);
+    setTimeout(() => onConfirm({ color, size, qty }), 600);
   };
+
+  const total = (item.price || 0) * qty;
 
   return (
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
-      className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 backdrop-blur p-4 overflow-y-auto"
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-start justify-center overflow-y-auto bg-background/90 p-4 backdrop-blur sm:items-center"
     >
       <motion.div
-        initial={{ scale: 0.9, y: 20 }}
+        initial={{ scale: 0.95, y: 20 }}
         animate={{ scale: 1, y: 0 }}
-        exit={{ scale: 0.9 }}
-        className="relative w-full max-w-2xl bg-card border border-border my-8"
+        exit={{ scale: 0.95, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()}
+        className="relative my-4 flex w-full max-w-lg flex-col border border-border bg-card shadow-2xl"
       >
-        <button onClick={onClose} className="absolute right-4 top-4 z-10 text-muted-foreground hover:text-off-white">
-          <X className="h-5 w-5" />
-        </button>
+        {/* Header with title + X */}
+        <div className="flex items-center justify-between border-b border-border px-5 py-4">
+          <div className="min-w-0 pr-4">
+            <p className="text-[10px] tracking-widest text-primary">{item.brand.toUpperCase()}</p>
+            <h2 className="truncate font-display text-2xl leading-tight">{item.name}</h2>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center border border-border text-muted-foreground transition-colors hover:border-primary hover:text-off-white"
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </div>
 
+        {/* Success overlay */}
         {success && (
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            className="absolute inset-0 z-20 flex items-center justify-center bg-primary/20"
+            className="absolute inset-0 z-20 flex items-center justify-center bg-card/95"
           >
-            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring" }}>
-              <Check className="h-32 w-32 text-primary" strokeWidth={3} />
+            <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ type: "spring" }} className="flex flex-col items-center gap-3">
+              <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/15">
+                <Check className="h-14 w-14 text-primary" strokeWidth={3} />
+              </div>
+              <p className="font-display text-xl tracking-widest text-primary">SALE RECORDED</p>
             </motion.div>
           </motion.div>
         )}
 
-        <div className="p-6 space-y-5">
-          <div className="aspect-[3/1] bg-muted flex items-center justify-center font-display text-7xl text-primary">
-            {item.brand[0]}
-          </div>
-          <div>
-            <p className="text-[10px] tracking-widest text-primary">{item.brand.toUpperCase()}</p>
-            <h2 className="font-display text-3xl">{item.name}</h2>
+        {/* Body */}
+        <div className="space-y-5 p-5">
+          {/* Price strip */}
+          <div className="flex items-center justify-between border border-border bg-background/40 px-4 py-3">
+            <span className="text-[10px] tracking-widest text-muted-foreground">UNIT PRICE</span>
+            <span className="font-display text-xl text-primary">ETB {(item.price || 0).toLocaleString()}</span>
           </div>
 
-          <div>
-            <p className="text-[10px] tracking-widest text-muted-foreground mb-2">COLOR</p>
-            <div className="flex gap-2">
-              {colors.map((c) => (
-                <button key={c} onClick={() => setColor(c)} className={`px-3 py-1 text-xs border ${color === c ? "bg-primary text-primary-foreground border-primary" : "border-border"}`}>{c}</button>
-              ))}
+          {colors.length > 1 && (
+            <div>
+              <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">COLOR</p>
+              <div className="flex flex-wrap gap-2">
+                {colors.map((c) => (
+                  <button key={c} onClick={() => setColor(c)} className={`px-3 py-2 text-xs border transition-colors ${color === c ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-primary/50"}`}>{c}</button>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
           <div>
-            <p className="text-[10px] tracking-widest text-muted-foreground mb-2">SIZE</p>
+            <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">SIZE</p>
             <div className="flex flex-wrap gap-2">
               {item.sizes.map((s) => (
-                <button key={s} onClick={() => setSize(s)} className={`px-4 py-2 text-xs border ${size === s ? "bg-primary text-primary-foreground border-primary" : "border-border"}`}>{s}</button>
+                <button key={s} onClick={() => setSize(s)} className={`min-w-[44px] px-3 py-2 text-xs border transition-colors ${size === s ? "bg-primary text-primary-foreground border-primary" : "border-border hover:border-primary/50"}`}>{s}</button>
               ))}
             </div>
           </div>
 
           <div>
-            <p className="text-[10px] tracking-widest text-muted-foreground mb-2">QUANTITY</p>
-            <div className="flex items-center gap-4">
-              <button onClick={() => setQty(Math.max(1, qty - 1))} className="border border-border w-10 h-10 flex items-center justify-center"><Minus className="h-4 w-4" /></button>
+            <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">QUANTITY</p>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setQty(Math.max(1, qty - 1))} className="flex h-11 w-11 items-center justify-center border border-border hover:border-primary/50"><Minus className="h-4 w-4" /></button>
               <span className="font-display text-3xl w-12 text-center">{qty}</span>
-              <button onClick={() => setQty(Math.min(item.qty, qty + 1))} className="border border-border w-10 h-10 flex items-center justify-center"><Plus className="h-4 w-4" /></button>
+              <button onClick={() => setQty(Math.min(item.qty, qty + 1))} className="flex h-11 w-11 items-center justify-center border border-border hover:border-primary/50"><Plus className="h-4 w-4" /></button>
+              <span className="ml-auto text-[10px] tracking-widest text-muted-foreground">{item.qty} IN STOCK</span>
             </div>
           </div>
 
-          <div>
-            <p className="text-[10px] tracking-widest text-muted-foreground mb-2">STAFF PIN</p>
-            <div className="flex gap-2 mb-3">
-              {[0,1,2,3].map((i) => (
-                <div key={i} className={`w-12 h-12 border ${pin.length > i ? "border-primary bg-primary/10" : "border-border"} flex items-center justify-center text-2xl`}>
-                  {pin.length > i ? "•" : ""}
-                </div>
-              ))}
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              {["1","2","3","4","5","6","7","8","9","C","0","<"].map((n) => (
-                <button key={n} onClick={() => press(n)} className="border border-border py-3 font-display text-xl hover:bg-muted">{n}</button>
-              ))}
-            </div>
+          {/* Total */}
+          <div className="flex items-center justify-between border-t border-border pt-4">
+            <span className="text-[10px] tracking-widest text-muted-foreground">TOTAL</span>
+            <span className="font-display text-3xl text-primary">ETB {total.toLocaleString()}</span>
           </div>
 
-          <button onClick={confirm} className="w-full bg-primary py-4 font-display text-xl tracking-widest text-primary-foreground">
+          <button onClick={confirm} className="w-full bg-primary py-4 font-display text-xl tracking-widest text-primary-foreground transition-opacity hover:opacity-90">
             CONFIRM SALE
           </button>
         </div>
