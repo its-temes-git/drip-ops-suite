@@ -19,11 +19,11 @@ export const StatCard = ({
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay, duration: 0.4 }}
     whileHover={{ y: -4 }}
-    className="border border-border bg-card p-5 transition-colors hover:border-primary/40"
+    className="border border-border bg-card p-4 sm:p-5 transition-colors hover:border-primary/40"
   >
     <p className="text-[10px] tracking-widest text-muted-foreground">{label}</p>
     <p
-      className={`mt-3 font-display text-5xl ${
+      className={`mt-2 sm:mt-3 font-display text-3xl sm:text-5xl ${
         accent === "warning" ? "text-warning" : accent === "primary" ? "text-primary" : "text-off-white"
       }`}
     >
