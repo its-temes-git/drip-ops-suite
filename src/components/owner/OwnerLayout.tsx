@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutGrid, Box, BarChart3, Zap, AlertTriangle, User, Settings, LogOut } from "lucide-react";
+import { LayoutGrid, Box, BarChart3, Zap, User, Settings, LogOut, ShoppingBag } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MOCK_TRANSACTIONS } from "@/data/inventory";
+import { toast } from "sonner";
 
 const navItems = [
   { to: "/owner", label: "DASHBOARD", icon: LayoutGrid, end: true },
   { to: "/owner/inventory", label: "INVENTORY", icon: Box },
   { to: "/owner/analytics", label: "ANALYTICS", icon: BarChart3 },
   { to: "/owner/drop", label: "NEW DROP", icon: Zap },
-  { to: "/owner/alerts", label: "LOW STOCK", icon: AlertTriangle },
   { to: "/owner/staff", label: "STAFF", icon: User },
   { to: "/owner/settings", label: "SETTINGS", icon: Settings },
 ];
@@ -36,18 +37,27 @@ const Hamburger = ({ open }: { open: boolean }) => (
 );
 
 export const OwnerLayout = () => {
-  const { inventory, setOwnerLoggedIn } = useApp();
-  const lowCount = inventory.filter((i) => i.qty <= 3).length;
+  const { setOwnerLoggedIn } = useApp();
+  // Items sold today = transactions whose time string doesn't start with "Yesterday"
+  const soldToday = MOCK_TRANSACTIONS.filter((t) => !t.time.toLowerCase().startsWith("yesterday")).length;
+  const revenueToday = MOCK_TRANSACTIONS
+    .filter((t) => !t.time.toLowerCase().startsWith("yesterday"))
+    .reduce((sum, t) => sum + t.price, 0);
+
+  const showSalesToday = () => {
+    toast.success(`${soldToday} items sold today`, {
+      description: `Total revenue: ETB ${revenueToday.toLocaleString()}`,
+    });
+  };
+
   const nav = useNavigate();
   const location = useLocation();
   const [mobileOpen, setMobileOpen] = useState(false);
 
-  // close drawer on route change
   useEffect(() => {
     setMobileOpen(false);
   }, [location.pathname]);
 
-  // lock scroll when drawer open
   useEffect(() => {
     if (mobileOpen) {
       const prev = document.body.style.overflow;
@@ -76,11 +86,6 @@ export const OwnerLayout = () => {
           <span className="overflow-hidden whitespace-nowrap md:opacity-0 md:transition-opacity md:group-hover:opacity-100">
             {item.label}
           </span>
-          {item.to === "/owner/alerts" && lowCount > 0 && (
-            <span className="ml-auto rounded-sm bg-warning px-1.5 py-0.5 text-[10px] text-warning-foreground">
-              {lowCount}
-            </span>
-          )}
         </NavLink>
       ))}
     </nav>
@@ -99,16 +104,19 @@ export const OwnerLayout = () => {
         </button>
         <span className="font-display text-2xl text-primary">SAWKEM</span>
         <div className="flex items-center gap-2">
-          {lowCount > 0 && (
-            <span className="rounded-sm bg-warning px-1.5 py-0.5 text-[10px] text-warning-foreground">
-              {lowCount}
-            </span>
-          )}
+          <button
+            onClick={showSalesToday}
+            aria-label="Items sold today"
+            className="flex items-center gap-1.5 rounded-sm bg-primary/15 px-2 py-1 text-[10px] font-medium tracking-widest text-primary transition-colors hover:bg-primary/25"
+          >
+            <ShoppingBag className="h-3 w-3" />
+            {soldToday}
+          </button>
           <ThemeToggle />
         </div>
       </header>
 
-      {/* DESKTOP SIDEBAR (hover-expand) */}
+      {/* DESKTOP SIDEBAR */}
       <aside className="group fixed left-0 top-0 z-40 hidden h-screen w-16 flex-col border-r border-border bg-sidebar transition-all duration-300 hover:w-60 md:flex">
         <div className="flex h-16 items-center justify-center border-b border-border">
           <span className="font-display text-3xl text-primary">S</span>
@@ -178,7 +186,14 @@ export const OwnerLayout = () => {
         transition={{ duration: 0.4 }}
         className="flex-1 px-4 py-6 md:ml-16 md:p-10"
       >
-        <div className="fixed right-6 top-6 z-30 hidden md:block">
+        <div className="fixed right-6 top-6 z-30 hidden md:flex items-center gap-3">
+          <button
+            onClick={showSalesToday}
+            className="flex items-center gap-2 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-[11px] font-medium tracking-widest text-primary transition-colors hover:bg-primary/20"
+          >
+            <ShoppingBag className="h-3.5 w-3.5" />
+            {soldToday} SOLD TODAY
+          </button>
           <ThemeToggle />
         </div>
         <Outlet />
