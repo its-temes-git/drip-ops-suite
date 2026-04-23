@@ -1,6 +1,6 @@
-import { ReactNode } from "react";
-import { NavLink, Outlet, useNavigate } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useEffect, useState } from "react";
+import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
 import { LayoutGrid, Box, BarChart3, Zap, AlertTriangle, User, Settings, LogOut } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
@@ -15,69 +15,170 @@ const navItems = [
   { to: "/owner/settings", label: "SETTINGS", icon: Settings },
 ];
 
+const Hamburger = ({ open }: { open: boolean }) => (
+  <div className="relative h-5 w-6">
+    <motion.span
+      className="absolute left-0 block h-0.5 w-6 bg-current"
+      animate={open ? { top: 9, rotate: 45 } : { top: 2, rotate: 0 }}
+      transition={{ duration: 0.25 }}
+    />
+    <motion.span
+      className="absolute left-0 top-[9px] block h-0.5 w-6 bg-current"
+      animate={open ? { opacity: 0 } : { opacity: 1 }}
+      transition={{ duration: 0.2 }}
+    />
+    <motion.span
+      className="absolute left-0 block h-0.5 w-6 bg-current"
+      animate={open ? { top: 9, rotate: -45 } : { top: 16, rotate: 0 }}
+      transition={{ duration: 0.25 }}
+    />
+  </div>
+);
+
 export const OwnerLayout = () => {
   const { inventory, setOwnerLoggedIn } = useApp();
   const lowCount = inventory.filter((i) => i.qty <= 3).length;
   const nav = useNavigate();
+  const location = useLocation();
+  const [mobileOpen, setMobileOpen] = useState(false);
+
+  // close drawer on route change
+  useEffect(() => {
+    setMobileOpen(false);
+  }, [location.pathname]);
+
+  // lock scroll when drawer open
+  useEffect(() => {
+    if (mobileOpen) {
+      const prev = document.body.style.overflow;
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = prev; };
+    }
+  }, [mobileOpen]);
+
+  const NavList = ({ onNavigate }: { onNavigate?: () => void }) => (
+    <nav className="flex-1 overflow-y-auto py-2">
+      {navItems.map((item) => (
+        <NavLink
+          key={item.to}
+          to={item.to}
+          end={item.end}
+          onClick={onNavigate}
+          className={({ isActive }) =>
+            `relative flex h-12 items-center gap-4 px-5 text-xs tracking-widest transition-colors ${
+              isActive
+                ? "border-l-2 border-primary bg-primary/5 text-primary"
+                : "border-l-2 border-transparent text-muted-foreground hover:text-off-white"
+            }`
+          }
+        >
+          <item.icon className="h-5 w-5 flex-shrink-0" />
+          <span className="overflow-hidden whitespace-nowrap md:opacity-0 md:transition-opacity md:group-hover:opacity-100">
+            {item.label}
+          </span>
+          {item.to === "/owner/alerts" && lowCount > 0 && (
+            <span className="ml-auto rounded-sm bg-warning px-1.5 py-0.5 text-[10px] text-warning-foreground">
+              {lowCount}
+            </span>
+          )}
+        </NavLink>
+      ))}
+    </nav>
+  );
 
   return (
-    <div className="grain flex min-h-screen bg-background text-off-white">
-      <aside className="group fixed left-0 top-0 z-40 flex h-screen w-16 flex-col border-r border-border bg-sidebar transition-all duration-300 hover:w-60">
+    <div className="grain min-h-screen bg-background text-off-white">
+      {/* MOBILE TOP BAR */}
+      <header className="md:hidden sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border bg-sidebar px-4">
+        <button
+          onClick={() => setMobileOpen((v) => !v)}
+          aria-label="Toggle menu"
+          className="flex h-10 w-10 items-center justify-center text-off-white"
+        >
+          <Hamburger open={mobileOpen} />
+        </button>
+        <span className="font-display text-2xl text-primary">SAWKEM</span>
+        <div className="flex items-center gap-2">
+          {lowCount > 0 && (
+            <span className="rounded-sm bg-warning px-1.5 py-0.5 text-[10px] text-warning-foreground">
+              {lowCount}
+            </span>
+          )}
+          <ThemeToggle />
+        </div>
+      </header>
+
+      {/* DESKTOP SIDEBAR (hover-expand) */}
+      <aside className="group fixed left-0 top-0 z-40 hidden h-screen w-16 flex-col border-r border-border bg-sidebar transition-all duration-300 hover:w-60 md:flex">
         <div className="flex h-16 items-center justify-center border-b border-border">
           <span className="font-display text-3xl text-primary">S</span>
         </div>
-
-        <nav className="flex-1 overflow-y-auto py-4">
-          {navItems.map((item) => (
-            <NavLink
-              key={item.to}
-              to={item.to}
-              end={item.end}
-              className={({ isActive }) =>
-                `relative flex h-12 items-center gap-4 px-5 text-xs tracking-widest transition-colors ${
-                  isActive
-                    ? "border-l-2 border-primary bg-primary/5 text-primary"
-                    : "border-l-2 border-transparent text-muted-foreground hover:text-off-white"
-                }`
-              }
-            >
-              <item.icon className="h-5 w-5 flex-shrink-0" />
-              <span className="overflow-hidden whitespace-nowrap opacity-0 transition-opacity group-hover:opacity-100">
-                {item.label}
-              </span>
-              {item.to === "/owner/alerts" && lowCount > 0 && (
-                <span className="ml-auto rounded-sm bg-warning px-1.5 py-0.5 text-[10px] text-warning-foreground opacity-100 group-hover:opacity-100">
-                  {lowCount}
-                </span>
-              )}
-            </NavLink>
-          ))}
-        </nav>
-
-        <div className="border-t border-border p-4 space-y-3">
+        <NavList />
+        <div className="space-y-3 border-t border-border p-4">
           <button
             onClick={() => { setOwnerLoggedIn(false); nav("/"); }}
             className="flex items-center gap-3 text-xs text-muted-foreground hover:text-off-white"
           >
             <LogOut className="h-4 w-4" />
-            <span className="opacity-0 group-hover:opacity-100 transition-opacity">LOGOUT</span>
+            <span className="opacity-0 transition-opacity group-hover:opacity-100">LOGOUT</span>
           </button>
           <div className="flex items-center gap-3">
             <span className="pulse-dot h-2 w-2 rounded-full bg-primary" />
-            <span className="text-[10px] tracking-widest text-primary opacity-0 group-hover:opacity-100 transition-opacity">
+            <span className="text-[10px] tracking-widest text-primary opacity-0 transition-opacity group-hover:opacity-100">
               LIVE
             </span>
           </div>
         </div>
       </aside>
 
+      {/* MOBILE DRAWER */}
+      <AnimatePresence>
+        {mobileOpen && (
+          <>
+            <motion.div
+              key="backdrop"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              onClick={() => setMobileOpen(false)}
+              className="fixed inset-0 top-14 z-40 bg-black/60 md:hidden"
+            />
+            <motion.aside
+              key="drawer"
+              initial={{ x: "-100%" }}
+              animate={{ x: 0 }}
+              exit={{ x: "-100%" }}
+              transition={{ type: "tween", duration: 0.28, ease: "easeOut" }}
+              className="fixed left-0 top-14 z-50 flex h-[calc(100vh-3.5rem)] w-72 max-w-[80vw] flex-col border-r border-border bg-sidebar md:hidden"
+            >
+              <NavList onNavigate={() => setMobileOpen(false)} />
+              <div className="space-y-3 border-t border-border p-4">
+                <button
+                  onClick={() => { setOwnerLoggedIn(false); nav("/"); }}
+                  className="flex items-center gap-3 text-xs text-muted-foreground hover:text-off-white"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span>LOGOUT</span>
+                </button>
+                <div className="flex items-center gap-3">
+                  <span className="pulse-dot h-2 w-2 rounded-full bg-primary" />
+                  <span className="text-[10px] tracking-widest text-primary">LIVE</span>
+                </div>
+              </div>
+            </motion.aside>
+          </>
+        )}
+      </AnimatePresence>
+
+      {/* MAIN */}
       <motion.main
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="ml-16 flex-1 p-6 md:p-10"
+        className="flex-1 px-4 py-6 md:ml-16 md:p-10"
       >
-        <div className="fixed right-6 top-6 z-30">
+        <div className="fixed right-6 top-6 z-30 hidden md:block">
           <ThemeToggle />
         </div>
         <Outlet />
