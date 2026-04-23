@@ -1,33 +1,30 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { Area, AreaChart, ResponsiveContainer, Tooltip, XAxis, YAxis, CartesianGrid } from "recharts";
+import { TrendingUp, ArrowUpRight } from "lucide-react";
 import { StatCard } from "@/components/owner/StatCard";
 import { ACTIVITY_FEED, inventory } from "@/data/inventory";
 
-const todayData = [
-  { t: "9AM", v: 200 }, { t: "10AM", v: 450 }, { t: "11AM", v: 620 },
-  { t: "12PM", v: 890 }, { t: "1PM", v: 1100 }, { t: "2PM", v: 750 },
-  { t: "3PM", v: 600 }, { t: "4PM", v: 820 }, { t: "5PM", v: 1050 },
-  { t: "6PM", v: 1250 }, { t: "7PM", v: 980 }, { t: "8PM", v: 700 }, { t: "9PM", v: 380 },
-];
 const weekData = ["Mon","Tue","Wed","Thu","Fri","Sat","Sun"].map((d, i) => ({ t: d, v: [4200,3800,5100,4900,6800,8200,5600][i] }));
 const monthData = Array.from({ length: 30 }, (_, i) => ({ t: `${i+1}`, v: 2000 + Math.round(Math.random() * 6000) }));
 
-const tabs = { TODAY: todayData, "THIS WEEK": weekData, "THIS MONTH": monthData };
+const tabs = { "THIS WEEK": weekData, "THIS MONTH": monthData };
 
 const bestSellers = [
-  { rank: 1, name: "Geobasket", brand: "Rick Owens", category: "Shoes", sold: 18 },
-  { rank: 2, name: "Hoodie", brand: "SP5DER", category: "Tops", sold: 15 },
-  { rank: 3, name: "Tech Fleece Set", brand: "Nike", category: "Tops", sold: 13 },
-  { rank: 4, name: "Jogger Shorts", brand: "Denim Tears", category: "Bottoms", sold: 11 },
-  { rank: 5, name: "Flared Jeans", brand: "Gallery Dept", category: "Bottoms", sold: 9 },
-  { rank: 6, name: "Tie", brand: "Chrome Hearts", category: "Accessories", sold: 8 },
+  { rank: 1, name: "Air Force 1", brand: "NOCTA", category: "Shoes", sold: 22 },
+  { rank: 2, name: "Tracksuit", brand: "SP5DER", category: "Tops", sold: 17 },
+  { rank: 3, name: "Derby", brand: "Balenciaga", category: "Shoes", sold: 14 },
+  { rank: 4, name: "Tee Washed", brand: "Hellstar", category: "Tops", sold: 12 },
+  { rank: 5, name: "1 Retro High Chicago", brand: "Jordan", category: "Shoes", sold: 10 },
+  { rank: 6, name: "3XL Hoodie", brand: "Balenciaga", category: "Tops", sold: 9 },
 ];
 
 const Dashboard = () => {
-  const [tab, setTab] = useState<keyof typeof tabs>("TODAY");
+  const [tab, setTab] = useState<keyof typeof tabs>("THIS WEEK");
   const totalItems = inventory.reduce((a, b) => a + b.qty, 0);
-  const lowCount = inventory.filter((i) => i.qty <= 3).length;
+
+  // Only sales — drop low/restock entries
+  const recentSales = ACTIVITY_FEED.filter((a) => a.type === "sale");
 
   const catSummary: Record<string, { styles: number; pieces: number }> = {};
   inventory.forEach((i) => {
@@ -44,11 +41,10 @@ const Dashboard = () => {
       </header>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <StatCard label="TODAY'S REVENUE" value="ETB 4,850" sub={<span className="rounded-sm bg-primary/20 px-2 py-0.5 text-[10px] text-primary">+12% vs yesterday</span>} delay={0} />
         <StatCard label="ITEMS IN STOCK" value={`${totalItems}`} sub={<span className="text-muted-foreground">across all categories</span>} delay={0.05} />
-        <StatCard label="LOW STOCK ALERTS" value={`${lowCount}`} accent="warning" sub={<span className="text-muted-foreground">need restock</span>} delay={0.1} />
-        <StatCard label="SALES TODAY" value="14" sub={<span className="text-muted-foreground">transactions</span>} delay={0.15} />
+        <StatCard label="SALES TODAY" value="14" sub={<span className="text-muted-foreground">transactions</span>} delay={0.1} />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
@@ -89,32 +85,60 @@ const Dashboard = () => {
           </ResponsiveContainer>
         </div>
 
-        {/* Activity Feed */}
-        <div className="border border-border bg-card p-4 sm:p-6">
-          <div className="mb-4 sm:mb-6 flex items-center gap-3">
-            <span className="pulse-dot h-2 w-2 rounded-full bg-primary" />
-            <h2 className="font-display text-xl sm:text-2xl tracking-wide">LIVE ACTIVITY</h2>
+        {/* Recent Sales — redesigned */}
+        <div className="relative overflow-hidden border border-border bg-card p-4 sm:p-6">
+          {/* glow accent */}
+          <div className="pointer-events-none absolute -right-16 -top-16 h-40 w-40 rounded-full bg-primary/20 blur-3xl" />
+
+          <div className="mb-4 sm:mb-6 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <span className="pulse-dot h-2 w-2 rounded-full bg-primary" />
+              <h2 className="font-display text-xl sm:text-2xl tracking-wide">RECENT SALES</h2>
+            </div>
+            <span className="rounded-sm border border-primary/30 bg-primary/10 px-2 py-0.5 text-[10px] tracking-widest text-primary">
+              LIVE
+            </span>
           </div>
-          <div className="space-y-4 max-h-[280px] overflow-y-auto">
-            {ACTIVITY_FEED.map((a, i) => (
-              <motion.div
-                key={i}
-                initial={{ opacity: 0, x: 10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="flex gap-3 border-l-2 pl-3 text-xs"
-                style={{
-                  borderColor:
-                    a.type === "sale" ? "hsl(81 100% 67%)" :
-                    a.type === "low" ? "hsl(38 95% 55%)" : "hsl(210 80% 60%)",
-                }}
-              >
-                <div className="flex-1">
-                  <p className="text-off-white">{a.text}</p>
-                  <p className="text-[10px] text-muted-foreground">{a.time}</p>
-                </div>
-              </motion.div>
-            ))}
+
+          <div className="space-y-3 max-h-[300px] overflow-y-auto pr-1">
+            {recentSales.map((a, i) => {
+              // Parse a bit of structure from text
+              const [label, ...rest] = a.text.split("—").map((s) => s.trim());
+              const detail = rest.slice(0, -1).join(" • ");
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.06 }}
+                  whileHover={{ x: 4 }}
+                  className="group relative flex items-center gap-3 overflow-hidden rounded-sm border border-border bg-background/40 p-3 transition-colors hover:border-primary/40"
+                >
+                  {/* left accent bar */}
+                  <span className="absolute left-0 top-0 h-full w-0.5 bg-primary" />
+
+                  <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-sm bg-primary/10 text-primary">
+                    <TrendingUp className="h-4 w-4" />
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate font-display text-sm tracking-wide text-off-white">
+                      {label}
+                    </p>
+                    {detail && (
+                      <p className="truncate text-[10px] tracking-wider text-muted-foreground">
+                        {detail}
+                      </p>
+                    )}
+                  </div>
+
+                  <div className="flex flex-col items-end gap-1">
+                    <span className="text-[10px] font-mono text-muted-foreground">{a.time}</span>
+                    <ArrowUpRight className="h-3 w-3 text-primary opacity-0 transition-opacity group-hover:opacity-100" />
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         </div>
       </div>
