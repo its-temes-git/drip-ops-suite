@@ -12,11 +12,11 @@ const catData = [
 const monthTrend = Array.from({ length: 30 }, (_, i) => ({ d: `${i+1}`, v: 2000 + Math.round(Math.random() * 6000) }));
 
 const Analytics = () => (
-  <div className="space-y-8">
+  <div className="space-y-6 sm:space-y-8">
     <header className="flex items-center justify-between flex-wrap gap-4">
       <div>
-        <h1 className="font-display text-5xl tracking-wide">SALES ANALYTICS</h1>
-        <p className="text-xs tracking-widest text-muted-foreground">PERFORMANCE OVERVIEW</p>
+        <h1 className="font-display text-3xl sm:text-5xl tracking-wide">SALES ANALYTICS</h1>
+        <p className="text-[10px] sm:text-xs tracking-widest text-muted-foreground">PERFORMANCE OVERVIEW</p>
       </div>
       <input type="text" placeholder="Last 30 days" className="border border-border bg-card px-4 py-2 text-xs tracking-widest" />
     </header>

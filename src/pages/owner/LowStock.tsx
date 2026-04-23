@@ -7,13 +7,13 @@ const LowStock = () => {
   const items = inventory.filter((i) => i.qty <= 4);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <header>
         <div className="flex items-center gap-3">
           <span className="pulse-dot h-3 w-3 rounded-full bg-warning" />
-          <h1 className="font-display text-5xl tracking-wide">LOW STOCK ALERTS</h1>
+          <h1 className="font-display text-3xl sm:text-5xl tracking-wide">LOW STOCK ALERTS</h1>
         </div>
-        <p className="text-xs tracking-widest text-muted-foreground mt-1">ITEMS WITH 4 OR FEWER UNITS</p>
+        <p className="text-[10px] sm:text-xs tracking-widest text-muted-foreground mt-1">ITEMS WITH 4 OR FEWER UNITS</p>
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

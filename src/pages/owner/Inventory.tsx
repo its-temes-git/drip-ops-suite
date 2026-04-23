@@ -34,14 +34,14 @@ const InventoryPage = () => {
   const selected = inventory.find((i) => i.id === open);
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <header>
-        <h1 className="font-display text-5xl tracking-wide">FULL INVENTORY</h1>
-        <p className="text-xs tracking-widest text-muted-foreground">SUMMIT BRANCH — {filtered.length} ITEMS</p>
+        <h1 className="font-display text-3xl sm:text-5xl tracking-wide">FULL INVENTORY</h1>
+        <p className="text-[10px] sm:text-xs tracking-widest text-muted-foreground">SUMMIT BRANCH — {filtered.length} ITEMS</p>
       </header>
 
-      <div className="flex flex-wrap gap-3">
-        <div className="flex-1 min-w-[200px] flex items-center gap-2 border border-border bg-card px-3">
+      <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+        <div className="flex flex-1 items-center gap-2 border border-border bg-card px-3 sm:min-w-[200px]">
           <Search className="h-4 w-4 text-muted-foreground" />
           <input
             value={q}
@@ -50,23 +50,62 @@ const InventoryPage = () => {
             className="flex-1 bg-transparent py-3 text-sm outline-none"
           />
         </div>
-        <select value={cat} onChange={(e) => setCat(e.target.value)} className="border border-border bg-card px-3 py-3 text-xs tracking-widest">
-          <option value="ALL">CATEGORY</option>
-          {cats.map((c) => <option key={c} value={c}>{c.toUpperCase()}</option>)}
-        </select>
-        <select value={brand} onChange={(e) => setBrand(e.target.value)} className="border border-border bg-card px-3 py-3 text-xs tracking-widest">
-          <option value="ALL">BRAND</option>
-          {brands.map((b) => <option key={b} value={b}>{b.toUpperCase()}</option>)}
-        </select>
-        <select value={status} onChange={(e) => setStatus(e.target.value)} className="border border-border bg-card px-3 py-3 text-xs tracking-widest">
-          <option value="ALL">ALL STATUS</option>
-          <option value="IN">IN STOCK</option>
-          <option value="LOW">LOW STOCK</option>
-          <option value="OUT">OUT</option>
-        </select>
+        <div className="grid grid-cols-3 gap-2 sm:flex sm:gap-3">
+          <select value={cat} onChange={(e) => setCat(e.target.value)} className="border border-border bg-card px-2 py-3 text-[10px] sm:text-xs tracking-widest">
+            <option value="ALL">CATEGORY</option>
+            {cats.map((c) => <option key={c} value={c}>{c.toUpperCase()}</option>)}
+          </select>
+          <select value={brand} onChange={(e) => setBrand(e.target.value)} className="border border-border bg-card px-2 py-3 text-[10px] sm:text-xs tracking-widest">
+            <option value="ALL">BRAND</option>
+            {brands.map((b) => <option key={b} value={b}>{b.toUpperCase()}</option>)}
+          </select>
+          <select value={status} onChange={(e) => setStatus(e.target.value)} className="border border-border bg-card px-2 py-3 text-[10px] sm:text-xs tracking-widest">
+            <option value="ALL">STATUS</option>
+            <option value="IN">IN STOCK</option>
+            <option value="LOW">LOW STOCK</option>
+            <option value="OUT">OUT</option>
+          </select>
+        </div>
       </div>
 
-      <div className="border border-border bg-card overflow-x-auto">
+      {/* MOBILE CARDS */}
+      <div className="grid grid-cols-1 gap-3 sm:hidden">
+        {filtered.map((i, idx) => {
+          const s = statusOf(i.qty);
+          return (
+            <motion.button
+              key={i.id}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: Math.min(idx * 0.01, 0.2) }}
+              onClick={() => setOpen(i.id)}
+              className="flex items-center gap-3 border border-border bg-card p-3 text-left"
+            >
+              <div className="h-12 w-12 flex-shrink-0 bg-muted flex items-center justify-center font-display text-base text-primary">
+                {i.brand[0]}
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] tracking-widest text-primary truncate">{i.brand.toUpperCase()}</p>
+                <p className="text-sm font-medium truncate">{i.name}</p>
+                <p className="text-[10px] text-muted-foreground truncate">{i.category} • {i.sizes.join(", ")}</p>
+              </div>
+              <div className="flex flex-col items-end gap-1">
+                <span className="font-display text-2xl leading-none">{i.qty}</span>
+                <span className={`px-1.5 py-0.5 text-[9px] tracking-widest ${
+                  s === "IN" ? "bg-primary text-primary-foreground" :
+                  s === "LOW" ? "bg-warning text-warning-foreground" :
+                  "bg-destructive text-destructive-foreground"
+                }`}>
+                  {s === "IN" ? "IN" : s === "LOW" ? "LOW" : "OUT"}
+                </span>
+              </div>
+            </motion.button>
+          );
+        })}
+      </div>
+
+      {/* DESKTOP TABLE */}
+      <div className="hidden sm:block border border-border bg-card overflow-x-auto">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-border text-[10px] tracking-widest text-muted-foreground">

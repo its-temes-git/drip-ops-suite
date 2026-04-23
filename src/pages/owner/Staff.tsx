@@ -4,10 +4,10 @@ import { StatCard } from "@/components/owner/StatCard";
 const Staff = () => {
   const total = MOCK_TRANSACTIONS.reduce((a, b) => a + b.price, 0);
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <header>
-        <h1 className="font-display text-5xl tracking-wide">STAFF ACTIVITY</h1>
-        <p className="text-xs tracking-widest text-muted-foreground">SUMMIT BRANCH — TODAY</p>
+        <h1 className="font-display text-3xl sm:text-5xl tracking-wide">STAFF ACTIVITY</h1>
+        <p className="text-[10px] sm:text-xs tracking-widest text-muted-foreground">SUMMIT BRANCH — TODAY</p>
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -16,7 +16,7 @@ const Staff = () => {
         <StatCard label="AVG SALE" value={`ETB ${Math.round(total / MOCK_TRANSACTIONS.length).toLocaleString()}`} />
       </div>
 
-      <div className="border border-border bg-card p-6">
+      <div className="border border-border bg-card p-4 sm:p-6">
         <h2 className="font-display text-2xl mb-4">SHIFT LOG</h2>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">

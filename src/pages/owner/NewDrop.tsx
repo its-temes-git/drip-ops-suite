@@ -54,17 +54,17 @@ Link in bio or DM 👇
   };
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6 sm:space-y-8">
       <header>
-        <h1 className="font-display text-5xl tracking-wide">NEW DROP GENERATOR</h1>
-        <p className="text-xs tracking-widest text-muted-foreground">
+        <h1 className="font-display text-3xl sm:text-5xl tracking-wide">NEW DROP GENERATOR</h1>
+        <p className="text-[10px] sm:text-xs tracking-widest text-muted-foreground">
           ADD INVENTORY + GENERATE TELEGRAM / TIKTOK CAPTIONS
         </p>
       </header>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 lg:gap-8">
         {/* Form */}
-        <div className="border border-border bg-card p-6 space-y-5">
+        <div className="border border-border bg-card p-4 sm:p-6 space-y-5">
           <h2 className="font-display text-2xl">ITEM DETAILS</h2>
 
           <div>
@@ -131,7 +131,7 @@ Link in bio or DM 👇
         </div>
 
         {/* Preview */}
-        <div className="border border-border bg-card p-6 space-y-4">
+        <div className="border border-border bg-card p-4 sm:p-6 space-y-4">
           <h2 className="font-display text-2xl">READY TO POST</h2>
           <div className="flex gap-6 text-[10px] tracking-widest border-b border-border">
             {(["TG","TT"] as const).map((t) => (

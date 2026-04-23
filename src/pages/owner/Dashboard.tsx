@@ -37,10 +37,10 @@ const Dashboard = () => {
   });
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-6 sm:space-y-10">
       <header>
-        <h1 className="font-display text-5xl tracking-wide">DASHBOARD</h1>
-        <p className="text-xs tracking-widest text-muted-foreground">SUMMIT BRANCH — {new Date().toLocaleDateString()}</p>
+        <h1 className="font-display text-3xl sm:text-5xl tracking-wide">DASHBOARD</h1>
+        <p className="text-[10px] sm:text-xs tracking-widest text-muted-foreground">SUMMIT BRANCH — {new Date().toLocaleDateString()}</p>
       </header>
 
       {/* Stats */}
@@ -53,10 +53,10 @@ const Dashboard = () => {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Chart */}
-        <div className="lg:col-span-2 border border-border bg-card p-6">
-          <div className="mb-6 flex items-center justify-between">
-            <h2 className="font-display text-2xl tracking-wide">REVENUE</h2>
-            <div className="flex gap-6 text-[10px] tracking-widest">
+        <div className="lg:col-span-2 border border-border bg-card p-4 sm:p-6">
+          <div className="mb-4 sm:mb-6 flex flex-wrap items-center justify-between gap-3">
+            <h2 className="font-display text-xl sm:text-2xl tracking-wide">REVENUE</h2>
+            <div className="flex gap-3 sm:gap-6 text-[10px] tracking-widest">
               {(Object.keys(tabs) as (keyof typeof tabs)[]).map((k) => (
                 <button
                   key={k}
@@ -90,10 +90,10 @@ const Dashboard = () => {
         </div>
 
         {/* Activity Feed */}
-        <div className="border border-border bg-card p-6">
-          <div className="mb-6 flex items-center gap-3">
+        <div className="border border-border bg-card p-4 sm:p-6">
+          <div className="mb-4 sm:mb-6 flex items-center gap-3">
             <span className="pulse-dot h-2 w-2 rounded-full bg-primary" />
-            <h2 className="font-display text-2xl tracking-wide">LIVE ACTIVITY</h2>
+            <h2 className="font-display text-xl sm:text-2xl tracking-wide">LIVE ACTIVITY</h2>
           </div>
           <div className="space-y-4 max-h-[280px] overflow-y-auto">
             {ACTIVITY_FEED.map((a, i) => (
@@ -121,7 +121,7 @@ const Dashboard = () => {
 
       {/* Best Sellers */}
       <section>
-        <h2 className="font-display text-3xl tracking-wide mb-6">TOP MOVERS THIS MONTH</h2>
+        <h2 className="font-display text-2xl sm:text-3xl tracking-wide mb-4 sm:mb-6">TOP MOVERS THIS MONTH</h2>
         <div className="space-y-3">
           {bestSellers.map((b, i) => (
             <motion.div
@@ -130,18 +130,18 @@ const Dashboard = () => {
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: i * 0.05 }}
               whileHover={{ x: 6 }}
-              className="flex items-center gap-6 border border-border bg-card p-4 hover:border-primary/40"
+              className="flex items-center gap-3 sm:gap-6 border border-border bg-card p-3 sm:p-4 hover:border-primary/40"
             >
-              <span className="font-display text-6xl text-muted-foreground/30 w-16 text-center">#{b.rank}</span>
-              <div className="h-14 w-14 bg-muted flex items-center justify-center font-display text-xl text-primary">
+              <span className="font-display text-3xl sm:text-6xl text-muted-foreground/30 w-8 sm:w-16 text-center">#{b.rank}</span>
+              <div className="h-10 w-10 sm:h-14 sm:w-14 bg-muted flex items-center justify-center font-display text-base sm:text-xl text-primary flex-shrink-0">
                 {b.brand[0]}
               </div>
-              <div className="flex-1">
-                <p className="text-[10px] tracking-widest text-primary">{b.brand.toUpperCase()}</p>
-                <p className="font-display text-xl">{b.name}</p>
+              <div className="flex-1 min-w-0">
+                <p className="text-[10px] tracking-widest text-primary truncate">{b.brand.toUpperCase()}</p>
+                <p className="font-display text-base sm:text-xl truncate">{b.name}</p>
               </div>
-              <span className="text-xs text-muted-foreground border border-border px-2 py-1">{b.category}</span>
-              <span className="bg-primary px-3 py-1 text-xs text-primary-foreground font-medium">{b.sold} SOLD</span>
+              <span className="hidden sm:inline text-xs text-muted-foreground border border-border px-2 py-1">{b.category}</span>
+              <span className="bg-primary px-2 sm:px-3 py-1 text-[10px] sm:text-xs text-primary-foreground font-medium whitespace-nowrap">{b.sold} SOLD</span>
             </motion.div>
           ))}
         </div>
@@ -149,21 +149,21 @@ const Dashboard = () => {
 
       {/* Inventory Overview */}
       <section>
-        <h2 className="font-display text-3xl tracking-wide mb-6">INVENTORY OVERVIEW</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-5">
+        <h2 className="font-display text-2xl sm:text-3xl tracking-wide mb-4 sm:mb-6">INVENTORY OVERVIEW</h2>
+        <div className="grid grid-cols-2 gap-3 sm:gap-4 lg:grid-cols-5">
           {Object.entries(catSummary).map(([cat, d]) => (
-            <div key={cat} className="border border-border bg-card p-5">
+            <div key={cat} className="border border-border bg-card p-4 sm:p-5">
               <p className="text-[10px] tracking-widest text-muted-foreground">{cat.toUpperCase()}</p>
-              <p className="font-display text-4xl mt-2">{d.pieces}</p>
+              <p className="font-display text-3xl sm:text-4xl mt-2">{d.pieces}</p>
               <p className="text-xs text-muted-foreground">{d.styles} styles</p>
               <div className="mt-3 h-1 bg-muted">
                 <div className="h-full bg-primary" style={{ width: `${Math.min(100, (d.pieces/120)*100)}%` }} />
               </div>
             </div>
           ))}
-          <div className="border-2 border-primary bg-card p-5">
+          <div className="border-2 border-primary bg-card p-4 sm:p-5 col-span-2 lg:col-span-1">
             <p className="text-[10px] tracking-widest text-primary">SUMMIT TOTAL</p>
-            <p className="font-display text-4xl mt-2 text-primary">{totalItems}</p>
+            <p className="font-display text-3xl sm:text-4xl mt-2 text-primary">{totalItems}</p>
             <p className="text-xs text-muted-foreground">items in stock</p>
           </div>
         </div>
