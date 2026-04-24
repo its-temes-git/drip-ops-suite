@@ -217,36 +217,30 @@ const RecordSaleModal = ({ item, onClose, onConfirm }: {
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.95, opacity: 0 }}
         onClick={(e) => e.stopPropagation()}
-        className="relative grid w-full max-w-3xl grid-cols-1 overflow-hidden border border-border bg-card shadow-2xl md:grid-cols-[40%_60%]"
+        className="relative flex w-full max-w-md flex-col overflow-hidden border border-border bg-card shadow-2xl"
         style={{ maxHeight: "calc(100vh - 1.5rem)" }}
       >
-        {/* Close button — floating top-right */}
-        <button
-          onClick={onClose}
-          aria-label="Close"
-          className="absolute right-3 top-3 z-30 flex h-10 w-10 items-center justify-center border border-border bg-background/80 text-muted-foreground backdrop-blur transition-colors hover:border-primary hover:text-off-white"
-        >
-          <X className="h-5 w-5" />
-        </button>
-
-        {/* IMAGE — left on desktop, top on mobile */}
-        <div className="relative aspect-square w-full overflow-hidden bg-muted md:aspect-auto md:h-full">
-          {item.image ? (
-            <img src={item.image} alt={item.name} className="h-full w-full object-cover" />
-          ) : (
-            <div className="flex h-full w-full items-center justify-center font-display text-9xl text-primary/60">
-              {item.brand[0]}
+        {/* Header with brand mark + close */}
+        <div className="relative flex items-start justify-between gap-3 border-b border-border bg-gradient-to-br from-primary/10 via-card to-card px-5 py-5">
+          <div className="min-w-0 flex-1">
+            <div className="mb-2 inline-flex items-center gap-2">
+              <span className="inline-block h-1.5 w-1.5 rounded-full bg-primary" />
+              <p className="text-[10px] tracking-[0.25em] text-primary">{item.brand.toUpperCase()}</p>
             </div>
-          )}
+            <h2 className="font-display text-3xl leading-tight">{item.name}</h2>
+            <p className="mt-2 font-display text-2xl text-primary">ETB {(item.price || 0).toLocaleString()}</p>
+          </div>
+          <button
+            onClick={onClose}
+            aria-label="Close"
+            className="flex h-10 w-10 flex-shrink-0 items-center justify-center border border-border bg-background/60 text-muted-foreground transition-colors hover:border-primary hover:text-off-white"
+          >
+            <X className="h-5 w-5" />
+          </button>
         </div>
 
-        {/* CONTENT — right on desktop, below on mobile */}
+        {/* CONTENT */}
         <div className="flex min-h-0 flex-col">
-          <div className="border-b border-border px-5 py-4">
-            <p className="text-[10px] tracking-widest text-primary">{item.brand.toUpperCase()}</p>
-            <h2 className="font-display text-2xl leading-tight">{item.name}</h2>
-            <p className="mt-1 font-display text-lg text-primary">ETB {(item.price || 0).toLocaleString()}</p>
-          </div>
 
           {/* Success overlay */}
           {success && (
