@@ -92,8 +92,12 @@ const SalesPortal = () => {
                     whileHover={{ scale: 1.02 }}
                     className="relative border border-border bg-card overflow-hidden hover:border-primary/60 hover:shadow-[0_0_20px_hsl(81_100%_67%/0.15)]"
                   >
-                    <div className="aspect-square bg-muted flex items-center justify-center font-display text-7xl text-primary/60">
-                      {it.brand[0]}
+                    <div className="aspect-square bg-muted overflow-hidden">
+                      {it.image ? (
+                        <img src={it.image} alt={it.name} loading="lazy" className="h-full w-full object-cover" />
+                      ) : (
+                        <div className="flex h-full w-full items-center justify-center font-display text-7xl text-primary/60">{it.brand[0]}</div>
+                      )}
                     </div>
                     <span className={`absolute top-2 right-2 px-2 py-1 text-[10px] tracking-widest ${out ? "bg-destructive text-destructive-foreground" : low ? "bg-warning text-warning-foreground" : "bg-background/80 text-off-white"}`}>
                       {out ? "OUT" : low ? `LOW (${it.qty})` : `${it.qty} LEFT`}
