@@ -20,19 +20,30 @@ const HomePage = () => {
 
   return (
     <>
-      {/* HERO — animated mesh gradient */}
+      {/* HERO — full-bleed image background */}
       <section className="relative grain overflow-hidden min-h-[calc(100vh-4rem)] bg-[#f0ede8] dark:bg-[#080808]">
-        {/* Mesh orbs */}
+        {/* Background image — covers entire hero at low opacity */}
+        <motion.img
+          initial={{ opacity: 0, scale: 1.05 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 1.2 }}
+          src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=1600&h=2000&fit=crop"
+          alt="Sawkem streetwear editorial"
+          className="absolute inset-0 h-full w-full object-cover opacity-30 dark:opacity-25"
+        />
+        {/* Theme-aware overlay tint to keep text readable */}
+        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#f0ede8]/85 via-[#f0ede8]/40 to-[#f0ede8]/10 dark:from-[#080808]/90 dark:via-[#080808]/50 dark:to-[#080808]/20" />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f0ede8] to-transparent dark:from-[#080808]" />
+
+        {/* Mesh orbs on top */}
         <div className="hero-orb hero-orb-1" />
         <div className="hero-orb hero-orb-2" />
         <div className="hero-orb hero-orb-3" />
         <div className="hero-orb hero-orb-4" />
-        <div className="absolute inset-0 backdrop-blur-[1px]" />
 
-        <div className="relative z-10 grid min-h-[calc(100vh-4rem)] grid-cols-1 items-center gap-10 px-6 py-12 md:px-12 lg:grid-cols-[55%_45%] lg:gap-0 lg:px-0 lg:py-0">
-          {/* LEFT — text */}
-          <div className="text-center lg:pl-[8%] lg:text-left">
-            <div className="inline-block rounded-xl bg-black/15 p-6 dark:bg-black/30 md:p-8">
+        <div className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center px-6 py-12 md:px-12 lg:pl-[8%]">
+          <div className="w-full text-center lg:max-w-3xl lg:text-left">
+            <div className="inline-block rounded-xl bg-black/15 p-6 dark:bg-black/40 md:p-8">
             <motion.h1
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
@@ -46,8 +57,8 @@ const HomePage = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.15 }}
-              className="font-display leading-[0.85] text-[64px] md:text-[100px] lg:text-[140px] text-[#080808] dark:text-white lg:ml-6"
-              style={{ letterSpacing: "-2px", fontWeight: 900, WebkitTextStroke: "2px currentColor", color: "transparent" }}
+              className="font-display leading-[0.85] text-[64px] md:text-[100px] lg:text-[140px] hero-outline-light dark:hero-outline-dark lg:ml-6"
+              style={{ letterSpacing: "-2px", fontWeight: 900 }}
             >
               FASHION
             </motion.h2>
@@ -64,7 +75,7 @@ const HomePage = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: 0.45 }}
-              className="mx-auto mt-5 max-w-[420px] font-mono text-[15px] leading-[1.7] text-black/65 dark:text-white/75 lg:mx-0"
+              className="mx-auto mt-5 max-w-[420px] font-mono text-[15px] leading-[1.7] text-black/75 dark:text-white/80 lg:mx-0"
             >
               Premium streetwear. Serious quality. Ethiopia's dopest fits.
             </motion.p>
@@ -98,38 +109,13 @@ const HomePage = () => {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.6, delay: 0.75 }}
-              className="mt-5 font-mono text-[11px] uppercase text-black/35 dark:text-white/35"
+              className="mt-5 font-mono text-[11px] uppercase text-black/45 dark:text-white/45"
               style={{ letterSpacing: "2px" }}
             >
               6,874 followers • 51K+ likes on TikTok
             </motion.p>
             </div>
           </div>
-
-          {/* RIGHT — image */}
-          <motion.div
-            initial={{ opacity: 0, x: 60 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.8, delay: 0.2 }}
-            className="relative h-[260px] w-full md:h-[300px] lg:h-screen"
-          >
-            <div
-              className="relative h-full w-full overflow-hidden"
-              style={{
-                clipPath:
-                  typeof window !== "undefined" && window.innerWidth >= 1024
-                    ? "polygon(0 0, 90% 0, 100% 5%, 100% 100%, 10% 100%, 0 95%)"
-                    : "none",
-              }}
-            >
-              <img
-                src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=900&h=1400&fit=crop"
-                alt="Sawkem streetwear editorial"
-                className="h-full w-full object-cover"
-              />
-              <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-[#f0ede8] via-transparent to-transparent dark:from-[#080808]" />
-            </div>
-          </motion.div>
         </div>
 
         {/* Scroll indicator */}
