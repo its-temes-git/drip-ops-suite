@@ -18,7 +18,7 @@ const Row = ({
         {doubled.map((b, i) => (
           <span
             key={i}
-            className={`inline-block text-3xl md:text-5xl font-display text-[hsl(40_22%_92%)]/80 hover:text-primary hover:scale-110 transition-all duration-200 ${b.style}`}
+            className={`inline-block text-3xl md:text-5xl font-display text-off-white/80 hover:text-primary hover:scale-110 transition-all duration-200 ${b.style}`}
           >
             {b.name} <span className="text-primary mx-2">•</span>
           </span>
