@@ -248,23 +248,25 @@ const HomePage = () => {
               OUR STORY
             </Link>
           </div>
-          <div className="relative h-[480px]">
-            {[
-              { src: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=500&fit=crop", style: "top-0 left-0 -rotate-2" },
-              { src: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=500&fit=crop", style: "top-12 left-1/3 rotate-1" },
-              { src: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&h=500&fit=crop", style: "top-24 left-2/3 rotate-3" },
-            ].map((img, i) => (
-              <motion.img
-                key={i}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.6, delay: i * 0.15 }}
-                src={img.src}
-                alt="Sawkem"
-                className={`absolute h-72 w-52 object-cover border border-border ${img.style}`}
-              />
-            ))}
+          <div className="relative w-full overflow-hidden">
+            <div className="flex gap-4 animate-marquee-left" style={{ width: "max-content" }}>
+              {[
+                "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=500&fit=crop",
+                "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=500&fit=crop",
+                "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&h=500&fit=crop",
+                "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=500&fit=crop",
+                "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=500&fit=crop",
+                "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&h=500&fit=crop",
+              ].map((src, i) => (
+                <img
+                  key={i}
+                  src={src}
+                  alt="Sawkem"
+                  className="h-80 w-56 flex-shrink-0 object-cover border border-border"
+                  loading="lazy"
+                />
+              ))}
+            </div>
           </div>
         </div>
       </section>
