@@ -120,7 +120,7 @@ const AboutPage = () => {
         ))}
       </section>
 
-      <section className="bg-[hsl(0_0%_5%)] px-6 py-20 md:px-12">
+      <section className="dark-band px-6 py-20 md:px-12">
         <h2 className="text-center font-display text-6xl md:text-7xl">BRANDS WE CARRY</h2>
         <div className="mt-12">
           <BrandMarquee />
@@ -162,7 +162,7 @@ const AboutPage = () => {
         </div>
       </section>
 
-      <section className="bg-[hsl(0_0%_5%)] px-6 py-24 md:px-12">
+      <section className="dark-band px-6 py-24 md:px-12">
         <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
           {STATS.map((s) => (
             <div key={s.label} className="border border-border bg-card p-6 text-center">

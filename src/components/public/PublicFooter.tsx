@@ -10,7 +10,7 @@ const FOOTER_BRANDS = [
 export const PublicFooter = () => {
   const doubled = [...FOOTER_BRANDS, ...FOOTER_BRANDS];
   return (
-    <footer className="relative border-t border-primary/40 bg-[hsl(0_0%_2%)] text-off-white">
+    <footer className="relative border-t border-primary/40 dark-band text-off-white">
       <div className="grid gap-12 px-6 py-16 md:grid-cols-3 md:px-12">
         <div>
           <h3 className="font-display text-5xl tracking-wide">SAWKEM</h3>

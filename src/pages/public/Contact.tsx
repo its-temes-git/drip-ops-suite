@@ -130,7 +130,7 @@ const ContactPage = () => {
         </div>
       </section>
 
-      <section className="bg-[hsl(0_0%_5%)] px-6 py-20 md:px-12">
+      <section className="dark-band px-6 py-20 md:px-12">
         <h2 className="font-display text-6xl md:text-7xl">VISIT THE STORE</h2>
         <div className="mt-10 grid gap-8 md:grid-cols-2 border border-border bg-card p-6 md:p-10">
           <div>

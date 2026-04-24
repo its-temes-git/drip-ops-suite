@@ -208,7 +208,7 @@ const HomePage = () => {
       </section>
 
       {/* TIKTOK */}
-      <section className="bg-[hsl(0_0%_5%)] px-6 py-20 md:px-12">
+      <section className="dark-band px-6 py-20 md:px-12">
         <h2 className="font-display text-6xl md:text-7xl">AS SEEN ON TIKTOK</h2>
         <p className="mt-2 text-xs tracking-[0.3em] text-primary">
           @SAWKEM_FASHION • 51K+ LIKES • ADDIS ABABA
@@ -272,7 +272,7 @@ const HomePage = () => {
       </section>
 
       {/* FIND US */}
-      <section className="bg-[hsl(0_0%_5%)] px-6 py-20 md:px-12">
+      <section className="dark-band px-6 py-20 md:px-12">
         <h2 className="font-display text-6xl md:text-7xl">FIND US</h2>
         <div className="mt-10 mx-auto max-w-3xl border-l-4 border-primary bg-card p-8">
           <h3 className="font-display text-4xl md:text-5xl">SUMMIT BRANCH</h3>
