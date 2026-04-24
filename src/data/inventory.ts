@@ -33,15 +33,15 @@ const BAG_IMG = "1553062407-98eeb64c6a62";
 
 export const inventory: InventoryItem[] = [
   // SHOES
-  { id: 1, brand: "Rick Owens", name: "Geobasket Jumbo Laces", variant: "Jumbo Laces", category: "Shoes", sizes: ["40","41","42","43","44"], color: "Black/White", qty: 6, price: 12500, image: `https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop&q=85` },
+  { id: 1, brand: "Rick Owens", name: "Geobasket Jumbo Laces", variant: "Jumbo Laces", category: "Shoes", sizes: ["40","41","42","43","44"], color: "Black/White", qty: 6, price: 12500, image: rickOwensGeobasket },
   { id: 2, brand: "Rick Owens", name: "Geobasket Big Sole", variant: "Big Sole", category: "Shoes", sizes: ["41","42","43"], color: "Cement Gray", qty: 3, price: 13200, image: `https://images.unsplash.com/photo-1600185365926-3a2ce3cdb9eb?w=600&h=600&fit=crop&q=85` },
   { id: 3, brand: "Balenciaga", name: "Derby", category: "Shoes", sizes: ["40","41","42","43","44","45"], color: "Black", qty: 8, price: 18900, image: `https://images.unsplash.com/photo-1595950653106-6c9ebd614d3a?w=600&h=600&fit=crop&q=85` },
   { id: 4, brand: "Jordan", name: "5 Retro", category: "Shoes", sizes: ["40","41","42","43","44"], color: "Red Suede", qty: 5, price: 8900, image: `https://images.unsplash.com/photo-1556906781-9a412961c28c?w=600&h=600&fit=crop&q=85` },
   { id: 5, brand: "Nike", name: "Shox R4", category: "Shoes", sizes: ["40","41","42","43","44","45"], color: "White/Silver", qty: 7, price: 6500, image: `https://images.unsplash.com/photo-1606107557195-0e29a4b5b4aa?w=600&h=600&fit=crop&q=85` },
   { id: 6, brand: "ASICS", name: "Gel-Kayano", category: "Shoes", sizes: ["40","41","42","43"], color: "White/Blue", qty: 4, price: 5800, image: `https://images.unsplash.com/photo-1539185441755-769473a23570?w=600&h=600&fit=crop&q=85` },
-  { id: 7, brand: "NOCTA", name: "Air Force 1", category: "Shoes", sizes: ["40","41","42","43","44","45"], color: "White", qty: 9, price: 7200, image: `https://images.unsplash.com/photo-1597248881519-db089d3744a5?w=600&h=600&fit=crop&q=85` },
+  { id: 7, brand: "NOCTA", name: "Air Force 1", category: "Shoes", sizes: ["40","41","42","43","44","45"], color: "White", qty: 9, price: 7200, image: noctaAf1 },
   { id: 8, brand: "Timberland", name: "6-Inch Boot", category: "Shoes", sizes: ["40","41","42","43","44"], color: "Wheat", qty: 5, price: 6900, image: `https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&h=600&fit=crop&q=85` },
-  { id: 9, brand: "Jordan", name: "1 Retro High Chicago", category: "Shoes", sizes: ["40","41","42","43","44"], color: "Red/White", qty: 4, price: 9500, image: `https://images.unsplash.com/photo-1552346154-21d32810aba3?w=600&h=600&fit=crop&q=85` },
+  { id: 9, brand: "Jordan", name: "1 Retro High Chicago", category: "Shoes", sizes: ["40","41","42","43","44"], color: "Red/White", qty: 4, price: 9500, image: jordan1Chicago },
   { id: 10, brand: "Jordan", name: "1 Retro High Royal", category: "Shoes", sizes: ["41","42","43","44"], color: "Royal Blue", qty: 3, price: 9500, image: `https://images.unsplash.com/photo-1571945153237-4929e783af4a?w=600&h=600&fit=crop&q=85` },
   { id: 14, brand: "Balenciaga", name: "3XL Hoodie", category: "Tops", sizes: ["S","M","L","XL"], color: "Black", qty: 6, price: 14500, image: `https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop` },
   { id: 15, brand: "Balenciaga", name: "Track Top", category: "Tops", sizes: ["M","L","XL"], color: "Navy", qty: 4, price: 11200, image: `https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=400&fit=crop` },
