@@ -59,7 +59,7 @@ export const inventory: InventoryItem[] = [
   { id: 22, brand: "Sawkem", name: "Zip-Up Oversized Jacket", category: "Tops", sizes: ["M","L","XL","XXL"], color: "Cream", qty: 8, price: 4500, image: `https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=400&fit=crop` },
 
   // BOTTOMS
-  { id: 23, brand: "Gallery Dept", name: "Flared Jeans Vintage", category: "Bottoms", sizes: ["28","30","32","34","36"], color: "Vintage Wash", qty: 7, price: 4800, image: `https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop` },
+  { id: 23, brand: "Gallery Dept", name: "Flared Jeans Vintage", category: "Bottoms", sizes: ["28","30","32","34","36"], color: "Vintage Wash", qty: 7, price: 4800, image: galleryDeptJeans },
   { id: 24, brand: "Gallery Dept", name: "Flared Jeans Distressed", category: "Bottoms", sizes: ["28","30","32","34"], color: "Black", qty: 4, price: 5200, image: `https://images.unsplash.com/photo-1604176354204-9268737828e4?w=400&h=400&fit=crop` },
   { id: 25, brand: "Denim Tears", name: "Jogger Pants", category: "Bottoms", sizes: ["S","M","L","XL"], color: "Classic", qty: 8, price: 4500, image: `https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&h=400&fit=crop` },
   { id: 26, brand: "Denim Tears", name: "Shorts Old Design", category: "Bottoms", sizes: ["S","M","L","XL"], color: "Blue", qty: 5, price: 3800, image: `https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop` },
