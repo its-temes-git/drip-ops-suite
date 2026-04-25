@@ -257,45 +257,47 @@ const HomePage = () => {
       {/* FIND US */}
       <section className="dark-band px-6 py-20 md:px-12">
         <h2 className="font-display text-6xl md:text-7xl">FIND US</h2>
-        <div className="mt-10 mx-auto max-w-3xl border-l-4 border-primary bg-card p-8">
-          <h3 className="font-display text-4xl md:text-5xl">SUMMIT BRANCH</h3>
-          <p className="mt-3 text-sm text-off-white/80">Summit Area, in front of Deborah School, Addis Ababa</p>
-          <p className="mt-2 text-xs text-muted-foreground">
-            Mon–Sat: 9:00 AM – 8:00 PM | Sun: 11:00 AM – 6:00 PM
-          </p>
-          <div className="mt-4 space-y-1 text-sm">
-            <p>📞 <a href="tel:+251951077634" className="hover:text-primary">0951 077 634</a></p>
-            <p>💬 <a href="https://t.me/sawkemcollection" target="_blank" rel="noreferrer" className="hover:text-primary">@sawkemcollection</a></p>
+        <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:items-stretch">
+          <div className="border-l-4 border-primary bg-card p-8 flex flex-col">
+            <h3 className="font-display text-4xl md:text-5xl">SUMMIT BRANCH</h3>
+            <p className="mt-3 text-sm text-off-white/80">Summit Area, in front of Deborah School, Addis Ababa</p>
+            <p className="mt-2 text-xs text-muted-foreground">
+              Mon–Sat: 9:00 AM – 8:00 PM | Sun: 11:00 AM – 6:00 PM
+            </p>
+            <div className="mt-4 space-y-1 text-sm">
+              <p>📞 <a href="tel:+251951077634" className="hover:text-primary">0951 077 634</a></p>
+              <p>💬 <a href="https://t.me/sawkemcollection" target="_blank" rel="noreferrer" className="hover:text-primary">@sawkemcollection</a></p>
+            </div>
+            <div className="mt-6 flex flex-wrap gap-3">
+              <a
+                href="https://www.google.com/maps/search/Summit+Addis+Ababa"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 bg-primary px-5 py-3 text-xs tracking-[0.25em] text-primary-foreground hover:bg-off-white transition-colors"
+              >
+                <MapPin className="h-4 w-4" /> GET DIRECTIONS
+              </a>
+              <a
+                href="https://t.me/sawkemcollection"
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-2 border border-off-white px-5 py-3 text-xs tracking-[0.25em] hover:bg-off-white hover:text-background transition-all"
+              >
+                <Send className="h-4 w-4" /> DM ON TELEGRAM
+              </a>
+            </div>
           </div>
-          <div className="mt-6 flex flex-wrap gap-3">
-            <a
-              href="https://www.google.com/maps/search/Summit+Addis+Ababa"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2 bg-primary px-5 py-3 text-xs tracking-[0.25em] text-primary-foreground hover:bg-off-white transition-colors"
-            >
-              <MapPin className="h-4 w-4" /> GET DIRECTIONS
-            </a>
-            <a
-              href="https://t.me/sawkemcollection"
-              target="_blank"
-              rel="noreferrer"
-              className="flex items-center gap-2 border border-off-white px-5 py-3 text-xs tracking-[0.25em] hover:bg-off-white hover:text-background transition-all"
-            >
-              <Send className="h-4 w-4" /> DM ON TELEGRAM
-            </a>
-          </div>
-        </div>
-        <div className="relative mt-10 mx-auto max-w-5xl aspect-[16/9] overflow-hidden border border-border">
-          <iframe
-            title="Summit Map"
-            src="https://www.google.com/maps?q=Summit,Addis+Ababa,Ethiopia&output=embed"
-            className="h-full w-full"
-            style={{ filter: "grayscale(100%) invert(90%) contrast(85%)" }}
-            loading="lazy"
-          />
-          <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-            <span className="block h-4 w-4 rounded-full bg-primary pulse-dot" />
+          <div className="relative min-h-[320px] overflow-hidden border border-border lg:min-h-0">
+            <iframe
+              title="Summit Map"
+              src="https://www.google.com/maps?q=Summit,Addis+Ababa,Ethiopia&output=embed"
+              className="absolute inset-0 h-full w-full"
+              style={{ filter: "grayscale(100%) invert(90%) contrast(85%)" }}
+              loading="lazy"
+            />
+            <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+              <span className="block h-4 w-4 rounded-full bg-primary pulse-dot" />
+            </div>
           </div>
         </div>
       </section>
