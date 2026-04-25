@@ -285,7 +285,7 @@ const AboutPage = () => {
           {STATS.map((s) => (
             <div key={s.label} className="border border-border bg-card p-6 text-center">
               <p className="font-display text-6xl md:text-7xl text-primary leading-none">
-                <CountUp to={s.num} suffix={s.suffix} liveBumps={s.liveBumps} />
+                <CountUp to={s.num} suffix={s.suffix} live={s.live} />
               </p>
               <p className="mt-3 text-[10px] tracking-[0.3em] text-off-white">{s.label}</p>
             </div>
