@@ -31,8 +31,8 @@ const BRAND_GRID = [
   "BURBERRY","NOCTA","SYNA WORLD","TIMBERLAND",
 ];
 
-const STATS: { num: number; label: string; suffix: string; liveBumps?: number[] }[] = [
-  { num: 51000, label: "TIKTOK LIKES", suffix: "+", liveBumps: [3, 10, 12, 6, 20] },
+const STATS: { num: number; label: string; suffix: string; live?: boolean }[] = [
+  { num: 51000, label: "TIKTOK LIKES", suffix: "+", live: true },
   { num: 6874, label: "FOLLOWERS", suffix: "" },
   { num: 40, label: "BRANDS CARRIED", suffix: "+" },
 ];
@@ -40,73 +40,61 @@ const STATS: { num: number; label: string; suffix: string; liveBumps?: number[] 
 const CountUp = ({
   to,
   suffix,
-  liveBumps,
+  live,
 }: {
   to: number;
   suffix: string;
-  liveBumps?: number[];
+  live?: boolean;
 }) => {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
   const [n, setN] = useState(0);
-  const [pulse, setPulse] = useState(false);
-  const [bumpAmt, setBumpAmt] = useState(0);
+  const [tick, setTick] = useState(0); // triggers per-bump pulse
 
+  // Initial count-up to `to`
   useEffect(() => {
     if (!inView) return;
     const dur = 1800;
     const t0 = performance.now();
-    const tick = (t: number) => {
+    let raf = 0;
+    const step = (t: number) => {
       const p = Math.min(1, (t - t0) / dur);
-      // easeOutExpo for a snappy, premium feel
       const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
       setN(Math.round(to * eased));
-      if (p < 1) requestAnimationFrame(tick);
+      if (p < 1) raf = requestAnimationFrame(step);
     };
-    requestAnimationFrame(tick);
+    raf = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(raf);
   }, [inView, to]);
 
-  // Live "likes coming in" ticker after the initial count-up settles
+  // Continuous live ticker — random small bumps forever
   useEffect(() => {
-    if (!inView || !liveBumps?.length) return;
+    if (!inView || !live) return;
     let cancelled = false;
-    let running = to;
-    const start = setTimeout(() => {
-      liveBumps.forEach((amt, i) => {
-        setTimeout(() => {
-          if (cancelled) return;
-          running += amt;
-          setN(running);
-          setBumpAmt(amt);
-          setPulse(true);
-          setTimeout(() => setPulse(false), 700);
-        }, i * 900);
-      });
-    }, 2000);
+    let timeout: ReturnType<typeof setTimeout>;
+    const start = setTimeout(function loop() {
+      if (cancelled) return;
+      const bump = Math.floor(Math.random() * 18) + 1; // 1–18 likes
+      setN((prev) => prev + bump);
+      setTick((c) => c + 1);
+      timeout = setTimeout(loop, 700 + Math.random() * 1600); // 0.7s–2.3s
+    }, 2200);
     return () => {
       cancelled = true;
       clearTimeout(start);
+      clearTimeout(timeout!);
     };
-  }, [inView, liveBumps, to]);
+  }, [inView, live]);
 
   return (
     <span ref={ref} className="relative inline-block">
       <span
-        className={`inline-block transition-all duration-300 ${
-          pulse ? "scale-110 [text-shadow:0_0_24px_hsl(var(--primary)/0.8)]" : "scale-100"
-        }`}
+        key={tick}
+        className={`inline-block ${live ? "animate-[like-pulse_0.6s_ease-out]" : ""}`}
       >
         {n >= 1000 ? n.toLocaleString() : n}
         {suffix}
       </span>
-      {pulse && bumpAmt > 0 && (
-        <span
-          key={n}
-          className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 font-mono text-sm text-primary animate-[float-up_0.7s_ease-out_forwards]"
-        >
-          +{bumpAmt}
-        </span>
-      )}
     </span>
   );
 };
