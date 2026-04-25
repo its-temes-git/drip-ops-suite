@@ -277,6 +277,23 @@
   }
   .scroll-line { animation: scroll-line 2s ease-in-out infinite; }
 
+  /* Story stack — fanned card idle float */
+  @keyframes story-float-1 {
+    0%, 100% { transform: translate(-50%, -50%) rotate(-8deg) translateX(-4rem) translateY(0); }
+    50%      { transform: translate(-50%, -50%) rotate(-8deg) translateX(-4rem) translateY(-10px); }
+  }
+  @keyframes story-float-2 {
+    0%, 100% { transform: translate(-50%, -50%) rotate(0deg) translateY(0); }
+    50%      { transform: translate(-50%, -50%) rotate(0deg) translateY(-14px); }
+  }
+  @keyframes story-float-3 {
+    0%, 100% { transform: translate(-50%, -50%) rotate(8deg) translateX(4rem) translateY(0); }
+    50%      { transform: translate(-50%, -50%) rotate(8deg) translateX(4rem) translateY(-10px); }
+  }
+  .story-stack:not(:hover) .story-float-1 { animation: story-float-1 5s ease-in-out infinite; }
+  .story-stack:not(:hover) .story-float-2 { animation: story-float-2 5s ease-in-out infinite 0.4s; }
+  .story-stack:not(:hover) .story-float-3 { animation: story-float-3 5s ease-in-out infinite 0.8s; }
+
   /* Hide cursor on interactives — custom cursor handles it */
   a, button, [role="button"], input, textarea, select {
     cursor: none;
