@@ -10,7 +10,7 @@ const FOOTER_BRANDS = [
 export const PublicFooter = () => {
   const doubled = [...FOOTER_BRANDS, ...FOOTER_BRANDS];
   return (
-    <footer className="relative border-t border-primary/40 dark-band text-off-white">
+    <footer className="relative border-t border-primary/40 bg-background text-foreground">
       <div className="grid gap-12 px-6 py-16 md:grid-cols-3 md:px-12">
         <div>
           <h3 className="font-display text-5xl tracking-wide">SAWKEM</h3>
@@ -61,7 +61,7 @@ export const PublicFooter = () => {
               href="https://www.tiktok.com/@sawkem_fashion"
               target="_blank"
               rel="noreferrer"
-              className="text-off-white transition-colors hover:text-primary"
+              className="text-foreground transition-colors hover:text-primary"
               aria-label="TikTok"
             >
               <TikTokIcon className="h-5 w-5" />
@@ -70,7 +70,7 @@ export const PublicFooter = () => {
               href="https://t.me/sawkemcollection"
               target="_blank"
               rel="noreferrer"
-              className="text-off-white transition-colors hover:text-primary"
+              className="text-foreground transition-colors hover:text-primary"
               aria-label="Telegram"
             >
               <Send className="h-5 w-5" />
@@ -88,7 +88,7 @@ export const PublicFooter = () => {
           {doubled.map((b, i) => (
             <span
               key={i}
-              className="font-display text-2xl tracking-wider text-off-white/50 hover:text-primary transition-colors"
+              className="font-display text-2xl tracking-wider text-foreground/50 hover:text-primary transition-colors"
             >
               {b} <span className="text-primary mx-2">•</span>
             </span>
