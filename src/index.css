@@ -277,10 +277,10 @@
   }
   .scroll-line { animation: scroll-line 2s ease-in-out infinite; }
 
-  @keyframes float-up {
-    0%   { opacity: 0; transform: translate(-50%, 0) scale(0.8); }
-    20%  { opacity: 1; transform: translate(-50%, -10px) scale(1.1); }
-    100% { opacity: 0; transform: translate(-50%, -40px) scale(1); }
+  @keyframes like-pulse {
+    0%   { transform: scale(1);    text-shadow: 0 0 0 hsl(var(--primary) / 0); }
+    40%  { transform: scale(1.06); text-shadow: 0 0 24px hsl(var(--primary) / 0.7); }
+    100% { transform: scale(1);    text-shadow: 0 0 0 hsl(var(--primary) / 0); }
   }
 
   /* Story stack — fanned card idle float */
