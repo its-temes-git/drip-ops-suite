@@ -4,6 +4,7 @@ import { ArrowRight, ArrowLeft, MapPin, Send } from "lucide-react";
 import { useRef } from "react";
 import { BrandMarquee } from "@/components/BrandMarquee";
 import { TikTokCard, TIKTOK_PLACEHOLDERS } from "@/components/public/TikTokCard";
+import ourStoryImg from "@/assets/our-story.jpg";
 
 const FEATURED = [
   { id: 1, brand: "Rick Owens", name: "Geobasket", price: 12500, sizes: ["40","41","42","43","44"], image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop" },
