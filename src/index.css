@@ -277,6 +277,12 @@
   }
   .scroll-line { animation: scroll-line 2s ease-in-out infinite; }
 
+  @keyframes float-up {
+    0%   { opacity: 0; transform: translate(-50%, 0) scale(0.8); }
+    20%  { opacity: 1; transform: translate(-50%, -10px) scale(1.1); }
+    100% { opacity: 0; transform: translate(-50%, -40px) scale(1); }
+  }
+
   /* Story stack — fanned card idle float */
   @keyframes story-float-1 {
     0%, 100% { transform: translate(-50%, -50%) rotate(-8deg) translateX(-4rem) translateY(0); }

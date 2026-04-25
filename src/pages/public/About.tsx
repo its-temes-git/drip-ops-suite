@@ -31,33 +31,82 @@ const BRAND_GRID = [
   "BURBERRY","NOCTA","SYNA WORLD","TIMBERLAND",
 ];
 
-const STATS = [
-  { num: 51000, label: "TIKTOK LIKES", suffix: "+" },
+const STATS: { num: number; label: string; suffix: string; liveBumps?: number[] }[] = [
+  { num: 51000, label: "TIKTOK LIKES", suffix: "+", liveBumps: [3, 10, 12, 6, 20] },
   { num: 6874, label: "FOLLOWERS", suffix: "" },
   { num: 40, label: "BRANDS CARRIED", suffix: "+" },
-  { num: 300, label: "ITEMS IN STOCK", suffix: "+" },
 ];
 
-const CountUp = ({ to, suffix }: { to: number; suffix: string }) => {
+const CountUp = ({
+  to,
+  suffix,
+  liveBumps,
+}: {
+  to: number;
+  suffix: string;
+  liveBumps?: number[];
+}) => {
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
   const [n, setN] = useState(0);
+  const [pulse, setPulse] = useState(false);
+  const [bumpAmt, setBumpAmt] = useState(0);
+
   useEffect(() => {
     if (!inView) return;
-    let start = 0;
-    const dur = 1500;
+    const dur = 1800;
     const t0 = performance.now();
     const tick = (t: number) => {
       const p = Math.min(1, (t - t0) / dur);
-      setN(Math.round(start + (to - start) * (1 - Math.pow(1 - p, 3))));
+      // easeOutExpo for a snappy, premium feel
+      const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
+      setN(Math.round(to * eased));
       if (p < 1) requestAnimationFrame(tick);
     };
     requestAnimationFrame(tick);
   }, [inView, to]);
+
+  // Live "likes coming in" ticker after the initial count-up settles
+  useEffect(() => {
+    if (!inView || !liveBumps?.length) return;
+    let cancelled = false;
+    let running = to;
+    const start = setTimeout(() => {
+      liveBumps.forEach((amt, i) => {
+        setTimeout(() => {
+          if (cancelled) return;
+          running += amt;
+          setN(running);
+          setBumpAmt(amt);
+          setPulse(true);
+          setTimeout(() => setPulse(false), 700);
+        }, i * 900);
+      });
+    }, 2000);
+    return () => {
+      cancelled = true;
+      clearTimeout(start);
+    };
+  }, [inView, liveBumps, to]);
+
   return (
-    <span ref={ref}>
-      {n >= 1000 ? n.toLocaleString() : n}
-      {suffix}
+    <span ref={ref} className="relative inline-block">
+      <span
+        className={`inline-block transition-all duration-300 ${
+          pulse ? "scale-110 [text-shadow:0_0_24px_hsl(var(--primary)/0.8)]" : "scale-100"
+        }`}
+      >
+        {n >= 1000 ? n.toLocaleString() : n}
+        {suffix}
+      </span>
+      {pulse && bumpAmt > 0 && (
+        <span
+          key={n}
+          className="pointer-events-none absolute -top-4 left-1/2 -translate-x-1/2 font-mono text-sm text-primary animate-[float-up_0.7s_ease-out_forwards]"
+        >
+          +{bumpAmt}
+        </span>
+      )}
     </span>
   );
 };
@@ -244,11 +293,11 @@ const AboutPage = () => {
       </section>
 
       <section className="dark-band px-6 py-24 md:px-12">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
           {STATS.map((s) => (
             <div key={s.label} className="border border-border bg-card p-6 text-center">
               <p className="font-display text-6xl md:text-7xl text-primary leading-none">
-                <CountUp to={s.num} suffix={s.suffix} />
+                <CountUp to={s.num} suffix={s.suffix} liveBumps={s.liveBumps} />
               </p>
               <p className="mt-3 text-[10px] tracking-[0.3em] text-off-white">{s.label}</p>
             </div>
