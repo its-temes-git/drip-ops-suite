@@ -234,25 +234,46 @@ const HomePage = () => {
               OUR STORY
             </Link>
           </div>
-          <div className="relative w-full overflow-hidden">
-            <div className="flex gap-4 animate-marquee-left" style={{ width: "max-content" }}>
-              {[
-                "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=500&fit=crop",
-                "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=500&fit=crop",
-                "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&h=500&fit=crop",
-                "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=400&h=500&fit=crop",
-                "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=500&fit=crop",
-                "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&h=500&fit=crop",
-              ].map((src, i) => (
-                <img
-                  key={i}
-                  src={src}
-                  alt="Sawkem"
-                  className="h-80 w-56 flex-shrink-0 object-cover border border-border"
-                  loading="lazy"
-                />
-              ))}
-            </div>
+          <div className="story-stack group relative mx-auto h-[420px] w-full max-w-md">
+            {[
+              {
+                src: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=500&h=650&fit=crop",
+                rest: "rotate-[-8deg] -translate-x-16",
+                hover: "group-hover:rotate-[-18deg] group-hover:-translate-x-32 group-hover:-translate-y-2",
+                float: "story-float-1",
+                z: "z-10",
+              },
+              {
+                src: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=500&h=650&fit=crop",
+                rest: "rotate-0 translate-x-0",
+                hover: "group-hover:-translate-y-6 group-hover:scale-[1.04]",
+                float: "story-float-2",
+                z: "z-20",
+              },
+              {
+                src: "https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=500&h=650&fit=crop",
+                rest: "rotate-[8deg] translate-x-16",
+                hover: "group-hover:rotate-[18deg] group-hover:translate-x-32 group-hover:-translate-y-2",
+                float: "story-float-3",
+                z: "z-10",
+              },
+            ].map((card, i) => (
+              <div
+                key={i}
+                className={`absolute left-1/2 top-1/2 h-80 w-56 -translate-x-1/2 -translate-y-1/2 ${card.rest} ${card.z} ${card.float} transition-all duration-700 ease-[cubic-bezier(0.22,1,0.36,1)] ${card.hover}`}
+              >
+                <div className="relative h-full w-full overflow-hidden border border-border shadow-2xl shadow-black/50">
+                  <img
+                    src={card.src}
+                    alt="Sawkem"
+                    className="h-full w-full object-cover transition-transform duration-700 group-hover:scale-110"
+                    loading="lazy"
+                  />
+                  <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-primary/0 via-primary/0 to-primary/0 opacity-0 transition-opacity duration-500 group-hover:opacity-30 group-hover:from-primary/20 group-hover:to-transparent" />
+                  <div className="pointer-events-none absolute -inset-x-12 -top-12 h-32 rotate-12 bg-gradient-to-r from-transparent via-white/20 to-transparent translate-x-[-200%] group-hover:translate-x-[200%] transition-transform duration-1000" />
+                </div>
+              </div>
+            ))}
           </div>
         </div>
       </section>
