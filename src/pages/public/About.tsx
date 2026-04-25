@@ -293,11 +293,11 @@ const AboutPage = () => {
       </section>
 
       <section className="dark-band px-6 py-24 md:px-12">
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-3">
           {STATS.map((s) => (
             <div key={s.label} className="border border-border bg-card p-6 text-center">
               <p className="font-display text-6xl md:text-7xl text-primary leading-none">
-                <CountUp to={s.num} suffix={s.suffix} />
+                <CountUp to={s.num} suffix={s.suffix} liveBumps={s.liveBumps} />
               </p>
               <p className="mt-3 text-[10px] tracking-[0.3em] text-off-white">{s.label}</p>
             </div>
