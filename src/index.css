@@ -294,6 +294,17 @@
   .story-stack:not(:hover) .story-float-2 { animation: story-float-2 5s ease-in-out infinite 0.4s; }
   .story-stack:not(:hover) .story-float-3 { animation: story-float-3 5s ease-in-out infinite 0.8s; }
 
+  @media (prefers-reduced-motion: reduce) {
+    .story-stack .story-float-1,
+    .story-stack .story-float-2,
+    .story-stack .story-float-3 {
+      animation: none !important;
+    }
+    .story-stack * {
+      transition-duration: 0ms !important;
+    }
+  }
+
   /* Hide cursor on interactives — custom cursor handles it */
   a, button, [role="button"], input, textarea, select {
     cursor: none;
