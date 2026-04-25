@@ -83,7 +83,7 @@ const AboutPage = () => {
               transition={{ duration: 0.7, delay: 0.2 + i * 0.15 }}
               className="font-display leading-[0.85] text-[18vw] md:text-[16vw]"
             >
-              {line}
+              <MagneticLine text={line} />
             </motion.h1>
           ))}
           <motion.p
