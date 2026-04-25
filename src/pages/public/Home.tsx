@@ -57,7 +57,7 @@ const HomePage = () => {
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.7, delay: 0.15 }}
-              className="font-display leading-[0.85] text-[64px] md:text-[100px] lg:text-[140px] hero-outline-light dark:hero-outline-dark lg:ml-6"
+              className="font-display leading-[0.85] text-[64px] md:text-[100px] lg:text-[140px] text-[#080808] dark:text-white lg:ml-6"
               style={{ letterSpacing: "-2px", fontWeight: 900 }}
             >
               FASHION
