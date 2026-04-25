@@ -88,7 +88,7 @@ export const PublicFooter = () => {
           {doubled.map((b, i) => (
             <span
               key={i}
-              className="font-display text-2xl tracking-wider text-off-white/50 hover:text-primary transition-colors"
+              className="font-display text-2xl tracking-wider text-foreground/50 hover:text-primary transition-colors"
             >
               {b} <span className="text-primary mx-2">•</span>
             </span>
