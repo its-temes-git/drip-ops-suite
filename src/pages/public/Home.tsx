@@ -168,13 +168,25 @@ const HomePage = () => {
       </section>
 
       {/* MARQUEE */}
-      <section className="dark-band py-10">
+      <motion.section
+        variants={revealClip}
+        initial="hidden"
+        whileInView="show"
+        viewport={viewportOnce}
+        className="dark-band py-10"
+      >
         <BrandMarquee />
-      </section>
+      </motion.section>
 
       {/* NEW DROPS */}
       <section className="px-6 py-20 md:px-12">
-        <div className="flex items-end justify-between">
+        <motion.div
+          variants={revealRise}
+          initial="hidden"
+          whileInView="show"
+          viewport={viewportOnce}
+          className="flex items-end justify-between"
+        >
           <div>
             <h2 className="font-display text-6xl md:text-7xl">NEW DROPS</h2>
             <p className="mt-2 text-xs tracking-[0.3em] text-primary">
@@ -189,15 +201,20 @@ const HomePage = () => {
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>
-        </div>
+        </motion.div>
 
-        <div
+        <motion.div
           ref={scrollRef}
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={viewportOnce}
           className="mt-10 flex gap-6 overflow-x-auto scroll-smooth pb-4 snap-x snap-mandatory"
         >
           {FEATURED.map((p) => (
             <motion.div
               key={p.id}
+              variants={staggerChild}
               whileHover={{ y: -6 }}
               className="group min-w-[280px] md:min-w-[340px] snap-start border border-border bg-card transition-colors hover:border-primary"
             >
@@ -222,21 +239,37 @@ const HomePage = () => {
               </div>
             </motion.div>
           ))}
-        </div>
+        </motion.div>
       </section>
 
       {/* TIKTOK */}
       <section className="dark-band px-6 py-20 md:px-12">
-        <h2 className="font-display text-6xl md:text-7xl">AS SEEN ON TIKTOK</h2>
-        <p className="mt-2 text-xs tracking-[0.3em] text-primary">
-          @SAWKEM_FASHION • 51K+ LIKES • ADDIS ABABA
-        </p>
-        <div className="mt-10 grid gap-6 md:grid-cols-3">
+        <motion.div variants={revealRise} initial="hidden" whileInView="show" viewport={viewportOnce}>
+          <h2 className="font-display text-6xl md:text-7xl">AS SEEN ON TIKTOK</h2>
+          <p className="mt-2 text-xs tracking-[0.3em] text-primary">
+            @SAWKEM_FASHION • 51K+ LIKES • ADDIS ABABA
+          </p>
+        </motion.div>
+        <motion.div
+          variants={staggerParent}
+          initial="hidden"
+          whileInView="show"
+          viewport={viewportOnce}
+          className="mt-10 grid gap-6 md:grid-cols-3"
+        >
           {TIKTOK_PLACEHOLDERS.map((t, i) => (
-            <TikTokCard key={i} {...t} />
+            <motion.div key={i} variants={staggerChild}>
+              <TikTokCard {...t} />
+            </motion.div>
           ))}
-        </div>
-        <div className="mt-12 text-center">
+        </motion.div>
+        <motion.div
+          variants={revealScale}
+          initial="hidden"
+          whileInView="show"
+          viewport={viewportOnce}
+          className="mt-12 text-center"
+        >
           <a
             href="https://www.tiktok.com/@sawkem_fashion"
             target="_blank"
@@ -245,13 +278,13 @@ const HomePage = () => {
           >
             FOLLOW US FOR NEW DROPS
           </a>
-        </div>
+        </motion.div>
       </section>
 
       {/* ABOUT TEASER */}
       <section className="px-6 py-24 md:px-12">
         <div className="grid gap-12 md:grid-cols-2 items-center">
-          <div>
+          <motion.div variants={revealLeft} initial="hidden" whileInView="show" viewport={viewportOnce}>
             <h2 className="font-display text-5xl md:text-7xl leading-[0.9]">
               ETHIOPIA'S DOPEST FITS. SINCE DAY ONE.
             </h2>
@@ -265,8 +298,14 @@ const HomePage = () => {
             >
               OUR STORY
             </Link>
-          </div>
-          <div className="relative mx-auto h-[520px] w-full max-w-md overflow-hidden">
+          </motion.div>
+          <motion.div
+            variants={revealRight}
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
+            className="relative mx-auto h-[520px] w-full max-w-md overflow-hidden"
+          >
             <img
               src={ourStoryImg}
               alt="Sawkem streetwear editorial"
@@ -281,15 +320,29 @@ const HomePage = () => {
                   "linear-gradient(to left, hsl(0 0% 0%) 40%, transparent 100%)",
               }}
             />
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* FIND US */}
       <section className="dark-band px-6 py-20 md:px-12">
-        <h2 className="font-display text-6xl md:text-7xl">FIND US</h2>
+        <motion.h2
+          variants={revealClip}
+          initial="hidden"
+          whileInView="show"
+          viewport={viewportOnce}
+          className="font-display text-6xl md:text-7xl"
+        >
+          FIND US
+        </motion.h2>
         <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:items-stretch">
-          <div className="border-l-4 border-primary bg-card p-8 flex flex-col">
+          <motion.div
+            variants={revealLeft}
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
+            className="border-l-4 border-primary bg-card p-8 flex flex-col"
+          >
             <h3 className="font-display text-4xl md:text-5xl">SUMMIT BRANCH</h3>
             <p className="mt-3 text-sm text-off-white/80">Summit Area, in front of Deborah School, Addis Ababa</p>
             <p className="mt-2 text-xs text-muted-foreground">
@@ -317,8 +370,14 @@ const HomePage = () => {
                 <Send className="h-4 w-4" /> DM ON TELEGRAM
               </a>
             </div>
-          </div>
-          <div className="relative min-h-[320px] overflow-hidden border border-border lg:min-h-0">
+          </motion.div>
+          <motion.div
+            variants={revealRight}
+            initial="hidden"
+            whileInView="show"
+            viewport={viewportOnce}
+            className="relative min-h-[320px] overflow-hidden border border-border lg:min-h-0"
+          >
             <iframe
               title="Summit Map"
               src="https://www.google.com/maps?q=Summit,Addis+Ababa,Ethiopia&output=embed"
@@ -329,7 +388,7 @@ const HomePage = () => {
             <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
               <span className="block h-4 w-4 rounded-full bg-primary pulse-dot" />
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </>
