@@ -202,7 +202,7 @@ const HomePage = () => {
             </motion.p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Scroll indicator */}
         <motion.div
