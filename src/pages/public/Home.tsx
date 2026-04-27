@@ -1,7 +1,10 @@
-import { motion, type Variants } from "framer-motion";
+import { motion, type Variants, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowLeft, MapPin, Send } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
+import { BrandMarquee } from "@/components/BrandMarquee";
+import { TikTokCard, TIKTOK_PLACEHOLDERS } from "@/components/public/TikTokCard";
+import ourStoryImg from "@/assets/our-story.jpg";
 
 // Reusable scroll-reveal variants — modern, simple, distinct per section
 const revealRise: Variants = {
@@ -33,9 +36,6 @@ const staggerChild: Variants = {
   show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
 };
 const viewportOnce = { once: true, amount: 0.2 } as const;
-import { BrandMarquee } from "@/components/BrandMarquee";
-import { TikTokCard, TIKTOK_PLACEHOLDERS } from "@/components/public/TikTokCard";
-import ourStoryImg from "@/assets/our-story.jpg";
 
 const FEATURED = [
   { id: 1, brand: "Rick Owens", name: "Geobasket", price: 12500, sizes: ["40","41","42","43","44"], image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop" },
@@ -50,18 +50,69 @@ const HomePage = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollBy = (n: number) => scrollRef.current?.scrollBy({ left: n, behavior: "smooth" });
 
+  // Hero parallax — background image drifts up + scales as you scroll
+  const heroRef = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
+  const titleY = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"]);
+  const titleOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+
+  // Kinetic type — letters drift toward the mouse
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const sx = useSpring(mx, { stiffness: 80, damping: 18, mass: 0.6 });
+  const sy = useSpring(my, { stiffness: 80, damping: 18, mass: 0.6 });
+
+  useEffect(() => {
+    const el = heroRef.current;
+    if (!el) return;
+    if (window.matchMedia("(hover: none)").matches) return;
+    const onMove = (e: MouseEvent) => {
+      const r = el.getBoundingClientRect();
+      const px = (e.clientX - r.left) / r.width - 0.5; // -0.5..0.5
+      const py = (e.clientY - r.top) / r.height - 0.5;
+      mx.set(px);
+      my.set(py);
+    };
+    const onLeave = () => { mx.set(0); my.set(0); };
+    el.addEventListener("mousemove", onMove);
+    el.addEventListener("mouseleave", onLeave);
+    return () => {
+      el.removeEventListener("mousemove", onMove);
+      el.removeEventListener("mouseleave", onLeave);
+    };
+  }, [mx, my]);
+
+  // Per-letter offsets — outer letters drift more (kinetic feel)
+  const renderKineticWord = (word: string, intensity = 24) => {
+    const letters = word.split("");
+    const mid = (letters.length - 1) / 2;
+    return letters.map((ch, i) => {
+      const dist = (i - mid) / mid; // -1..1
+      const lx = useTransform(sx, (v) => v * intensity * dist * 1.6);
+      const ly = useTransform(sy, (v) => v * intensity * 0.6);
+      return (
+        <motion.span key={`${word}-${i}`} style={{ x: lx, y: ly, display: "inline-block" }}>
+          {ch}
+        </motion.span>
+      );
+    });
+  };
+
   return (
     <>
       {/* HERO — full-bleed image background */}
-      <section className="relative grain overflow-hidden min-h-[calc(100vh-4rem)] bg-[#f0ede8] dark:bg-[#080808]">
-        {/* Background image — covers entire hero at low opacity */}
+      <section ref={heroRef} className="relative grain overflow-hidden min-h-[calc(100vh-4rem)] bg-[#f0ede8] dark:bg-[#080808]">
+        {/* Background image — covers entire hero at low opacity, with scroll parallax */}
         <motion.img
           initial={{ opacity: 0, scale: 1.05 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 1.2 }}
+          style={{ y: bgY, scale: bgScale }}
           src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=1600&h=2000&fit=crop"
           alt="Sawkem streetwear editorial"
-          className="absolute inset-0 h-full w-full object-cover opacity-30 dark:opacity-25"
+          className="absolute inset-0 h-full w-full object-cover opacity-30 dark:opacity-25 will-change-transform"
         />
         {/* Theme-aware overlay tint to keep text readable */}
         <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#f0ede8]/85 via-[#f0ede8]/40 to-[#f0ede8]/10 dark:from-[#080808]/90 dark:via-[#080808]/50 dark:to-[#080808]/20" />
@@ -73,7 +124,10 @@ const HomePage = () => {
         <div className="hero-orb hero-orb-3" />
         <div className="hero-orb hero-orb-4" />
 
-        <div className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center px-6 py-12 md:px-12 lg:pl-[8%]">
+        <motion.div
+          style={{ y: titleY, opacity: titleOpacity }}
+          className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center px-6 py-12 md:px-12 lg:pl-[8%]"
+        >
           <div className="w-full text-center lg:max-w-3xl lg:text-left">
             <div className="inline-block rounded-xl bg-black/15 p-6 dark:bg-black/40 md:p-8">
             <motion.h1
@@ -83,7 +137,7 @@ const HomePage = () => {
               className="font-display leading-[0.85] text-[64px] md:text-[100px] lg:text-[140px] text-[#080808] dark:text-white"
               style={{ letterSpacing: "-2px", fontWeight: 900 }}
             >
-              SAWKEM
+              {renderKineticWord("SAWKEM", 28)}
             </motion.h1>
             <motion.h2
               initial={{ opacity: 0, y: 30 }}
@@ -92,7 +146,7 @@ const HomePage = () => {
               className="font-display leading-[0.85] text-[64px] md:text-[100px] lg:text-[140px] text-[#080808] dark:text-white lg:ml-6"
               style={{ letterSpacing: "-2px", fontWeight: 900 }}
             >
-              FASHION
+              {renderKineticWord("FASHION", 22)}
             </motion.h2>
             <motion.p
               initial={{ opacity: 0, y: 30 }}
@@ -148,7 +202,7 @@ const HomePage = () => {
             </motion.p>
             </div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Scroll indicator */}
         <motion.div
