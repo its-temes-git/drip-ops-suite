@@ -1,7 +1,10 @@
-import { motion, type Variants } from "framer-motion";
+import { motion, type Variants, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowLeft, MapPin, Send } from "lucide-react";
-import { useRef } from "react";
+import { useRef, useEffect } from "react";
+import { BrandMarquee } from "@/components/BrandMarquee";
+import { TikTokCard, TIKTOK_PLACEHOLDERS } from "@/components/public/TikTokCard";
+import ourStoryImg from "@/assets/our-story.jpg";
 
 // Reusable scroll-reveal variants — modern, simple, distinct per section
 const revealRise: Variants = {
@@ -33,15 +36,6 @@ const staggerChild: Variants = {
   show: { opacity: 1, y: 0, filter: "blur(0px)", transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] } },
 };
 const viewportOnce = { once: true, amount: 0.2 } as const;
-
-import { useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
-import { useEffect } from "react";
-import { BrandMarquee } from "@/components/BrandMarquee";
-import { TikTokCard, TIKTOK_PLACEHOLDERS } from "@/components/public/TikTokCard";
-import ourStoryImg from "@/assets/our-story.jpg";
-import { BrandMarquee } from "@/components/BrandMarquee";
-import { TikTokCard, TIKTOK_PLACEHOLDERS } from "@/components/public/TikTokCard";
-import ourStoryImg from "@/assets/our-story.jpg";
 
 const FEATURED = [
   { id: 1, brand: "Rick Owens", name: "Geobasket", price: 12500, sizes: ["40","41","42","43","44"], image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop" },
