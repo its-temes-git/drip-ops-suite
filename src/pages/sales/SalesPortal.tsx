@@ -62,11 +62,13 @@ const SalesPortal = () => {
 
   const todaySales = sales.filter((s) => s.time >= startOfToday);
   const weekSales = sales.filter((s) => s.time >= startOfWeek);
+  const todayActive = todaySales.filter((s) => !s.deleted);
+  const weekActive = weekSales.filter((s) => !s.deleted);
 
-  const todayItemCount = todaySales.reduce((a, b) => a + b.qty, 0);
-  const weekItemCount = weekSales.reduce((a, b) => a + b.qty, 0);
-  const todayRevenue = todaySales.reduce((a, b) => a + b.price * b.qty, 0);
-  const weekRevenue = weekSales.reduce((a, b) => a + b.price * b.qty, 0);
+  const todayItemCount = todayActive.reduce((a, b) => a + b.qty, 0);
+  const weekItemCount = weekActive.reduce((a, b) => a + b.qty, 0);
+  const todayRevenue = todayActive.reduce((a, b) => a + b.price * b.qty, 0);
+  const weekRevenue = weekActive.reduce((a, b) => a + b.price * b.qty, 0);
 
   const lowStock = inventory.filter((i) => i.qty > 0 && i.qty <= 3);
   const outStock = inventory.filter((i) => i.qty === 0);
