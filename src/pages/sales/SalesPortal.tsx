@@ -648,6 +648,28 @@ const RecordSaleModal = ({
                 </p>
               )}
             </div>
+
+            <div>
+              <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">PAYMENT METHOD</p>
+              <div className="grid grid-cols-3 gap-2">
+                {PAYMENTS.map((p) => {
+                  const active = payment === p.id;
+                  return (
+                    <button
+                      key={p.id}
+                      type="button"
+                      onClick={() => setPayment(p.id)}
+                      className={`flex flex-col items-center justify-center gap-1.5 border px-2 py-3 text-[10px] tracking-widest transition-colors ${
+                        active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary/50"
+                      }`}
+                    >
+                      <p.icon className="h-5 w-5" />
+                      {p.label}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
           </div>
 
           <div className="space-y-3 border-t border-border p-4">
@@ -662,6 +684,177 @@ const RecordSaleModal = ({
               CONFIRM SALE
             </button>
           </div>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+// ----- Edit Sale Modal -----
+const EditSaleModal = ({
+  sale,
+  editor,
+  onClose,
+  onSave,
+}: {
+  sale: Sale;
+  editor: string;
+  onClose: () => void;
+  onSave: (changes: { qty: number; price: number; size: string; color: string; payment: PaymentMethod }) => void;
+}) => {
+  const [qty, setQty] = useState(sale.qty);
+  const [priceStr, setPriceStr] = useState(String(sale.price));
+  const [size, setSize] = useState(sale.size);
+  const [color, setColor] = useState(sale.color);
+  const [payment, setPayment] = useState<PaymentMethod>(sale.payment);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const price = Number(priceStr) || 0;
+
+  const save = () => {
+    if (price <= 0) { toast.error("Enter a valid price"); return; }
+    if (qty <= 0) { toast.error("Quantity must be at least 1"); return; }
+    onSave({ qty, price, size, color, payment });
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 p-3 backdrop-blur"
+    >
+      <motion.div
+        initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()}
+        className="relative flex w-full max-w-md flex-col overflow-hidden border border-border bg-card shadow-2xl"
+        style={{ maxHeight: "calc(100vh - 1.5rem)" }}
+      >
+        <div className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
+          <div>
+            <p className="text-[10px] tracking-[0.25em] text-primary">EDIT SALE</p>
+            <h2 className="font-display text-2xl">{sale.itemName}</h2>
+            <p className="text-[10px] text-muted-foreground">Editor: {editor}</p>
+          </div>
+          <button onClick={onClose} aria-label="Close" className="flex h-9 w-9 items-center justify-center border border-border text-muted-foreground hover:text-off-white">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="flex-1 space-y-4 overflow-y-auto p-5">
+          <div>
+            <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">QUANTITY</p>
+            <div className="flex items-center gap-3">
+              <button onClick={() => setQty(Math.max(1, qty - 1))} className="flex h-10 w-10 items-center justify-center border border-border"><Minus className="h-4 w-4" /></button>
+              <span className="w-10 text-center font-display text-2xl">{qty}</span>
+              <button onClick={() => setQty(qty + 1)} className="flex h-10 w-10 items-center justify-center border border-border"><Plus className="h-4 w-4" /></button>
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">SOLD AT (ETB)</p>
+            <div className="flex items-center gap-2 border border-border bg-background px-3">
+              <span className="text-xs tracking-widest text-muted-foreground">ETB</span>
+              <input
+                type="number" min={0} value={priceStr}
+                onChange={(e) => setPriceStr(e.target.value)}
+                className="flex-1 bg-transparent py-3 font-display text-xl outline-none"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">SIZE</p>
+              <input value={size} onChange={(e) => setSize(e.target.value)} className="w-full border border-border bg-background px-3 py-2 outline-none" />
+            </div>
+            <div>
+              <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">COLOR</p>
+              <input value={color} onChange={(e) => setColor(e.target.value)} className="w-full border border-border bg-background px-3 py-2 outline-none" />
+            </div>
+          </div>
+
+          <div>
+            <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">PAYMENT METHOD</p>
+            <div className="grid grid-cols-3 gap-2">
+              {PAYMENTS.map((p) => {
+                const active = payment === p.id;
+                return (
+                  <button
+                    key={p.id} type="button" onClick={() => setPayment(p.id)}
+                    className={`flex flex-col items-center justify-center gap-1.5 border px-2 py-3 text-[10px] tracking-widest ${active ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary/50"}`}
+                  >
+                    <p.icon className="h-5 w-5" />
+                    {p.label}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="border-t border-border p-4">
+          <button onClick={save} className="w-full bg-primary py-3 font-display text-lg tracking-widest text-primary-foreground hover:opacity-90">
+            SAVE CHANGES
+          </button>
+        </div>
+      </motion.div>
+    </motion.div>
+  );
+};
+
+// ----- Audit Trail Modal -----
+const AuditModal = ({ sale, onClose }: { sale: Sale; onClose: () => void }) => {
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  const actionColor = (a: string) =>
+    a === "created" ? "text-primary" : a === "deleted" ? "text-destructive" : "text-warning";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+      onClick={onClose}
+      className="fixed inset-0 z-50 flex items-center justify-center bg-background/90 p-3 backdrop-blur"
+    >
+      <motion.div
+        initial={{ scale: 0.95, y: 20 }} animate={{ scale: 1, y: 0 }} exit={{ scale: 0.95, opacity: 0 }}
+        onClick={(e) => e.stopPropagation()}
+        className="flex w-full max-w-md flex-col overflow-hidden border border-border bg-card shadow-2xl"
+        style={{ maxHeight: "calc(100vh - 1.5rem)" }}
+      >
+        <div className="flex items-start justify-between gap-3 border-b border-border px-5 py-4">
+          <div>
+            <p className="text-[10px] tracking-[0.25em] text-primary">AUDIT TRAIL</p>
+            <h2 className="font-display text-xl">{sale.itemName}</h2>
+            <p className="text-[10px] text-muted-foreground">Sale ID: {sale.id.slice(0, 8)}</p>
+          </div>
+          <button onClick={onClose} className="flex h-9 w-9 items-center justify-center border border-border text-muted-foreground hover:text-off-white">
+            <X className="h-4 w-4" />
+          </button>
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-5">
+          <ol className="relative space-y-4 border-l border-border pl-5">
+            {sale.audit.map((entry, i) => (
+              <li key={i} className="relative">
+                <span className={`absolute -left-[27px] top-1 h-3 w-3 rounded-full border-2 border-background ${entry.action === "created" ? "bg-primary" : entry.action === "deleted" ? "bg-destructive" : "bg-warning"}`} />
+                <p className={`text-xs tracking-widest uppercase ${actionColor(entry.action)}`}>{entry.action}</p>
+                <p className="mt-0.5 text-sm">By <span className="text-primary">{entry.by || "Unknown"}</span></p>
+                <p className="text-[10px] text-muted-foreground">{entry.at.toLocaleString()}</p>
+                {entry.changes && (
+                  <p className="mt-1 text-xs text-off-white">{entry.changes}</p>
+                )}
+              </li>
+            ))}
+          </ol>
         </div>
       </motion.div>
     </motion.div>
