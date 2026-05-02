@@ -131,60 +131,79 @@ const ContactPage = () => {
       </section>
 
       <section className="dark-band px-6 py-20 md:px-12">
-        <h2 className="font-display text-6xl md:text-7xl">VISIT THE STORE</h2>
-        <div className="mt-10 grid gap-8 md:grid-cols-2 border border-border bg-card p-6 md:p-10">
-          <div>
-            <h3 className="font-display text-4xl md:text-5xl">SUMMIT BRANCH</h3>
-            <div className="mt-3 h-px w-16 bg-primary" />
-            <p className="mt-4 text-sm">Summit Area, in front of Deborah School</p>
-            <p className="text-sm text-muted-foreground">Addis Ababa, Ethiopia</p>
-            <table className="mt-6 text-xs">
-              <tbody>
-                {[
-                  ["Mon – Fri", "9:00 AM – 8:00 PM"],
-                  ["Saturday", "9:00 AM – 8:00 PM"],
-                  ["Sunday", "11:00 AM – 6:00 PM"],
-                ].map(([d, h]) => (
-                  <tr key={d}>
-                    <td className="py-1 pr-6 tracking-widest text-muted-foreground">{d}</td>
-                    <td className="py-1">{h}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-            <p className="mt-4 text-sm">📞 0951 077 634</p>
-            <p className="text-sm">💬 @sawkemcollection</p>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <a
-                href="https://www.google.com/maps/search/Summit+Addis+Ababa"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 bg-primary px-5 py-3 text-xs tracking-[0.25em] text-primary-foreground hover:bg-off-white transition-colors"
-              >
-                <MapPin className="h-4 w-4" /> GET DIRECTIONS
-              </a>
-              <a
-                href="https://t.me/sawkemcollection"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 border border-off-white px-5 py-3 text-xs tracking-[0.25em] hover:bg-off-white hover:text-background transition-all"
-              >
-                <Send className="h-4 w-4" /> DM ON TELEGRAM
-              </a>
+        <h2 className="font-display text-6xl md:text-7xl">VISIT THE STORES</h2>
+        <p className="mt-3 text-xs tracking-[0.3em] text-primary">TWO LOCATIONS — ADDIS ABABA</p>
+
+        <div className="mt-10 grid gap-8 lg:grid-cols-2">
+          {[
+            {
+              title: "SUMMIT BRANCH",
+              line1: "Summit Area, in front of Deborah School",
+              line2: "Addis Ababa, Ethiopia",
+              mapQuery: "Summit,Addis+Ababa,Ethiopia",
+            },
+            {
+              title: "SARIS BRANCH",
+              line1: "Saris, Yekality Taxi Meyaza",
+              line2: "Addis Ababa, Ethiopia",
+              mapQuery: "Saris+Yekality+Taxi+Meyaza,Addis+Ababa,Ethiopia",
+            },
+          ].map((b) => (
+            <div key={b.title} className="grid gap-6 border border-border bg-card p-6 md:p-8">
+              <div>
+                <h3 className="font-display text-4xl md:text-5xl">{b.title}</h3>
+                <div className="mt-3 h-px w-16 bg-primary" />
+                <p className="mt-4 text-sm">{b.line1}</p>
+                <p className="text-sm text-muted-foreground">{b.line2}</p>
+                <table className="mt-6 text-xs">
+                  <tbody>
+                    {[
+                      ["Mon – Fri", "9:00 AM – 8:00 PM"],
+                      ["Saturday", "9:00 AM – 8:00 PM"],
+                      ["Sunday", "11:00 AM – 6:00 PM"],
+                    ].map(([d, h]) => (
+                      <tr key={d}>
+                        <td className="py-1 pr-6 tracking-widest text-muted-foreground">{d}</td>
+                        <td className="py-1">{h}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+                <p className="mt-4 text-sm">📞 0951 077 634</p>
+                <p className="text-sm">💬 @sawkemcollection</p>
+                <div className="mt-6 flex flex-wrap gap-3">
+                  <a
+                    href={`https://www.google.com/maps/search/${b.mapQuery}`}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2 bg-primary px-5 py-3 text-xs tracking-[0.25em] text-primary-foreground hover:bg-off-white transition-colors"
+                  >
+                    <MapPin className="h-4 w-4" /> GET DIRECTIONS
+                  </a>
+                  <a
+                    href="https://t.me/sawkemcollection"
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex items-center gap-2 border border-off-white px-5 py-3 text-xs tracking-[0.25em] hover:bg-off-white hover:text-background transition-all"
+                  >
+                    <Send className="h-4 w-4" /> DM ON TELEGRAM
+                  </a>
+                </div>
+              </div>
+              <div className="relative aspect-video overflow-hidden border border-border">
+                <iframe
+                  title={`${b.title} Map`}
+                  src={`https://www.google.com/maps?q=${b.mapQuery}&output=embed`}
+                  className="absolute inset-0 h-full w-full"
+                  style={{ filter: "grayscale(100%) invert(85%) contrast(90%)" }}
+                  loading="lazy"
+                />
+                <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                  <span className="block h-4 w-4 rounded-full bg-primary pulse-dot" />
+                </div>
+              </div>
             </div>
-          </div>
-          <div className="relative aspect-square md:aspect-auto overflow-hidden border border-border">
-            <iframe
-              title="Summit Map"
-              src="https://www.google.com/maps?q=Summit,Addis+Ababa,Ethiopia&output=embed"
-              className="h-full w-full"
-              style={{ filter: "grayscale(100%) invert(85%) contrast(90%)" }}
-              loading="lazy"
-            />
-            <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <span className="block h-4 w-4 rounded-full bg-primary pulse-dot" />
-            </div>
-          </div>
+          ))}
         </div>
       </section>
 
