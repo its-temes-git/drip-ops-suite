@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { Send } from "lucide-react";
+import { Send, Instagram } from "lucide-react";
 import { TikTokIcon } from "./PublicNav";
 
 const FOOTER_BRANDS = [
@@ -40,21 +40,17 @@ export const PublicFooter = () => {
         <div>
           <p className="mb-4 text-xs tracking-[0.3em] text-primary">FIND US</p>
           <p className="text-sm leading-relaxed">
+            <span className="text-primary">Summit Branch:</span><br />
             Summit Area, in front of Deborah School<br />
+            Addis Ababa, Ethiopia
+          </p>
+          <p className="mt-3 text-sm leading-relaxed">
+            <span className="text-primary">Saris Branch:</span><br />
+            Saris, Yekality Taxi Meyaza<br />
             Addis Ababa, Ethiopia
           </p>
           <p className="mt-3 text-sm">
             <a href="tel:+251951077634" className="hover:text-primary">0951 077 634</a>
-          </p>
-          <p className="text-sm">
-            <a href="https://t.me/sawkemcollection" target="_blank" rel="noreferrer" className="hover:text-primary">
-              @sawkemcollection
-            </a>
-          </p>
-          <p className="text-sm">
-            <a href="https://www.tiktok.com/@sawkem_fashion" target="_blank" rel="noreferrer" className="hover:text-primary">
-              @sawkem_fashion
-            </a>
           </p>
           <div className="mt-4 flex items-center gap-4">
             <a
@@ -74,6 +70,15 @@ export const PublicFooter = () => {
               aria-label="Telegram"
             >
               <Send className="h-5 w-5" />
+            </a>
+            <a
+              href="https://www.instagram.com/sawkem_fashion"
+              target="_blank"
+              rel="noreferrer"
+              className="text-foreground transition-colors hover:text-primary"
+              aria-label="Instagram"
+            >
+              <Instagram className="h-5 w-5" />
             </a>
           </div>
         </div>
