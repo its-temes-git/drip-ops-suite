@@ -1,7 +1,7 @@
 import { motion, type Variants, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowLeft, MapPin, Send } from "lucide-react";
-import { useRef, useEffect } from "react";
+import { useRef, useEffect, useState } from "react";
 import { BrandMarquee } from "@/components/BrandMarquee";
 import { TikTokCard, TIKTOK_PLACEHOLDERS } from "@/components/public/TikTokCard";
 import ourStoryImg from "@/assets/our-story.jpg";
@@ -49,6 +49,7 @@ const FEATURED = [
 const HomePage = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
   const scrollBy = (n: number) => scrollRef.current?.scrollBy({ left: n, behavior: "smooth" });
+  const [openMap, setOpenMap] = useState<"summit" | "saris" | null>(null);
 
   // Hero parallax — background image drifts up + scales as you scroll
   const heroRef = useRef<HTMLElement>(null);
@@ -389,60 +390,88 @@ const HomePage = () => {
         >
           FIND US
         </motion.h2>
-        <div className="mt-10 grid gap-6 lg:grid-cols-2 lg:items-stretch">
-          <motion.div
-            variants={revealLeft}
-            initial="hidden"
-            whileInView="show"
-            viewport={viewportOnce}
-            className="border-l-4 border-primary bg-card p-8 flex flex-col"
-          >
-            <h3 className="font-display text-4xl md:text-5xl">SUMMIT BRANCH</h3>
-            <p className="mt-3 text-sm text-off-white/80">Summit Area, in front of Deborah School, Addis Ababa</p>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Mon–Sat: 9:00 AM – 8:00 PM | Sun: 11:00 AM – 6:00 PM
-            </p>
-            <div className="mt-4 space-y-1 text-sm">
-              <p>📞 <a href="tel:+251951077634" className="hover:text-primary">0951 077 634</a></p>
-              <p>💬 <a href="https://t.me/sawkemcollection" target="_blank" rel="noreferrer" className="hover:text-primary">@sawkemcollection</a></p>
-            </div>
-            <div className="mt-6 flex flex-wrap gap-3">
-              <a
-                href="https://www.google.com/maps/search/Summit+Addis+Ababa"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 bg-primary px-5 py-3 text-xs tracking-[0.25em] text-primary-foreground hover:bg-off-white transition-colors"
+        <p className="mt-3 text-xs tracking-[0.3em] text-primary">TWO LOCATIONS — ADDIS ABABA</p>
+
+        <div className="mt-10 grid gap-6 lg:grid-cols-2">
+          {[
+            {
+              key: "summit" as const,
+              title: "SUMMIT BRANCH",
+              address: "Summit Area, in front of Deborah School, Addis Ababa",
+              hours: "Mon–Sat: 9:00 AM – 8:00 PM | Sun: 11:00 AM – 6:00 PM",
+              mapQuery: "Summit,Addis+Ababa,Ethiopia",
+              variant: revealLeft,
+            },
+            {
+              key: "saris" as const,
+              title: "SARIS BRANCH",
+              address: "Saris, Yekality Taxi Meyaza, Addis Ababa",
+              hours: "Mon–Sat: 9:00 AM – 8:00 PM | Sun: 11:00 AM – 6:00 PM",
+              mapQuery: "Saris+Yekality+Taxi+Meyaza,Addis+Ababa,Ethiopia",
+              variant: revealRight,
+            },
+          ].map((b) => (
+            <motion.div
+              key={b.key}
+              variants={b.variant}
+              initial="hidden"
+              whileInView="show"
+              viewport={viewportOnce}
+              className="border-l-4 border-primary bg-card p-8 flex flex-col"
+            >
+              <h3 className="font-display text-4xl md:text-5xl">{b.title}</h3>
+              <p className="mt-3 text-sm text-off-white/80">{b.address}</p>
+              <p className="mt-2 text-xs text-muted-foreground">{b.hours}</p>
+              <div className="mt-4 space-y-1 text-sm">
+                <p>📞 <a href="tel:+251951077634" className="hover:text-primary">0951 077 634</a></p>
+                <p>💬 <a href="https://t.me/sawkemcollection" target="_blank" rel="noreferrer" className="hover:text-primary">@sawkemcollection</a></p>
+              </div>
+              <div className="mt-6 flex flex-wrap gap-3">
+                <button
+                  type="button"
+                  onClick={() => setOpenMap(openMap === b.key ? null : b.key)}
+                  className="flex items-center gap-2 bg-primary px-5 py-3 text-xs tracking-[0.25em] text-primary-foreground hover:bg-off-white transition-colors"
+                >
+                  <MapPin className="h-4 w-4" />
+                  {openMap === b.key ? "HIDE MAP" : "SHOW MAP"}
+                </button>
+                <a
+                  href={`https://www.google.com/maps/search/${b.mapQuery}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="flex items-center gap-2 border border-off-white px-5 py-3 text-xs tracking-[0.25em] hover:bg-off-white hover:text-background transition-all"
+                >
+                  <Send className="h-4 w-4" /> DIRECTIONS
+                </a>
+              </div>
+
+              <motion.div
+                initial={false}
+                animate={{
+                  height: openMap === b.key ? 360 : 0,
+                  opacity: openMap === b.key ? 1 : 0,
+                  marginTop: openMap === b.key ? 24 : 0,
+                }}
+                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                className="relative overflow-hidden border border-border"
               >
-                <MapPin className="h-4 w-4" /> GET DIRECTIONS
-              </a>
-              <a
-                href="https://t.me/sawkemcollection"
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-2 border border-off-white px-5 py-3 text-xs tracking-[0.25em] hover:bg-off-white hover:text-background transition-all"
-              >
-                <Send className="h-4 w-4" /> DM ON TELEGRAM
-              </a>
-            </div>
-          </motion.div>
-          <motion.div
-            variants={revealRight}
-            initial="hidden"
-            whileInView="show"
-            viewport={viewportOnce}
-            className="relative min-h-[320px] overflow-hidden border border-border lg:min-h-0"
-          >
-            <iframe
-              title="Summit Map"
-              src="https://www.google.com/maps?q=Summit,Addis+Ababa,Ethiopia&output=embed"
-              className="absolute inset-0 h-full w-full"
-              style={{ filter: "grayscale(100%) invert(90%) contrast(85%)" }}
-              loading="lazy"
-            />
-            <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
-              <span className="block h-4 w-4 rounded-full bg-primary pulse-dot" />
-            </div>
-          </motion.div>
+                {openMap === b.key && (
+                  <>
+                    <iframe
+                      title={`${b.title} Map`}
+                      src={`https://www.google.com/maps?q=${b.mapQuery}&output=embed`}
+                      className="absolute inset-0 h-full w-full"
+                      style={{ filter: "grayscale(100%) invert(90%) contrast(85%)" }}
+                      loading="lazy"
+                    />
+                    <div className="pointer-events-none absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2">
+                      <span className="block h-4 w-4 rounded-full bg-primary pulse-dot" />
+                    </div>
+                  </>
+                )}
+              </motion.div>
+            </motion.div>
+          ))}
         </div>
       </section>
     </>
