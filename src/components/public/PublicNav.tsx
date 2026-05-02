@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, NavLink, useLocation } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Send } from "lucide-react";
+import { Menu, X, Send, Instagram } from "lucide-react";
 import { ThemeToggle } from "@/components/ThemeToggle";
 
 const links = [
@@ -92,6 +92,15 @@ export const PublicNav = () => {
             >
               <TikTokIcon className="h-4 w-4" />
             </a>
+            <a
+              href="https://www.instagram.com/sawkem_fashion"
+              target="_blank"
+              rel="noreferrer"
+              className="text-off-white transition-colors hover:text-primary"
+              aria-label="Instagram"
+            >
+              <Instagram className="h-4 w-4" />
+            </a>
             <Link
               to="/login"
               className="text-[10px] tracking-[0.3em] text-muted-foreground transition-colors hover:text-primary"
@@ -143,8 +152,11 @@ export const PublicNav = () => {
               <a href="https://t.me/sawkemcollection" target="_blank" rel="noreferrer">
                 <Send className="h-5 w-5" />
               </a>
-              <a href="https://www.tiktok.com/@sawkem_fashion" target="_blank" rel="noreferrer">
+              <a href="https://www.tiktok.com/@sawkem_fashion" target="_blank" rel="noreferrer" aria-label="TikTok">
                 <TikTokIcon className="h-5 w-5" />
+              </a>
+              <a href="https://www.instagram.com/sawkem_fashion" target="_blank" rel="noreferrer" aria-label="Instagram">
+                <Instagram className="h-5 w-5" />
               </a>
               <Link to="/login" className="ml-auto text-xs tracking-[0.3em] text-muted-foreground">
                 STAFF LOGIN
