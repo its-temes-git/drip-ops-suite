@@ -106,13 +106,6 @@ const SalesPortal = () => {
           <p className="mt-1 font-display text-2xl text-primary">{todayItemCount} <span className="text-xs text-muted-foreground">items</span></p>
           <p className="text-[11px] text-off-white">ETB {todayRevenue.toLocaleString()}</p>
         </div>
-        <div className="rounded-sm border border-border bg-card p-3">
-          <div className="flex items-center gap-2 text-[10px] tracking-widest text-muted-foreground">
-            <TrendingUp className="h-3 w-3" /> THIS WEEK
-          </div>
-          <p className="mt-1 font-display text-2xl text-primary">{weekItemCount} <span className="text-xs text-muted-foreground">items</span></p>
-          <p className="text-[11px] text-off-white">ETB {weekRevenue.toLocaleString()}</p>
-        </div>
       </div>
 
       <nav className="flex-1 overflow-y-auto py-2">
