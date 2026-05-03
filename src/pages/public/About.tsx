@@ -180,6 +180,33 @@ const MagneticLine = ({ text }: { text: string }) => {
   );
 };
 
+const Typewriter = ({ text, className }: { text: string; className?: string }) => {
+  const ref = useRef<HTMLParagraphElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+  const [count, setCount] = useState(0);
+
+  useEffect(() => {
+    if (!inView) return;
+    let i = 0;
+    const id = setInterval(() => {
+      i++;
+      setCount(i);
+      if (i >= text.length) clearInterval(id);
+    }, 18);
+    return () => clearInterval(id);
+  }, [inView, text]);
+
+  const done = count >= text.length;
+  return (
+    <p ref={ref} className={className}>
+      {inView ? text.slice(0, count) : ""}
+      <span
+        className={`inline-block w-[2px] h-[1em] align-[-0.15em] ml-0.5 bg-primary ${done ? "opacity-0" : "animate-pulse"}`}
+      />
+    </p>
+  );
+};
+
 const AboutPage = () => {
   return (
     <>
@@ -232,7 +259,7 @@ const AboutPage = () => {
             </div>
             <div>
               <h2 className="font-display text-5xl md:text-6xl leading-[0.9]">{b.title}</h2>
-              <p className="mt-6 text-sm text-off-white/80 leading-relaxed">{b.body}</p>
+              <Typewriter text={b.body} className="mt-6 text-sm text-off-white/80 leading-relaxed" />
             </div>
           </motion.div>
         ))}
