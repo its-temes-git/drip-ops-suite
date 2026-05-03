@@ -198,11 +198,15 @@ const Typewriter = ({ text, className }: { text: string; className?: string }) =
 
   const done = count >= text.length;
   return (
-    <p ref={ref} className={className}>
-      {inView ? text.slice(0, count) : ""}
-      <span
-        className={`inline-block w-[2px] h-[1em] align-[-0.15em] ml-0.5 bg-primary ${done ? "opacity-0" : "animate-pulse"}`}
-      />
+    <p ref={ref} className={`${className ?? ""} relative`}>
+      {/* Reserve full space so layout never shifts */}
+      <span aria-hidden className="invisible">{text}</span>
+      <span className="absolute inset-0">
+        {inView ? text.slice(0, count) : ""}
+        <span
+          className={`inline-block w-[2px] h-[1em] align-[-0.15em] ml-0.5 bg-primary ${done ? "opacity-0" : "animate-pulse"}`}
+        />
+      </span>
     </p>
   );
 };
@@ -231,16 +235,17 @@ const AboutPage = () => {
               <MagneticLine text={line} />
             </motion.h1>
           ))}
-          <motion.p
+          <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.9 }}
-            className="mx-auto mt-8 max-w-2xl text-sm text-off-white/80 leading-relaxed"
+            className="mx-auto mt-8 max-w-2xl"
           >
-            Sawkem Fashion is Addis Ababa's home for premium international streetwear.
-            We source the world's most coveted brands and bring them directly to Ethiopia —
-            authentic, original, and exclusively available at our Summit branch.
-          </motion.p>
+            <Typewriter
+              text="Sawkem Fashion is Addis Ababa's home for premium international streetwear. We source the world's most coveted brands and bring them directly to Ethiopia — authentic, original, and exclusively available at our Summit branch."
+              className="text-sm text-off-white/80 leading-relaxed"
+            />
+          </motion.div>
         </div>
       </section>
 
