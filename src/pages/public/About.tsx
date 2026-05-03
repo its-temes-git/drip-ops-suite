@@ -198,11 +198,15 @@ const Typewriter = ({ text, className }: { text: string; className?: string }) =
 
   const done = count >= text.length;
   return (
-    <p ref={ref} className={className}>
-      {inView ? text.slice(0, count) : ""}
-      <span
-        className={`inline-block w-[2px] h-[1em] align-[-0.15em] ml-0.5 bg-primary ${done ? "opacity-0" : "animate-pulse"}`}
-      />
+    <p ref={ref} className={`${className ?? ""} relative`}>
+      {/* Reserve full space so layout never shifts */}
+      <span aria-hidden className="invisible">{text}</span>
+      <span className="absolute inset-0">
+        {inView ? text.slice(0, count) : ""}
+        <span
+          className={`inline-block w-[2px] h-[1em] align-[-0.15em] ml-0.5 bg-primary ${done ? "opacity-0" : "animate-pulse"}`}
+        />
+      </span>
     </p>
   );
 };
