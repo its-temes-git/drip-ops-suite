@@ -21,6 +21,7 @@ import Analytics from "./pages/owner/Analytics";
 import NewDrop from "./pages/owner/NewDrop";
 import LowStock from "./pages/owner/LowStock";
 import Staff from "./pages/owner/Staff";
+import SalesLog from "./pages/owner/SalesLog";
 import Settings from "./pages/owner/Settings";
 import SalesPortal from "./pages/sales/SalesPortal";
 
@@ -66,6 +67,7 @@ const App = () => (
               <Route path="drop" element={<NewDrop />} />
               <Route path="alerts" element={<LowStock />} />
               <Route path="staff" element={<Staff />} />
+              <Route path="sales-log" element={<SalesLog />} />
               <Route path="settings" element={<Settings />} />
             </Route>
             <Route path="/sales" element={<SalesPortal />} />

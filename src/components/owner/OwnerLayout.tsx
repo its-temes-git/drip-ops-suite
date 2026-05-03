@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutGrid, Box, BarChart3, Zap, User, Settings, LogOut, ShoppingBag } from "lucide-react";
+import { LayoutGrid, Box, BarChart3, Zap, User, Settings, LogOut, ShoppingBag, Receipt } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MOCK_TRANSACTIONS } from "@/data/inventory";
@@ -10,6 +10,7 @@ import { toast } from "sonner";
 const navItems = [
   { to: "/owner", label: "DASHBOARD", icon: LayoutGrid, end: true },
   { to: "/owner/inventory", label: "INVENTORY", icon: Box },
+  { to: "/owner/sales-log", label: "SALES LOG", icon: Receipt },
   { to: "/owner/analytics", label: "ANALYTICS", icon: BarChart3 },
   { to: "/owner/drop", label: "NEW DROP", icon: Zap },
   { to: "/owner/staff", label: "STAFF", icon: User },
