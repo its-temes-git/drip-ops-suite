@@ -300,12 +300,10 @@ const AboutPage = () => {
             transition={{ duration: 0.7 }}
             className={`grid gap-10 items-center md:grid-cols-2 ${b.reverse ? "md:[&>div:first-child]:order-2" : ""}`}
           >
-            <div className="aspect-[4/3] overflow-hidden border border-border">
-              <img src={b.image} alt={b.title} className="h-full w-full object-cover grayscale hover:grayscale-0 transition-all duration-700" loading="lazy" />
-            </div>
+            <RevealImage src={b.image} alt={b.title} fromLeft={!b.reverse} />
             <div>
               <h2 className="font-display text-5xl md:text-6xl leading-[0.9]">{b.title}</h2>
-              <Typewriter text={b.body} className="mt-6 text-sm text-off-white/80 leading-relaxed" />
+              <WordReveal text={b.body} className="mt-6 text-sm text-off-white/80 leading-relaxed" />
             </div>
           </motion.div>
         ))}
