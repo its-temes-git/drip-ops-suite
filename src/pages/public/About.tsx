@@ -282,7 +282,7 @@ const AboutPage = () => {
             transition={{ delay: 0.9 }}
             className="mx-auto mt-8 max-w-2xl"
           >
-            <Typewriter
+            <WordReveal
               text="Sawkem Fashion is Addis Ababa's home for premium international streetwear. We source the world's most coveted brands and bring them directly to Ethiopia — authentic, original, and exclusively available at our Summit branch."
               className="text-sm text-off-white/80 leading-relaxed"
             />
