@@ -180,34 +180,75 @@ const MagneticLine = ({ text }: { text: string }) => {
   );
 };
 
-const Typewriter = ({ text, className }: { text: string; className?: string }) => {
+/* Word-by-word stagger reveal — replaces typewriter */
+const WordReveal = ({ text, className }: { text: string; className?: string }) => {
   const ref = useRef<HTMLParagraphElement>(null);
   const inView = useInView(ref, { once: true, margin: "-80px" });
-  const [count, setCount] = useState(0);
+  const words = text.split(" ");
 
-  useEffect(() => {
-    if (!inView) return;
-    let i = 0;
-    const id = setInterval(() => {
-      i++;
-      setCount(i);
-      if (i >= text.length) clearInterval(id);
-    }, 18);
-    return () => clearInterval(id);
-  }, [inView, text]);
-
-  const done = count >= text.length;
   return (
-    <p ref={ref} className={`${className ?? ""} relative`}>
-      {/* Reserve full space so layout never shifts */}
-      <span aria-hidden className="invisible">{text}</span>
-      <span className="absolute inset-0">
-        {inView ? text.slice(0, count) : ""}
-        <span
-          className={`inline-block w-[2px] h-[1em] align-[-0.15em] ml-0.5 bg-primary ${done ? "opacity-0" : "animate-pulse"}`}
-        />
-      </span>
+    <p ref={ref} className={className} aria-label={text}>
+      {words.map((w, i) => (
+        <span key={i} className="inline-block overflow-hidden align-bottom">
+          <motion.span
+            aria-hidden
+            className="inline-block"
+            initial={{ y: "110%", opacity: 0 }}
+            animate={inView ? { y: 0, opacity: 1 } : {}}
+            transition={{
+              duration: 0.55,
+              delay: i * 0.035,
+              ease: [0.22, 1, 0.36, 1],
+            }}
+          >
+            {w}
+          </motion.span>
+          {i < words.length - 1 && <span>&nbsp;</span>}
+        </span>
+      ))}
     </p>
+  );
+};
+
+/* Clip-path reveal + Ken Burns zoom + grayscale→color on scroll */
+const RevealImage = ({
+  src,
+  alt,
+  fromLeft = true,
+}: {
+  src: string;
+  alt: string;
+  fromLeft?: boolean;
+}) => {
+  const ref = useRef<HTMLDivElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+
+  const hidden = fromLeft
+    ? "polygon(0 0, 0 0, 0 100%, 0 100%)"
+    : "polygon(100% 0, 100% 0, 100% 100%, 100% 100%)";
+  const shown = "polygon(0 0, 100% 0, 100% 100%, 0 100%)";
+
+  return (
+    <motion.div
+      ref={ref}
+      className="aspect-[4/3] overflow-hidden border border-border"
+      initial={{ clipPath: hidden }}
+      animate={inView ? { clipPath: shown } : {}}
+      transition={{ duration: 1.1, ease: [0.77, 0, 0.175, 1] }}
+    >
+      <motion.img
+        src={src}
+        alt={alt}
+        loading="lazy"
+        className="h-full w-full object-cover"
+        initial={{ scale: 1.18, filter: "grayscale(100%)" }}
+        animate={inView ? { scale: 1, filter: "grayscale(0%)" } : {}}
+        transition={{
+          scale: { duration: 8, ease: "easeOut" },
+          filter: { duration: 1.4, delay: 0.3, ease: "easeOut" },
+        }}
+      />
+    </motion.div>
   );
 };
 
