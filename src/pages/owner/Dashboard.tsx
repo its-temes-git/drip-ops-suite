@@ -83,6 +83,8 @@ const Dashboard = () => {
 
   const dashboardData = data || {
     today: 0,
+    today_cogs: 0,
+    today_profit: 0,
     week: 0,
     month: 0,
     top_products: [],
@@ -99,9 +101,29 @@ const Dashboard = () => {
 
       {/* Stats */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
-        <StatCard label="TODAY'S REVENUE" value={`ETB ${dashboardData.today.toLocaleString()}`} delay={0} />
-        <StatCard label="THIS WEEK" value={`ETB ${dashboardData.week.toLocaleString()}`} delay={0.05} />
-        <StatCard label="THIS MONTH" value={`ETB ${dashboardData.month.toLocaleString()}`} delay={0.1} />
+        <StatCard
+          label="TODAY'S REVENUE"
+          value={`ETB ${dashboardData.today.toLocaleString()}`}
+          delay={0}
+          sub={<span className="text-muted-foreground text-[10px]">What customers paid</span>}
+        />
+        <StatCard
+          label="WHAT I PAID"
+          value={`ETB ${(dashboardData.today_cogs || 0).toLocaleString()}`}
+          delay={0.05}
+          sub={<span className="text-muted-foreground text-[10px]">Cost of goods sold today</span>}
+        />
+        <StatCard
+          label="TODAY'S PROFIT"
+          value={`ETB ${(dashboardData.today_profit || 0).toLocaleString()}`}
+          delay={0.1}
+          accent={dashboardData.today_profit >= 0 ? "primary" : "warning"}
+          sub={
+            <span className={(dashboardData.today_profit || 0) >= 0 ? "text-primary text-[10px]" : "text-destructive text-[10px]"}>
+              {(dashboardData.today_profit || 0) >= 0 ? "▲ In profit" : "▼ In loss"}
+            </span>
+          }
+        />
       </div>
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">

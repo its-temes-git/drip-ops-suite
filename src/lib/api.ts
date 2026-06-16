@@ -120,6 +120,8 @@ export const api = {
       const query = params ? `?${new URLSearchParams(params).toString()}` : '';
       return fetchAPI(`/api/owner/sales${query}`);
     },
+    deleteSale: (id: string) => fetchAPI(`/api/owner/sales/${id}`, { method: 'DELETE' }),
+    deleteAllSales: () => fetchAPI('/api/owner/sales/all', { method: 'DELETE' }),
     addProduct: (data: any) => fetchAPI('/api/owner/products', { method: 'POST', body: JSON.stringify(data) }),
     updateProduct: (id: string, data: any) => fetchAPI(`/api/owner/products/${id}`, { method: 'PUT', body: JSON.stringify(data) }),
     deleteProduct: (id: string | number) => fetchAPI(`/api/owner/products/${id}`, { method: 'DELETE' }),
