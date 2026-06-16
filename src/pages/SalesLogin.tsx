@@ -1,25 +1,31 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
+import { api } from "@/lib/api";
 
 const SalesLogin = () => {
-  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
   const [pin, setPin] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const nav = useNavigate();
-  const { setStaffName } = useApp();
+  const { login } = useApp();
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name.trim()) return toast.error("ENTER STAFF NAME");
-    if (pin === "1234") {
-      setStaffName(name.trim());
-      toast.success(`SHIFT STARTED — ${name.toUpperCase()}`);
+    if (!email.trim()) return toast.error("ENTER STAFF EMAIL");
+    setIsLoading(true);
+    try {
+      const response = await api.auth.login({ email, password: pin });
+      login(response.token, response.user);
+      toast.success(`SHIFT STARTED — ${response.user.full_name.toUpperCase()}`);
       setTimeout(() => nav("/sales"), 400);
-    } else {
-      toast.error("INVALID PIN");
+    } catch (error: any) {
+      toast.error(error.message || "INVALID CREDENTIALS");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -44,13 +50,13 @@ const SalesLogin = () => {
 
         <form onSubmit={submit} className="space-y-8">
           <div>
-            <label className="text-[10px] tracking-widest text-muted-foreground">STAFF NAME</label>
+            <label className="text-[10px] tracking-widest text-muted-foreground">STAFF EMAIL</label>
             <input
-              type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
               className="acid-glow w-full border-0 border-b border-border bg-transparent py-2 text-off-white outline-none focus:border-primary"
-              placeholder="Your name"
+              placeholder="Your email"
             />
           </div>
           <div>
@@ -59,7 +65,7 @@ const SalesLogin = () => {
               type="password"
               maxLength={4}
               value={pin}
-              onChange={(e) => setPin(e.target.value.replace(/\D/g, ""))}
+              onChange={(e) => setPin(e.target.value)}
               className="acid-glow w-full border-0 border-b border-border bg-transparent py-2 text-2xl tracking-[1em] text-off-white outline-none focus:border-primary"
               placeholder="••••"
             />
@@ -69,9 +75,10 @@ const SalesLogin = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full bg-off-white py-4 font-display text-xl tracking-widest text-background"
+            disabled={isLoading}
+            className="w-full flex items-center justify-center bg-off-white py-4 font-display text-xl tracking-widest text-background disabled:opacity-70"
           >
-            START SHIFT
+            {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : "START SHIFT"}
           </motion.button>
         </form>
 

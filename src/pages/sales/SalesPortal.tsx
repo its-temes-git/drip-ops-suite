@@ -6,22 +6,47 @@ import {
   TrendingUp, Calendar, Package, Menu, AlertTriangle, DollarSign,
   Pencil, Trash2, History, Banknote, Smartphone, Building2,
 } from "lucide-react";
+import { SalesCardSkeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useApp, PaymentMethod, Sale } from "@/context/AppContext";
-import { InventoryItem } from "@/data/inventory";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
-const cats = ["ALL", "Shoes", "Tops", "Bottoms", "Accessories"] as const;
+const cats = ["ALL", "Shoes", "Tops", "Bottoms", "Accessories", "Complete"] as const;
 const PAYMENTS: { id: PaymentMethod; label: string; icon: typeof Banknote }[] = [
   { id: "Cash", label: "CASH", icon: Banknote },
   { id: "Telebirr", label: "TELEBIRR", icon: Smartphone },
   { id: "CBE", label: "CBE", icon: Building2 },
 ];
 
+const COLOR_HEX: Record<string, string> = {
+  Black: "#000000", White: "#FFFFFF", Navy: "#1B2A4A", Grey: "#808080",
+  Beige: "#C8AD8F", Brown: "#7B4F2E", Red: "#CC2200", Burgundy: "#800020",
+  Forest: "#2D5A27", Olive: "#6B7C35", Blue: "#2255CC", Sky: "#87CEEB",
+  Yellow: "#F5C400", Orange: "#E8621A", Pink: "#F4A0B0", Purple: "#6A0DAD",
+  Camel: "#C19A6B", Cream: "#F5F0E8",
+};
+
 type View = "catalog" | "log" | "week" | "lowstock";
 
+interface InventoryItem {
+  id: string | number;
+  brand: string;
+  name: string;
+  price: number;
+  qty: number;
+  category: string;
+  image?: string;
+  sizes: string[];
+  color: string;
+  variants?: any[];
+}
+
+
 const SalesPortal = () => {
-  const { inventory, recordSale, editSale, deleteSale, sales, staffName, setStaffName } = useApp();
+  const { editSale, deleteSale, user, logout } = useApp();
+  const staffName = user?.full_name || "Staff";
   const [editing, setEditing] = useState<Sale | null>(null);
   const [auditFor, setAuditFor] = useState<Sale | null>(null);
   const nav = useNavigate();
@@ -32,14 +57,89 @@ const SalesPortal = () => {
   const [view, setView] = useState<View>("catalog");
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
+  const queryClient = useQueryClient();
+
+  const { data: rawInventory, isLoading: inventoryLoading } = useQuery({
+    queryKey: ['sales-products'],
+    queryFn: () => api.sales.products(),
+  });
+
+  const inventory = useMemo(() => {
+    if (!rawInventory) return [];
+    return rawInventory.map((i: any) => {
+      const variants = i.variants || [];
+      const extractedSizes = variants.length > 0 ? [...new Set(variants.map((v: any) => v.size))] : (i.sizes || ['-']);
+      const extractedColor = variants.length > 0 ? [...new Set(variants.map((v: any) => v.color))].join(', ') : (i.color || '-');
+
+      return {
+        ...i,
+        sizes: extractedSizes,
+        color: extractedColor
+      };
+    });
+  }, [rawInventory]);
+
+  const { data: realSales = [] } = useQuery({
+    queryKey: ['sales-history'],
+    queryFn: () => api.sales.mySales(),
+  });
+
+  const recordSaleMutation = useMutation({
+    mutationFn: (data: any) => api.sales.recordTransaction(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales-products'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-history'] });
+    }
+  });
+  
+  const deleteSaleMutation = useMutation({
+    mutationFn: ({ id, reason }: { id: string, reason: string }) => api.sales.deleteTransaction(id, reason),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales-products'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-history'] });
+    }
+  });
+
+  const editSaleMutation = useMutation({
+    mutationFn: ({ id, changes }: { id: string, changes: any }) => api.sales.editTransaction(id, changes),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['sales-products'] });
+      queryClient.invalidateQueries({ queryKey: ['sales-history'] });
+    }
+  });
+
+  const sales = useMemo(() => {
+    return Array.isArray(realSales) ? realSales.map((s: any) => {
+      const items = s.items || [];
+      const firstItem = items[0] || {};
+      const totalQty = items.reduce((acc: number, curr: any) => acc + (curr.quantity || 0), 0);
+      
+      // Improved regex to extract size and color from notes
+      const sizeMatch = s.notes?.match(/Size:\s*([^,]+)/);
+      const colorMatch = s.notes?.match(/Color:\s*([^,]+)/);
+      
+      return {
+        id: s.id || Math.random().toString(),
+        itemId: firstItem.product_id,
+        itemName: firstItem.product_name_snap || "Item",
+        brand: "SAWKEM", // Default brand
+        size: sizeMatch ? sizeMatch[1].trim() : "-",
+        color: colorMatch ? colorMatch[1].trim() : "-",
+        qty: totalQty || 1,
+        price: Number(s.total_amount) / (totalQty || 1), 
+        payment: s.sale_channel || "Cash",
+        staff: staffName,
+        time: new Date(s.sold_at || s.created_at || Date.now()),
+        deleted: s.status === 'refunded',
+        audit: []
+      };
+    }) : [];
+  }, [realSales, staffName]);
+
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(t);
   }, []);
-
-  useEffect(() => {
-    if (!staffName) nav("/login/sales");
-  }, [staffName, nav]);
 
   useEffect(() => {
     setSidebarOpen(false);
@@ -58,7 +158,7 @@ const SalesPortal = () => {
   // ---- Stats ----
   const startOfToday = new Date(now); startOfToday.setHours(0, 0, 0, 0);
   const startOfWeek = new Date(startOfToday);
-  startOfWeek.setDate(startOfToday.getDate() - startOfToday.getDay()); // Sunday
+  startOfWeek.setDate(startOfToday.getDate() - startOfToday.getDay()); 
 
   const todaySales = sales.filter((s) => s.time >= startOfToday);
   const weekSales = sales.filter((s) => s.time >= startOfWeek);
@@ -67,16 +167,11 @@ const SalesPortal = () => {
 
   const todayItemCount = todayActive.reduce((a, b) => a + b.qty, 0);
   const weekItemCount = weekActive.reduce((a, b) => a + b.qty, 0);
-  const todayRevenue = todayActive.reduce((a, b) => a + b.price * b.qty, 0);
-  const weekRevenue = weekActive.reduce((a, b) => a + b.price * b.qty, 0);
+  const todayRevenue = todayActive.reduce((a, b) => a + Number(b.price) * b.qty, 0);
+  const weekRevenue = weekActive.reduce((a, b) => a + Number(b.price) * b.qty, 0);
 
   const lowStock = inventory.filter((i) => i.qty > 0 && i.qty <= 3);
   const outStock = inventory.filter((i) => i.qty === 0);
-
-  const logout = () => {
-    setStaffName("");
-    nav("/");
-  };
 
   const navItems: { id: View; label: string; icon: typeof LayoutGrid; badge?: number }[] = [
     { id: "catalog", label: "CATALOG", icon: LayoutGrid },
@@ -97,7 +192,6 @@ const SalesPortal = () => {
         </div>
       </div>
 
-      {/* Quick stats */}
       <div className="space-y-2 border-b border-border p-4">
         <div className="rounded-sm border border-border bg-card p-3">
           <div className="flex items-center gap-2 text-[10px] tracking-widest text-muted-foreground">
@@ -219,51 +313,60 @@ const SalesPortal = () => {
                   ))}
                 </div>
 
-                <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                  {filtered.map((it, i) => {
-                    const low = it.qty <= 3;
-                    const out = it.qty === 0;
-                    return (
-                      <motion.div
-                        key={it.id}
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: Math.min(i * 0.02, 0.3) }}
-                        whileHover={{ scale: 1.02 }}
-                        className="relative overflow-hidden border border-border bg-card hover:border-primary/60 hover:shadow-[0_0_20px_hsl(81_100%_67%/0.15)]"
-                      >
-                        <div className="aspect-square overflow-hidden bg-muted">
-                          {it.image ? (
-                            <img src={it.image} alt={it.name} loading="lazy" className="h-full w-full object-cover" />
-                          ) : (
-                            <div className="flex h-full w-full items-center justify-center font-display text-7xl text-primary/60">
-                              {it.brand[0]}
-                            </div>
-                          )}
-                        </div>
-                        <span
-                          className={`absolute right-2 top-2 px-2 py-1 text-[10px] tracking-widest ${
-                            out ? "bg-destructive text-destructive-foreground" : low ? "bg-warning text-warning-foreground" : "bg-background/80 text-off-white"
-                          }`}
+                {inventoryLoading ? (
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                    {Array.from({ length: 8 }).map((_, i) => (
+                      <SalesCardSkeleton key={i} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                    {filtered.map((it, i) => {
+                      const qty = it.qty || 0;
+                      const low = qty <= 3;
+                      const out = qty === 0;
+                      return (
+                        <motion.div
+                          key={it.id}
+                          initial={{ opacity: 0, y: 10 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: Math.min(i * 0.02, 0.3) }}
+                          whileHover={{ scale: 1.02 }}
+                          className="relative overflow-hidden border border-border bg-card hover:border-primary/60 hover:shadow-[0_0_20px_hsl(81_100%_67%/0.15)]"
                         >
-                          {out ? "OUT" : low ? `LOW (${it.qty})` : `${it.qty} LEFT`}
-                        </span>
-                        <div className="space-y-2 p-3">
-                          <p className="text-[10px] tracking-widest text-primary">{it.brand.toUpperCase()}</p>
-                          <p className="font-display text-xl leading-tight">{it.name}</p>
-                          <p className="text-[11px] text-muted-foreground">List: ETB {(it.price || 0).toLocaleString()}</p>
-                          <button
-                            disabled={out}
-                            onClick={() => setSel(it)}
-                            className="w-full bg-off-white py-2 text-xs font-medium tracking-widest text-background disabled:cursor-not-allowed disabled:opacity-30"
+                          <div className="aspect-square overflow-hidden bg-muted">
+                            {it.image ? (
+                              <img src={it.image} alt={it.name} loading="lazy" className="h-full w-full object-cover" />
+                            ) : (
+                              <div className="flex h-full w-full items-center justify-center font-display text-7xl text-primary/60">
+                                {it.brand[0]}
+                              </div>
+                            )}
+                          </div>
+                          <span
+                            className={`absolute right-2 top-2 px-2 py-1 text-[10px] tracking-widest ${
+                              out ? "bg-destructive text-destructive-foreground" : low ? "bg-warning text-warning-foreground" : "bg-background/80 text-off-white"
+                            }`}
                           >
-                            RECORD SALE
-                          </button>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
-                </div>
+                            {out ? "OUT" : low ? `LOW (${qty})` : `${qty} LEFT`}
+                          </span>
+                          <div className="space-y-2 p-3">
+                            <p className="text-[10px] tracking-widest text-primary">{it.brand.toUpperCase()}</p>
+                            <p className="font-display text-xl leading-tight">{it.name}</p>
+                            <p className="text-[11px] text-muted-foreground">List: ETB {(it.price || 0).toLocaleString()}</p>
+                            <button
+                              disabled={out}
+                              onClick={() => setSel(it)}
+                              className="w-full bg-off-white py-2 text-xs font-medium tracking-widest text-background disabled:cursor-not-allowed disabled:opacity-30"
+                            >
+                              RECORD SALE
+                            </button>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
+                )}
               </>
             )}
 
@@ -280,8 +383,8 @@ const SalesPortal = () => {
                     <thead>
                       <tr className="border-b border-border text-[10px] tracking-widest text-muted-foreground">
                         <th className="p-2 text-left">TIME</th>
-                        <th className="p-2 text-left">ITEM</th>
-                        <th className="p-2 text-left">SIZE</th>
+                        <th className="p-2 text-left">PRODUCT</th>
+                        <th className="p-2 text-left">SIZE / COLOR</th>
                         <th className="p-2 text-left">QTY</th>
                         <th className="p-2 text-left">PAYMENT</th>
                         <th className="p-2 text-left">SOLD AT</th>
@@ -296,10 +399,17 @@ const SalesPortal = () => {
                         <tr key={s.id} className={`border-b border-border/50 ${s.deleted ? "opacity-40" : ""}`}>
                           <td className="p-2 text-xs">{s.time.toLocaleTimeString()}</td>
                           <td className={`p-2 ${s.deleted ? "line-through" : ""}`}>
-                            <span className="text-[10px] tracking-widest text-primary">{s.brand.toUpperCase()}</span> · {s.itemName}
+                            <div className="flex flex-col">
+                              <span className="text-[10px] tracking-widest text-primary font-bold">{s.brand.toUpperCase()}</span>
+                              <span className="font-medium">{s.itemName}</span>
+                            </div>
                           </td>
-                          <td className="p-2">{s.size}</td>
-                          <td className="p-2">{s.qty}</td>
+                          <td className="p-2 text-xs">
+                            <span className="text-muted-foreground">{s.size}</span>
+                            <span className="mx-1">/</span>
+                            <span className="text-muted-foreground">{s.color}</span>
+                          </td>
+                          <td className="p-2 font-display text-xl text-primary">{s.qty}</td>
                           <td className="p-2 text-[10px] tracking-widest">{s.payment.toUpperCase()}</td>
                           <td className="p-2 font-display text-lg">ETB {(s.price * s.qty).toLocaleString()}</td>
                           <td className="p-2">
@@ -322,9 +432,18 @@ const SalesPortal = () => {
                                   </button>
                                   <button
                                     onClick={() => {
-                                      if (confirm(`Delete sale of ${s.itemName}? Stock will be restored.`)) {
-                                        deleteSale(s.id, staffName);
-                                        toast.success(`Sale deleted by ${staffName}`);
+                                      const reason = window.prompt(`Reason for deleting sale of ${s.itemName}? (Required for restocking)`);
+                                      if (reason) {
+                                        deleteSaleMutation.mutate({ id: s.id, reason }, {
+                                          onSuccess: () => {
+                                            toast.success(`Sale deleted/restocked: ${reason}`);
+                                          },
+                                          onError: (err: any) => {
+                                            toast.error(`Error: ${err.message}`);
+                                          }
+                                        });
+                                      } else if (reason === "") {
+                                        toast.error("You must provide a reason to delete");
                                       }
                                     }}
                                     title="Delete"
@@ -428,19 +547,19 @@ const SalesPortal = () => {
             item={sel}
             onClose={() => setSel(null)}
             onConfirm={(args) => {
-              recordSale({
-                itemId: sel.id,
-                itemName: sel.name,
-                brand: sel.brand,
-                size: args.size,
-                color: args.color,
-                qty: args.qty,
-                price: args.soldPrice,
-                payment: args.payment,
-                staff: staffName,
+              recordSaleMutation.mutate({
+                items: [{ product_id: sel.id, quantity: args.qty, price_override: args.soldPrice, size: args.size, color: args.color }],
+                sale_channel: args.payment,
+                notes: `Size: ${args.size}, Color: ${args.color}, SoldPrice: ${args.soldPrice}`
+              }, {
+                onSuccess: () => {
+                  toast.success(`✓ SALE RECORDED — ${args.payment.toUpperCase()} — ETB ${args.soldPrice.toLocaleString()}`);
+                  setSel(null);
+                },
+                onError: (err: any) => {
+                  toast.error(`Sale Failed: ${err.message}`);
+                }
               });
-              toast.success(`✓ SALE RECORDED — ${args.payment.toUpperCase()} — ETB ${args.soldPrice.toLocaleString()}`);
-              setSel(null);
             }}
           />
         )}
@@ -450,9 +569,15 @@ const SalesPortal = () => {
             editor={staffName}
             onClose={() => setEditing(null)}
             onSave={(changes) => {
-              editSale(editing.id, changes, staffName);
-              toast.success(`Sale updated by ${staffName}`);
-              setEditing(null);
+              editSaleMutation.mutate({ id: editing.id, changes }, {
+                onSuccess: () => {
+                  toast.success(`Sale updated by ${staffName}`);
+                  setEditing(null);
+                },
+                onError: (err: any) => {
+                  toast.error(`Edit Failed: ${err.message}`);
+                }
+              });
             }}
           />
         )}
@@ -476,15 +601,77 @@ const RecordSaleModal = ({
   onClose,
   onConfirm,
 }: {
-  item: InventoryItem;
+  item: any;
   onClose: () => void;
   onConfirm: (a: { color: string; size: string; qty: number; soldPrice: number; payment: PaymentMethod }) => void;
 }) => {
-  const colors = item.color.split("/").map((c) => c.trim());
-  const original = item.price || 0;
+  // Handle both comma and slash separators for colors
+  const variants = useMemo(() => {
+    return (item.variants || []).filter((v: any) => Number(v.qty ?? v.quantity) > 0);
+  }, [item.variants]);
+  
+  const colors = useMemo(() => {
+    if (variants.length > 0) {
+      return [...new Set(variants.map((v: any) => v.color))].filter(Boolean);
+    }
+    if (!item.color || item.color === "-") return ["-"];
+    return item.color.split(/[,\/]/).map((c: string) => c.trim()).filter(Boolean);
+  }, [variants, item.color]);
+
   const [color, setColor] = useState(colors[0]);
-  const [size, setSize] = useState(item.sizes[0]);
+
+  // Filter available sizes based on selected color
+  const availableSizes = useMemo(() => {
+    if (variants.length > 0) {
+      const raw = variants
+        .filter((v: any) => v.color === color)
+        .map((v: any) => v.size || "-");
+      const unique = [...new Set(raw)] as string[];
+      return unique.length > 0 ? unique : ["-"];
+    }
+    const fromItem = (item.sizes || []).map((s: any) => s || "-");
+    const unique = [...new Set(fromItem)] as string[];
+    return unique.length > 0 ? unique : ["-"];
+  }, [variants, color, item.sizes]);
+
+  const [size, setSize] = useState(availableSizes[0]);
+
+  // Reset size if it's no longer available when color changes
+  useEffect(() => {
+    if (!availableSizes.includes(size)) {
+      setSize(availableSizes[0]);
+    }
+  }, [color, availableSizes, size]);
+
+  const original = item.price || 0;
+  
+  // Calculate variant-specific stock quantity
+  const variantQty = useMemo(() => {
+    if (variants.length > 0 && color) {
+      if (availableSizes.length > 0) {
+        if (!size) return 0;
+        const v = variants.find((v: any) => v.color === color && (v.size === size || (!v.size && size === "-")));
+        if (v) return (Number(v.qty ?? v.quantity) || 0);
+        
+        // Fallback: sum all with matching color if no exact match found
+        const colorVariants = variants.filter((v: any) => v.color === color);
+        return colorVariants.reduce((acc: number, v: any) => acc + (Number(v.qty ?? v.quantity) || 0), 0);
+      }
+    }
+    return item.qty || 0;
+  }, [variants, color, size, availableSizes, item.qty]);
+
   const [qty, setQty] = useState(1);
+
+  // Enforce max quantity limit whenever variant or variantQty changes
+  useEffect(() => {
+    if (qty > variantQty && variantQty > 0) {
+      setQty(variantQty);
+    } else if (variantQty === 0) {
+      setQty(0);
+    }
+  }, [variantQty, qty]);
+
   const [soldPriceStr, setSoldPriceStr] = useState(String(original));
   const [payment, setPayment] = useState<PaymentMethod>("Cash");
   const [success, setSuccess] = useState(false);
@@ -562,18 +749,22 @@ const RecordSaleModal = ({
           )}
 
           <div className="flex-1 space-y-4 overflow-y-auto p-5">
-            {colors.length > 1 && (
+            {colors.some(c => c && c !== "-") && (
               <div>
                 <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">COLOR</p>
                 <div className="flex flex-wrap gap-2">
-                  {colors.map((c) => (
+                  {colors.filter(c => c && c !== "-").map((c) => (
                     <button
                       key={c}
                       onClick={() => setColor(c)}
-                      className={`border px-3 py-1.5 text-xs transition-colors ${
-                        color === c ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary/50"
+                      className={`flex items-center gap-2 border px-3 py-1.5 text-xs transition-all ${
+                        color === c ? "border-primary bg-primary/10 text-primary" : "border-border hover:border-primary/50"
                       }`}
                     >
+                      <span
+                        className="h-4 w-4 rounded-full border border-white/20 flex-shrink-0"
+                        style={{ backgroundColor: COLOR_HEX[c] || "#555" }}
+                      />
                       {c}
                     </button>
                   ))}
@@ -584,7 +775,7 @@ const RecordSaleModal = ({
             <div>
               <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">SIZE</p>
               <div className="flex flex-wrap gap-2">
-                {item.sizes.map((s) => (
+                {availableSizes.map((s) => (
                   <button
                     key={s}
                     onClick={() => setSize(s)}
@@ -605,10 +796,10 @@ const RecordSaleModal = ({
                   <Minus className="h-4 w-4" />
                 </button>
                 <span className="w-10 text-center font-display text-2xl">{qty}</span>
-                <button onClick={() => setQty(Math.min(item.qty, qty + 1))} className="flex h-10 w-10 items-center justify-center border border-border hover:border-primary/50">
+                <button onClick={() => setQty(Math.min(variantQty, qty + 1))} className="flex h-10 w-10 items-center justify-center border border-border hover:border-primary/50">
                   <Plus className="h-4 w-4" />
                 </button>
-                <span className="ml-auto text-[10px] tracking-widest text-muted-foreground">{item.qty} IN STOCK</span>
+                <span className="ml-auto text-[10px] tracking-widest text-muted-foreground">{variantQty} IN STOCK</span>
               </div>
             </div>
 
@@ -672,9 +863,10 @@ const RecordSaleModal = ({
             </div>
             <button
               onClick={confirm}
-              className="w-full bg-primary py-3 font-display text-lg tracking-widest text-primary-foreground transition-opacity hover:opacity-90"
+              disabled={qty <= 0 || qty > variantQty}
+              className="w-full bg-primary py-3 font-display text-lg tracking-widest text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              CONFIRM SALE
+              {qty > variantQty ? "INSUFFICIENT STOCK" : "CONFIRM SALE"}
             </button>
           </div>
         </div>

@@ -1,10 +1,12 @@
 import { Link } from "react-router-dom";
 import { Send, Instagram } from "lucide-react";
 import { TikTokIcon } from "./PublicNav";
+import logoDark from "@/assets/images/Logo/IMG_20260612_232505_208.jpg";
+import logoLight from "@/assets/images/Logo/IMG_20260612_232505_556.jpg";
 
 const FOOTER_BRANDS = [
-  "RICK OWENS","BALENCIAGA","SP5DER","CHROME HEARTS","GALLERY DEPT",
-  "DENIM TEARS","HELLSTAR","BROKEN PLANET","NIKE TECH","BAPE",
+  "RICK OWENS", "BALENCIAGA", "SP5DER", "CHROME HEARTS", "GALLERY DEPT",
+  "DENIM TEARS", "HELLSTAR", "BROKEN PLANET", "NIKE TECH", "BAPE",
 ];
 
 export const PublicFooter = () => {
@@ -13,7 +15,10 @@ export const PublicFooter = () => {
     <footer className="relative border-t border-primary/40 bg-background text-foreground">
       <div className="grid gap-12 px-6 py-16 md:grid-cols-3 md:px-12">
         <div>
-          <h3 className="font-display text-5xl tracking-wide">SAWKEM</h3>
+          {/* Dark mode logo */}
+          <img src={logoDark} alt="Sawkem Fashion" className="hidden dark:block h-12 w-auto object-contain" />
+          {/* Light mode logo */}
+          <img src={logoLight} alt="Sawkem Fashion" className="block dark:hidden h-12 w-auto object-contain" />
           <p className="mt-2 text-xs tracking-[0.2em] text-muted-foreground">
             PREMIUM STREETWEAR. ADDIS ABABA.
           </p>
@@ -27,6 +32,7 @@ export const PublicFooter = () => {
               ["/shop", "Shop"],
               ["/about", "About"],
               ["/contact", "Contact"],
+              ["/login", "Staff Login"],
             ].map(([to, label]) => (
               <li key={to}>
                 <Link to={to} className="hover:text-primary transition-colors">
@@ -85,7 +91,7 @@ export const PublicFooter = () => {
       </div>
 
       <div className="border-t border-border px-6 py-6 text-center text-[10px] tracking-[0.3em] text-muted-foreground md:px-12">
-        © 2024 SAWKEM FASHION. ALL RIGHTS RESERVED. ADDIS ABABA, ETHIOPIA.
+        © 2026 SAWKEM FASHION. ALL RIGHTS RESERVED. ADDIS ABABA, ETHIOPIA.
       </div>
 
       <div className="overflow-hidden border-t border-border py-4">

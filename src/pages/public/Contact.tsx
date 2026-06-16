@@ -2,6 +2,7 @@ import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Send, Phone, Check, MapPin, ChevronDown, Instagram } from "lucide-react";
 import { TikTokIcon } from "@/components/public/PublicNav";
+import { api } from "@/lib/api";
 
 const FAQS = [
   { q: "Are all your items authentic?", a: "Yes. Every single item at Sawkem Fashion is 100% authentic. We do not sell replicas. Our reputation is built on this." },
@@ -14,6 +15,10 @@ const FAQS = [
 const ContactPage = () => {
   const [sent, setSent] = useState(false);
   const [open, setOpen] = useState<number | null>(0);
+
+  const handleTrack = (id: string) => {
+    api.public.trackClick(id, "Contact").catch(() => {});
+  };
 
   return (
     <>
@@ -55,7 +60,11 @@ const ContactPage = () => {
             </motion.div>
           ) : (
             <form
-              onSubmit={(e) => { e.preventDefault(); setSent(true); }}
+              onSubmit={(e) => {
+                e.preventDefault();
+                setSent(true);
+                handleTrack("contact-form-submit");
+              }}
               className="mt-8 space-y-6"
             >
               {[
@@ -108,6 +117,7 @@ const ContactPage = () => {
               body="The fastest way to reach us. DM for availability, reservations, and new drop alerts."
               cta="OPEN TELEGRAM"
               href="https://t.me/sawkemcollection"
+              onTrack={() => handleTrack("contact-telegram-card")}
               primary
             />
             <ContactCard
@@ -117,6 +127,7 @@ const ContactPage = () => {
               body="Call or WhatsApp during store hours."
               cta="CALL NOW"
               href="tel:+251951077634"
+              onTrack={() => handleTrack("contact-phone-card")}
             />
             <ContactCard
               icon={<TikTokIcon className="h-7 w-7 text-off-white" />}
@@ -125,6 +136,7 @@ const ContactPage = () => {
               body="New arrivals, fit checks, and restocks announced first on TikTok."
               cta="FOLLOW US"
               href="https://www.tiktok.com/@sawkem_fashion"
+              onTrack={() => handleTrack("contact-tiktok-card")}
             />
             <ContactCard
               icon={<Instagram className="h-7 w-7 text-off-white" />}
@@ -133,6 +145,7 @@ const ContactPage = () => {
               body="Behind-the-scenes, lookbooks, and daily fits on Instagram."
               cta="FOLLOW US"
               href="https://www.instagram.com/sawkem_fashion"
+              onTrack={() => handleTrack("contact-instagram-card")}
             />
           </div>
         </div>
@@ -177,13 +190,18 @@ const ContactPage = () => {
                     ))}
                   </tbody>
                 </table>
-                <p className="mt-4 text-sm">📞 0951 077 634</p>
-                <p className="text-sm">💬 @sawkemcollection</p>
+                <p className="mt-4 text-sm">
+                  📞 <a href="tel:+251951077634" onClick={() => handleTrack(`contact-phone-${b.title.toLowerCase().split(' ')[0]}`)} className="hover:text-primary">0951 077 634</a>
+                </p>
+                <p className="text-sm">
+                  💬 <a href="https://t.me/sawkemcollection" target="_blank" rel="noreferrer" onClick={() => handleTrack(`contact-telegram-${b.title.toLowerCase().split(' ')[0]}`)} className="hover:text-primary">@sawkemcollection</a>
+                </p>
                 <div className="mt-6 flex flex-wrap gap-3">
                   <a
                     href={`https://www.google.com/maps/search/${b.mapQuery}`}
                     target="_blank"
                     rel="noreferrer"
+                    onClick={() => handleTrack(`contact-directions-${b.title.toLowerCase().split(' ')[0]}`)}
                     className="flex items-center gap-2 bg-primary px-5 py-3 text-xs tracking-[0.25em] text-primary-foreground hover:bg-off-white transition-colors"
                   >
                     <MapPin className="h-4 w-4" /> GET DIRECTIONS
@@ -192,6 +210,7 @@ const ContactPage = () => {
                     href="https://t.me/sawkemcollection"
                     target="_blank"
                     rel="noreferrer"
+                    onClick={() => handleTrack(`contact-telegram-chat-${b.title.toLowerCase().split(' ')[0]}`)}
                     className="flex items-center gap-2 border border-off-white px-5 py-3 text-xs tracking-[0.25em] hover:bg-off-white hover:text-background transition-all"
                   >
                     <Send className="h-4 w-4" /> DM ON TELEGRAM
@@ -221,7 +240,10 @@ const ContactPage = () => {
           {FAQS.map((f, i) => (
             <div key={i}>
               <button
-                onClick={() => setOpen(open === i ? null : i)}
+                onClick={() => {
+                  setOpen(open === i ? null : i);
+                  handleTrack(`contact-faq-toggle-${i}`);
+                }}
                 className="flex w-full items-center justify-between gap-4 py-5 text-left"
               >
                 <span className="text-sm md:text-base">{f.q}</span>
@@ -254,10 +276,10 @@ const ContactPage = () => {
 };
 
 const ContactCard = ({
-  icon, eyebrow, title, body, cta, href, primary,
+  icon, eyebrow, title, body, cta, href, primary, onTrack,
 }: {
   icon: React.ReactNode; eyebrow: string; title: string; body: string;
-  cta: string; href: string; primary?: boolean;
+  cta: string; href: string; primary?: boolean; onTrack?: () => void;
 }) => (
   <motion.div
     whileHover={{ y: -3 }}
@@ -273,6 +295,7 @@ const ContactCard = ({
           href={href}
           target="_blank"
           rel="noreferrer"
+          onClick={onTrack}
           className={`mt-4 inline-block px-5 py-2.5 text-[10px] tracking-[0.3em] transition-colors ${
             primary
               ? "bg-primary text-primary-foreground hover:bg-off-white"

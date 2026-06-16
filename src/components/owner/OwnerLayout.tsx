@@ -1,11 +1,12 @@
 import { useEffect, useState } from "react";
 import { NavLink, Outlet, useLocation, useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
-import { LayoutGrid, Box, BarChart3, Zap, User, Settings, LogOut, ShoppingBag, Receipt } from "lucide-react";
+import { LayoutGrid, Box, BarChart3, Zap, User, Settings, LogOut, ShoppingBag, Receipt, Plus } from "lucide-react";
 import { useApp } from "@/context/AppContext";
 import { ThemeToggle } from "@/components/ThemeToggle";
-import { MOCK_TRANSACTIONS } from "@/data/inventory";
 import { toast } from "sonner";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
 
 const navItems = [
   { to: "/owner", label: "DASHBOARD", icon: LayoutGrid, end: true },
@@ -39,11 +40,14 @@ const Hamburger = ({ open }: { open: boolean }) => (
 
 export const OwnerLayout = () => {
   const { setOwnerLoggedIn } = useApp();
-  // Items sold today = transactions whose time string doesn't start with "Yesterday"
-  const soldToday = MOCK_TRANSACTIONS.filter((t) => !t.time.toLowerCase().startsWith("yesterday")).length;
-  const revenueToday = MOCK_TRANSACTIONS
-    .filter((t) => !t.time.toLowerCase().startsWith("yesterday"))
-    .reduce((sum, t) => sum + t.price, 0);
+  const { data: stats } = useQuery({
+    queryKey: ['owner-dashboard-stats'],
+    queryFn: () => api.owner.dashboard(),
+    refetchInterval: 30000 // Refresh every 30 seconds
+  });
+
+  const soldToday = stats?.today_items || 0;
+  const revenueToday = stats?.today || 0;
 
   const showSalesToday = () => {
     toast.success(`${soldToday} items sold today`, {
@@ -95,7 +99,7 @@ export const OwnerLayout = () => {
   return (
     <div className="grain min-h-screen bg-background text-off-white">
       {/* MOBILE TOP BAR */}
-      <header className="md:hidden sticky top-0 z-40 flex h-14 items-center justify-between border-b border-border bg-sidebar px-4">
+      <header className="md:hidden fixed top-0 left-0 right-0 z-40 flex h-14 items-center justify-between border-b border-border bg-sidebar px-4">
         <button
           onClick={() => setMobileOpen((v) => !v)}
           aria-label="Toggle menu"
@@ -105,6 +109,14 @@ export const OwnerLayout = () => {
         </button>
         <span className="font-display text-2xl text-primary">SAWKEM</span>
         <div className="flex items-center gap-2">
+          {location.pathname === "/owner/inventory" && (
+            <button
+              onClick={() => window.dispatchEvent(new CustomEvent('open-add-product'))}
+              className="flex items-center justify-center h-8 w-8 bg-primary text-primary-foreground rounded-sm shadow-lg active:scale-90 transition-all"
+            >
+              <Plus className="h-5 w-5" />
+            </button>
+          )}
           <button
             onClick={showSalesToday}
             aria-label="Items sold today"
@@ -185,16 +197,27 @@ export const OwnerLayout = () => {
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
-        className="flex-1 px-4 py-6 md:ml-16 md:p-10"
+        className="flex-1 px-4 py-6 md:ml-16 md:p-10 pt-24 md:pt-24"
       >
-        <div className="fixed right-6 top-6 z-30 hidden md:flex items-center gap-3">
+        <div className="fixed right-6 top-6 z-30 hidden md:flex items-center gap-3 bg-background/40 backdrop-blur-md p-1.5 rounded-sm border border-border/50">
+          {location.pathname === "/owner/inventory" && (
+            <button
+              onClick={() => {
+                window.dispatchEvent(new CustomEvent('open-add-product'));
+              }}
+              className="flex items-center gap-2 bg-primary px-4 py-2 text-[10px] tracking-widest text-primary-foreground font-bold hover:opacity-90 active:scale-95 transition-all shadow-lg"
+            >
+              <Plus className="h-4 w-4" /> ADD ITEM
+            </button>
+          )}
           <button
             onClick={showSalesToday}
-            className="flex items-center gap-2 rounded-sm border border-primary/30 bg-primary/10 px-3 py-1.5 text-[11px] font-medium tracking-widest text-primary transition-colors hover:bg-primary/20"
+            className="flex items-center gap-2 border border-primary/30 bg-primary/5 px-4 py-2 text-[10px] font-bold tracking-widest text-primary transition-colors hover:bg-primary/10"
           >
-            <ShoppingBag className="h-3.5 w-3.5" />
+            <ShoppingBag className="h-4 w-4" />
             {soldToday} SOLD TODAY
           </button>
+          <div className="h-4 w-px bg-border/50 mx-1" />
           <ThemeToggle />
         </div>
         <Outlet />

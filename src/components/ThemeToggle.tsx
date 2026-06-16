@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
-import { Moon, Sun } from "lucide-react";
+import { AnimatedThemeToggler } from "./ui/animated-theme-toggler";
+
 
 type Theme = "dark" | "light";
 
@@ -26,12 +27,9 @@ export const useTheme = () => {
 export const ThemeToggle = ({ className = "" }: { className?: string }) => {
   const { theme, toggle } = useTheme();
   return (
-    <button
-      onClick={toggle}
-      aria-label="Toggle theme"
-      className={`flex h-8 w-8 items-center justify-center rounded-full border border-border text-foreground transition-colors hover:border-primary hover:text-primary ${className}`}
-    >
-      {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-    </button>
+    <div className={`flex items-center justify-center ${className}`}>
+      <AnimatedThemeToggler isDark={theme === "dark"} onToggle={toggle} />
+    </div>
   );
 };
+

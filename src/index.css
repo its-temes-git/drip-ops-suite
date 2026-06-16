@@ -8,6 +8,11 @@
    All colors HSL. Semantic tokens only. */
 
 @layer base {
+  html, body {
+    overflow-x: hidden;
+    width: 100%;
+  }
+
   :root {
     --background: 0 0% 3%;             /* #080808 */
     --foreground: 40 22% 92%;          /* #f0ede8 */
@@ -207,6 +212,11 @@
       hsl(0 0% 100% / 0.05) 80px,
       hsl(0 0% 100% / 0.05) 81px
     );
+  }
+
+  /* Skeleton shimmer */
+  @keyframes shimmer {
+    100% { transform: translateX(100%); }
   }
 
   /* Marquee */

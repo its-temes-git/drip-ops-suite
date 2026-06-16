@@ -11,6 +11,7 @@ import OwnerLogin from "./pages/OwnerLogin";
 import SalesLogin from "./pages/SalesLogin";
 import { OwnerLayout } from "./components/owner/OwnerLayout";
 import { PublicLayout } from "./components/public/PublicLayout";
+import { ProtectedRoute } from "./components/ProtectedRoute";
 import HomePage from "./pages/public/Home";
 import ShopPage from "./pages/public/Shop";
 import AboutPage from "./pages/public/About";
@@ -57,20 +58,24 @@ const App = () => (
             <Route path="/login/sales" element={<SalesLogin />} />
             <Route path="/owner-login" element={<OwnerLogin />} />
             <Route path="/sales-login" element={<SalesLogin />} />
-            <Route path="/dashboard" element={<OwnerLayout />}>
-              <Route index element={<Dashboard />} />
+            <Route element={<ProtectedRoute allowedRoles={['owner']} />}>
+              <Route path="/dashboard" element={<OwnerLayout />}>
+                <Route index element={<Dashboard />} />
+              </Route>
+              <Route path="/owner" element={<OwnerLayout />}>
+                <Route index element={<Dashboard />} />
+                <Route path="inventory" element={<Inventory />} />
+                <Route path="analytics" element={<Analytics />} />
+                <Route path="drop" element={<NewDrop />} />
+                <Route path="alerts" element={<LowStock />} />
+                <Route path="staff" element={<Staff />} />
+                <Route path="sales-log" element={<SalesLog />} />
+                <Route path="settings" element={<Settings />} />
+              </Route>
             </Route>
-            <Route path="/owner" element={<OwnerLayout />}>
-              <Route index element={<Dashboard />} />
-              <Route path="inventory" element={<Inventory />} />
-              <Route path="analytics" element={<Analytics />} />
-              <Route path="drop" element={<NewDrop />} />
-              <Route path="alerts" element={<LowStock />} />
-              <Route path="staff" element={<Staff />} />
-              <Route path="sales-log" element={<SalesLog />} />
-              <Route path="settings" element={<Settings />} />
+            <Route element={<ProtectedRoute allowedRoles={['owner', 'sales']} />}>
+              <Route path="/sales" element={<SalesPortal />} />
             </Route>
-            <Route path="/sales" element={<SalesPortal />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

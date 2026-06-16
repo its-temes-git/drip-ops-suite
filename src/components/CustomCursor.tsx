@@ -9,7 +9,9 @@ export const CustomCursor = () => {
     const move = (e: MouseEvent) => {
       setPos({ x: e.clientX, y: e.clientY });
       const target = e.target as HTMLElement;
-      const interactive = target.closest("a, button, [role='button'], input, textarea, select, [data-cursor-hover]");
+      const interactive = target && typeof target.closest === "function"
+        ? target.closest("a, button, [role='button'], input, textarea, select, [data-cursor-hover]")
+        : null;
       setHover(!!interactive);
     };
     window.addEventListener("mousemove", move);

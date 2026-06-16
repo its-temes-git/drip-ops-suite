@@ -5,22 +5,39 @@ import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { StatCard } from "@/components/owner/StatCard";
-import { useApp } from "@/context/AppContext";
 import { cn } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { Loader2 } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 
 const SalesLog = () => {
-  const { sales } = useApp();
   const [date, setDate] = useState<Date>(startOfDay(new Date()));
   const today = startOfDay(new Date());
   const isToday = isSameDay(date, today);
 
-  const daySales = useMemo(
-    () => sales.filter((s) => !s.deleted && isSameDay(s.time, date)),
-    [sales, date]
-  );
+  const dateStr = format(date, "yyyy-MM-dd");
+  const startDate = dateStr;
+  const endDate = dateStr;
 
-  const totalRevenue = daySales.reduce((sum, s) => sum + s.price * s.qty, 0);
-  const totalItems = daySales.reduce((sum, s) => sum + s.qty, 0);
+  const { data: daySales = [], isLoading } = useQuery({
+    queryKey: ['sales-log', startDate, endDate],
+    queryFn: () => api.owner.sales({ startDate, endDate })
+  });
+
+  const [viewingReason, setViewingReason] = useState<string | null>(null);
+
+  const activeSales = daySales.filter((s: any) => s.status !== 'refunded');
+  const totalRevenue = activeSales.reduce((sum: number, s: any) => sum + Number(s.total_amount || 0), 0);
+  const totalItems = activeSales.reduce((sum: number, s: any) => {
+    const items = s.items || [];
+    return sum + items.reduce((iSum: number, i: any) => iSum + (i.quantity || 0), 0);
+  }, 0);
+
+  const getReason = (notes: string) => {
+    const match = notes?.match(/\[REFUND REASON\]:\s*(.*)/);
+    return match ? match[1] : "No reason provided";
+  };
 
   return (
     <div className="space-y-6 sm:space-y-8">
@@ -77,19 +94,27 @@ const SalesLog = () => {
       </header>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <StatCard label="ITEMS SOLD" value={`${totalItems}`} sub={<span className="text-muted-foreground">{daySales.length} transactions</span>} />
+        <StatCard label="ITEMS SOLD" value={`${totalItems}`} sub={<span className="text-muted-foreground">{activeSales.length} active sales</span>} />
         <StatCard label="REVENUE" value={`ETB ${totalRevenue.toLocaleString()}`} accent="primary" />
         <StatCard
           label="AVG SALE"
-          value={`ETB ${daySales.length ? Math.round(totalRevenue / daySales.length).toLocaleString() : 0}`}
+          value={`ETB ${activeSales.length ? Math.round(totalRevenue / activeSales.length).toLocaleString() : 0}`}
         />
       </div>
 
       <div className="border border-border bg-card p-4 sm:p-6">
-        <h2 className="font-display text-2xl mb-4">
-          {isToday ? "TODAY'S ITEMS" : `ITEMS SOLD — ${format(date, "MMM d")}`}
-        </h2>
-        {daySales.length === 0 ? (
+        <div className="flex items-center justify-between mb-4">
+          <h2 className="font-display text-2xl">
+            {isToday ? "TODAY'S ITEMS" : `ITEMS SOLD — ${format(date, "MMM d")}`}
+          </h2>
+          <div className="flex gap-4 text-[10px] tracking-widest text-muted-foreground">
+             <span>TOTAL: {daySales.length}</span>
+             <span className="text-destructive">REFUNDED: {daySales.length - activeSales.length}</span>
+          </div>
+        </div>
+        {isLoading ? (
+          <div className="py-12 flex justify-center"><Loader2 className="h-8 w-8 animate-spin text-primary" /></div>
+        ) : daySales.length === 0 ? (
           <p className="py-12 text-center text-sm text-muted-foreground">
             No sales recorded on this day.
           </p>
@@ -99,35 +124,111 @@ const SalesLog = () => {
               <thead>
                 <tr className="border-b border-border text-[10px] tracking-widest text-muted-foreground">
                   <th className="p-2 text-left">TIME</th>
-                  <th className="p-2 text-left">ITEM</th>
-                  <th className="p-2 text-left">BRAND</th>
-                  <th className="p-2 text-left">SIZE</th>
+                  <th className="p-2 text-left">PRODUCT</th>
+                  <th className="p-2 text-left">SIZE / COLOR</th>
                   <th className="p-2 text-left">QTY</th>
                   <th className="p-2 text-left">PAYMENT</th>
-                  <th className="p-2 text-left">STAFF</th>
-                  <th className="p-2 text-right">PRICE</th>
+                  <th className="p-2 text-left">STAFF / STATUS</th>
+                  <th className="p-2 text-right">TOTAL</th>
                 </tr>
               </thead>
               <tbody>
-                {daySales.map((s) => (
-                  <tr key={s.id} className="border-b border-border/50">
-                    <td className="p-2 text-xs text-muted-foreground">{format(s.time, "HH:mm")}</td>
-                    <td className="p-2">{s.itemName}</td>
-                    <td className="p-2 text-[10px] tracking-widest text-primary">{s.brand.toUpperCase()}</td>
-                    <td className="p-2">{s.size}</td>
-                    <td className="p-2">{s.qty}</td>
-                    <td className="p-2 text-xs">{s.payment}</td>
-                    <td className="p-2 text-xs">{s.staff}</td>
-                    <td className="p-2 text-right font-display text-lg">
-                      ETB {(s.price * s.qty).toLocaleString()}
-                    </td>
-                  </tr>
-                ))}
+                {daySales.map((s: any, i: number) => {
+                  const items = s.items || [];
+                  const firstItem = items[0] || {};
+                  const totalQty = items.reduce((acc: number, curr: any) => acc + (curr.quantity || 0), 0);
+                  const isRefunded = s.status === 'refunded';
+                  
+                  // Extract size and color from notes
+                  const sizeMatch = s.notes?.match(/Size:\s*([^,]+)/);
+                  const colorMatch = s.notes?.match(/Color:\s*([^,]+)/);
+                  const size = sizeMatch ? sizeMatch[1].trim() : "-";
+                  const color = colorMatch ? colorMatch[1].trim() : "-";
+
+                  return (
+                    <tr key={s.id || i} className={cn(
+                      "border-b border-border/50 transition-colors",
+                      isRefunded ? "bg-destructive/5 opacity-50" : "hover:bg-muted/30"
+                    )}>
+                      <td className="p-2 text-xs text-muted-foreground">
+                        {format(new Date(s.sold_at || Date.now()), "HH:mm")}
+                      </td>
+                      <td className={cn("p-2", isRefunded && "line-through")}>
+                        <div className="flex flex-col">
+                          <span className="text-[10px] tracking-widest text-primary font-bold">{(firstItem.brand || "SAWKEM").toUpperCase()}</span>
+                          <span className="font-medium">{firstItem.product_name_snap || "Item"}</span>
+                        </div>
+                      </td>
+                      <td className={cn("p-2 text-xs", isRefunded && "line-through")}>
+                        <span className="text-muted-foreground">{size}</span>
+                        <span className="mx-1">/</span>
+                        <span className="text-muted-foreground">{color}</span>
+                      </td>
+                      <td className={cn("p-2 font-display text-xl", isRefunded ? "text-muted-foreground" : "text-primary")}>
+                        {totalQty}
+                      </td>
+                      <td className="p-2 text-[10px] tracking-widest">{s.sale_channel?.toUpperCase()}</td>
+                      <td className="p-2">
+                        {isRefunded ? (
+                          <div className="flex items-center gap-2">
+                            <span className="px-2 py-0.5 bg-destructive/20 text-destructive text-[9px] font-bold tracking-widest rounded-sm">REFUNDED</span>
+                            <button 
+                              onClick={() => setViewingReason(getReason(s.notes))}
+                              className="px-2 py-0.5 border border-destructive/30 text-[8px] font-bold tracking-widest hover:bg-destructive hover:text-white transition-colors uppercase"
+                            >
+                              REASON
+                            </button>
+                          </div>
+                        ) : (
+                          <span className="text-xs">{s.sold_by}</span>
+                        )}
+                      </td>
+                      <td className={cn("p-2 text-right font-display text-lg", isRefunded && "line-through text-muted-foreground")}>
+                        ETB {(s.total_amount || 0).toLocaleString()}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         )}
       </div>
+
+      <AnimatePresence>
+        {viewingReason && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            onClick={() => setViewingReason(null)}
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 px-4 backdrop-blur-sm"
+          >
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0, y: 20 }}
+              animate={{ scale: 1, opacity: 1, y: 0 }}
+              exit={{ scale: 0.9, opacity: 0, y: 20 }}
+              onClick={(e) => e.stopPropagation()}
+              className="w-full max-w-sm overflow-hidden border border-border bg-card shadow-2xl"
+            >
+              <div className="border-b border-border bg-primary/10 px-5 py-4">
+                <h3 className="font-display text-xl tracking-wider text-primary">REFUND REASON</h3>
+              </div>
+              <div className="p-6">
+                <p className="text-sm leading-relaxed text-off-white italic">
+                  "{viewingReason}"
+                </p>
+                <Button 
+                  onClick={() => setViewingReason(null)}
+                  className="mt-6 w-full tracking-[0.2em] font-bold"
+                >
+                  CLOSE
+                </Button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

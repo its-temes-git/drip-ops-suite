@@ -1,10 +1,19 @@
-import { motion, type Variants, useScroll, useTransform, useMotionValue, useSpring } from "framer-motion";
+import { motion, type Variants, useScroll, useTransform } from "framer-motion";
 import { Link } from "react-router-dom";
 import { ArrowRight, ArrowLeft, MapPin, Send } from "lucide-react";
 import { useRef, useEffect, useState } from "react";
-import { BrandMarquee } from "@/components/BrandMarquee";
-import { TikTokCard, TIKTOK_PLACEHOLDERS } from "@/components/public/TikTokCard";
+import { PerspectiveMarquee } from "@/components/ui/perspective-marquee";
+import { TikTokEmbed, TIKTOK_VIDEOS } from "@/components/public/TikTokCard";
+import { TikTokIcon } from "@/components/public/PublicNav";
 import ourStoryImg from "@/assets/our-story.jpg";
+import heroImg3 from "@/assets/images/hero 3.png";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/lib/api";
+import { ParticleCanvas } from "@/components/public/ParticleCanvas";
+import { Skeleton } from "@/components/ui/skeleton";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
+import logoStory from "@/assets/images/Logo/transpa.png";
 
 // Reusable scroll-reveal variants — modern, simple, distinct per section
 const revealRise: Variants = {
@@ -37,218 +46,221 @@ const staggerChild: Variants = {
 };
 const viewportOnce = { once: true, amount: 0.2 } as const;
 
-const FEATURED = [
-  { id: 1, brand: "Rick Owens", name: "Geobasket", price: 12500, sizes: ["40","41","42","43","44"], image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop" },
-  { id: 11, brand: "SP5DER", name: "Hoodie", price: 5500, sizes: ["S","M","L","XL"], image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=600&fit=crop" },
-  { id: 19, brand: "Nike", name: "Tech Reflective Set", price: 3200, sizes: ["M","L","XL"], image: "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=600&h=600&fit=crop" },
-  { id: 23, brand: "Gallery Dept", name: "Flared Jeans", price: 4800, sizes: ["28","30","32","34","36"], image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&h=600&fit=crop" },
-  { id: 14, brand: "Balenciaga", name: "3XL Hoodie", price: 9800, sizes: ["S","M","L","XL"], image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&h=600&fit=crop" },
+const FALLBACK_FEATURED = [
+  { id: 1, brand: "Rick Owens", name: "Geobasket", price: 12500, sizes: ["40", "41", "42", "43", "44"], image: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=600&h=600&fit=crop" },
+  { id: 11, brand: "SP5DER", name: "Hoodie", price: 5500, sizes: ["S", "M", "L", "XL"], image: "https://images.unsplash.com/photo-1556821840-3a63f95609a7?w=600&h=600&fit=crop" },
+  { id: 19, brand: "Nike", name: "Tech Reflective Set", price: 3200, sizes: ["M", "L", "XL"], image: "https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=600&h=600&fit=crop" },
+  { id: 23, brand: "Gallery Dept", name: "Flared Jeans", price: 4800, sizes: ["28", "30", "32", "34", "36"], image: "https://images.unsplash.com/photo-1542272604-787c3835535d?w=600&h=600&fit=crop" },
+  { id: 14, brand: "Balenciaga", name: "3XL Hoodie", price: 9800, sizes: ["S", "M", "L", "XL"], image: "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=600&h=600&fit=crop" },
   { id: 40, brand: "Chrome Hearts", name: "Tie", price: 2100, sizes: ["OS"], image: "https://images.unsplash.com/photo-1606760227091-3dd870d97f1d?w=600&h=600&fit=crop" },
 ];
 
+const BRAND_ITEMS = [
+  "RICK OWENS", "BALENCIAGA", "SP5DER", "CHROME HEARTS", "GALLERY DEPT",
+  "DENIM TEARS", "HELLSTAR", "BROKEN PLANET", "NIKE TECH", "BAPE"
+];
+
+const GlowingEdgeLogo = () => {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useGSAP(() => {
+    gsap.to(".glow-gradient", {
+      rotation: 360,
+      duration: 4,
+      repeat: -1,
+      ease: "linear",
+    });
+  }, { scope: containerRef });
+
+  return (
+    <div ref={containerRef} className="relative mx-auto h-[480px] w-full max-w-sm overflow-hidden rounded-xl bg-black/40 p-[2px] shadow-[0_0_40px_rgba(184,255,87,0.05)]">
+      <div
+        className="glow-gradient absolute inset-[-100%] z-0"
+        style={{
+          background: "conic-gradient(from 0deg, transparent 0%, transparent 45%, rgba(184,255,87,1) 50%, transparent 55%, transparent 100%)"
+        }}
+      />
+      <div className="relative z-10 flex h-full w-full items-center justify-center rounded-xl bg-[#080808] p-12">
+        <img
+          src={logoStory}
+          alt="Sawkem Logo"
+          className="h-full w-full object-contain transition-all duration-500 hover:scale-105"
+        />
+      </div>
+    </div>
+  );
+};
+
 const HomePage = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
-  const scrollBy = (n: number) => scrollRef.current?.scrollBy({ left: n, behavior: "smooth" });
+
+  const { data: products = [], isLoading, isFetching } = useQuery({
+    queryKey: ['public-products'],
+    queryFn: api.public.products,
+    staleTime: 30_000, // 30 seconds — prevents instant re-fetch on revisit
+  });
+
+  const featuredItems = products.slice(0, 6);
+  // Show skeleton while loading OR while fetched but still empty (covers the first-render flash)
+  const showSkeleton = isLoading || isFetching || featuredItems.length === 0;
+
+  // Theme detection for marquee
+  const [isDark, setIsDark] = useState(false);
+  useEffect(() => {
+    const root = document.documentElement;
+    const update = () => setIsDark(root.classList.contains("dark"));
+    update();
+    const observer = new MutationObserver(update);
+    observer.observe(root, { attributes: true, attributeFilter: ["class"] });
+    return () => observer.disconnect();
+  }, []);
+
+  const scrollBy = (n: number) => {
+    scrollRef.current?.scrollBy({ left: n, behavior: "smooth" });
+    api.public.trackClick(`home-featured-products-scroll-${n > 0 ? 'right' : 'left'}`, "Home").catch(() => { });
+  };
+
   const [openMap, setOpenMap] = useState<"summit" | "saris" | null>(null);
 
-  // Hero parallax — background image drifts up + scales as you scroll
+  // Hero parallax
   const heroRef = useRef<HTMLElement>(null);
   const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "25%"]);
-  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.15]);
-  const titleY = useTransform(scrollYProgress, [0, 1], ["0%", "-30%"]);
-  const titleOpacity = useTransform(scrollYProgress, [0, 0.7], [1, 0]);
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "18%"]);
+  const bgScale = useTransform(scrollYProgress, [0, 1], [1, 1.08]);
+  const contentY = useTransform(scrollYProgress, [0, 1], ["0%", "22%"]);
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.6], [1, 0]);
 
-  // Kinetic type — letters drift toward the mouse
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const sx = useSpring(mx, { stiffness: 80, damping: 18, mass: 0.6 });
-  const sy = useSpring(my, { stiffness: 80, damping: 18, mass: 0.6 });
-
-  useEffect(() => {
-    const el = heroRef.current;
-    if (!el) return;
-    if (window.matchMedia("(hover: none)").matches) return;
-    const onMove = (e: MouseEvent) => {
-      const r = el.getBoundingClientRect();
-      const px = (e.clientX - r.left) / r.width - 0.5; // -0.5..0.5
-      const py = (e.clientY - r.top) / r.height - 0.5;
-      mx.set(px);
-      my.set(py);
-    };
-    const onLeave = () => { mx.set(0); my.set(0); };
-    el.addEventListener("mousemove", onMove);
-    el.addEventListener("mouseleave", onLeave);
-    return () => {
-      el.removeEventListener("mousemove", onMove);
-      el.removeEventListener("mouseleave", onLeave);
-    };
-  }, [mx, my]);
-
-  // Per-letter offsets — outer letters drift more (kinetic feel)
-  const renderKineticWord = (word: string, intensity = 24) => {
-    const letters = word.split("");
-    const mid = (letters.length - 1) / 2;
-    return letters.map((ch, i) => {
-      const dist = (i - mid) / mid; // -1..1
-      const lx = useTransform(sx, (v) => v * intensity * dist * 1.6);
-      const ly = useTransform(sy, (v) => v * intensity * 0.6);
-      return (
-        <motion.span key={`${word}-${i}`} style={{ x: lx, y: ly, display: "inline-block" }}>
-          {ch}
-        </motion.span>
-      );
-    });
+  const handleTrack = (id: string) => {
+    api.public.trackClick(id, "Home").catch(() => { });
   };
 
   return (
     <>
-      {/* HERO — full-bleed image background */}
-      <section ref={heroRef} className="relative grain overflow-hidden min-h-[calc(100vh-4rem)] bg-[#f0ede8] dark:bg-[#080808]">
-        {/* Background image — covers entire hero at low opacity, with scroll parallax */}
-        <motion.img
-          initial={{ opacity: 0, scale: 1.05 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 1.2 }}
-          style={{ y: bgY, scale: bgScale }}
-          src="https://images.unsplash.com/photo-1552374196-1ab2a1c593e8?w=1600&h=2000&fit=crop"
-          alt="Sawkem streetwear editorial"
-          className="absolute inset-0 h-full w-full object-cover opacity-30 dark:opacity-25 will-change-transform"
-        />
-        {/* Theme-aware overlay tint to keep text readable */}
-        <div className="pointer-events-none absolute inset-0 bg-gradient-to-r from-[#f0ede8]/85 via-[#f0ede8]/40 to-[#f0ede8]/10 dark:from-[#080808]/90 dark:via-[#080808]/50 dark:to-[#080808]/20" />
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-[#f0ede8] to-transparent dark:from-[#080808]" />
+      {/* ─── HERO — Full Bleed Photo ─────────────────────────── */}
+      <section ref={heroRef} className="relative overflow-hidden" style={{ height: "100svh", minHeight: 600 }}>
 
-        {/* Mesh orbs on top */}
-        <div className="hero-orb hero-orb-1" />
-        <div className="hero-orb hero-orb-2" />
-        <div className="hero-orb hero-orb-3" />
-        <div className="hero-orb hero-orb-4" />
+        {/* Photo — full bleed with scroll parallax aligned to show beanie model on the right */}
+        <motion.div className="absolute inset-0 will-change-transform" style={{ y: bgY, scale: bgScale }}>
+          <motion.img
+            src={heroImg3}
+            alt="Sawkem Fashion — Addis Ababa"
+            initial={{ scale: 1.06, opacity: 0 }}
+            animate={{ scale: 1, opacity: 1 }}
+            transition={{ duration: 1.5, ease: [0.22, 1, 0.36, 1] }}
+            className="h-full w-full object-cover object-right-top md:object-right"
+          />
+        </motion.div>
 
-        <motion.div
-          style={{ y: titleY, opacity: titleOpacity }}
-          className="relative z-10 flex min-h-[calc(100vh-4rem)] items-center px-6 py-12 md:px-12 lg:pl-[8%]"
-        >
-          <div className="w-full text-center lg:max-w-3xl lg:text-left">
-            <div className="inline-block rounded-xl bg-black/15 p-6 dark:bg-black/40 md:p-8">
-            <motion.h1
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7 }}
-              className="font-display leading-[0.85] text-[64px] md:text-[100px] lg:text-[140px] text-[#080808] dark:text-white"
-              style={{ letterSpacing: "-2px", fontWeight: 900 }}
-            >
-              {renderKineticWord("SAWKEM", 28)}
-            </motion.h1>
-            <motion.h2
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.7, delay: 0.15 }}
-              className="font-display leading-[0.85] text-[64px] md:text-[100px] lg:text-[140px] text-[#080808] dark:text-white lg:ml-6"
-              style={{ letterSpacing: "-2px", fontWeight: 900 }}
-            >
-              {renderKineticWord("FASHION", 22)}
-            </motion.h2>
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.3 }}
-              className="mt-4 font-mono text-[13px] uppercase text-[#b8ff57]"
-              style={{ letterSpacing: "6px", textShadow: "0 0 20px rgba(0,0,0,0.5)" }}
-            >
-              ADDIS ABABA
-            </motion.p>
-            <motion.p
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.45 }}
-              className="mx-auto mt-5 max-w-[420px] font-mono text-[15px] leading-[1.7] text-black/75 dark:text-white/80 lg:mx-0"
-            >
-              Premium streetwear. Serious quality. Ethiopia's dopest fits.
-            </motion.p>
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.6, delay: 0.6 }}
-              className="mt-9 flex flex-wrap justify-center gap-4 lg:justify-start"
-            >
+        {/* Custom vignette layers to mask the image and place focal point on the model */}
+        <div className="pointer-events-none absolute inset-0 z-0" style={{ background: "radial-gradient(ellipse 130% 110% at 75% 45%, transparent 18%, rgba(0,0,0,0.4) 55%, rgba(8,8,8,0.92) 100%)" }} />
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-64 z-0" style={{ background: "linear-gradient(to bottom, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.4) 55%, transparent 100%)" }} />
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[45%]" style={{ background: "linear-gradient(to top, rgba(8,8,8,1) 0%, rgba(8,8,8,0.7) 40%, transparent 100%)" }} />
+        <div className="pointer-events-none absolute inset-y-0 left-0 w-[45%] z-0" style={{ background: "linear-gradient(to right, rgba(8,8,8,0.9) 0%, rgba(8,8,8,0.3) 60%, transparent 100%)" }} />
+
+        {/* Film grain */}
+        <div className="pointer-events-none absolute inset-0 opacity-[0.055] z-0" style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
+
+        {/* Particle Canvas as overlay over the image, behind the text content */}
+        <ParticleCanvas isOverlay className="absolute inset-0 z-0 overflow-hidden pointer-events-auto" />
+
+        {/* Content */}
+        <motion.div style={{ y: contentY, opacity: contentOpacity }} className="relative z-10 flex h-full flex-col pointer-events-none">
+
+          {/* Left empty side — main typography */}
+          <div className="flex flex-1 flex-col items-start justify-center pb-20 pt-20 px-8 md:px-24 max-w-xl md:max-w-2xl lg:max-w-3xl text-left pointer-events-none">
+
+
+            {/* Premium Character Reveal — SAWKEM FASHION */}
+            <div className="pointer-events-auto flex flex-col">
+              {/* SAWKEM */}
+              <div className="flex overflow-hidden group/sawkem">
+                {"SAWKEM".split("").map((char, i) => (
+                  <motion.span
+                    key={`s-${i}`}
+                    initial={{ y: "110%", rotate: 15, opacity: 0, scale: 0.9 }}
+                    animate={{ y: 0, rotate: 0, opacity: 1, scale: 1 }}
+                    whileHover={{ y: -15, scale: 1.05, color: "#b8ff57" }}
+                    transition={{ duration: 0.9, delay: 0.15 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                    className="inline-block text-left font-display leading-[0.85] text-white cursor-crosshair"
+                    style={{ fontSize: "clamp(110px, 22vw, 300px)", letterSpacing: "-0.02em" }}
+                  >
+                    {char}
+                  </motion.span>
+                ))}
+              </div>
+
+              {/* FASHION */}
+              <div className="flex overflow-hidden -mt-4 md:-mt-8 group/fashion">
+                {"FASHION".split("").map((char, i) => (
+                  <motion.span
+                    key={`f-${i}`}
+                    initial={{ y: "110%", rotate: 15, opacity: 0, scale: 0.9 }}
+                    animate={{ y: 0, rotate: 0, opacity: 1, scale: 1 }}
+                    whileHover={{ y: -15, scale: 1.05, color: "#fff" }}
+                    transition={{ duration: 0.9, delay: 0.35 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
+                    className="inline-block text-left font-display leading-[0.85] text-[#b8ff57] cursor-crosshair"
+                    style={{ fontSize: "clamp(110px, 22vw, 30px)", letterSpacing: "0.1em" }}
+                  >
+                    {char}
+                  </motion.span>
+                ))}
+              </div>
+            </div>
+
+            {/* Accent line */}
+            <motion.div initial={{ scaleX: 0, opacity: 0 }} animate={{ scaleX: 1, opacity: 1 }} transition={{ duration: 0.9, delay: 0.52, ease: [0.22, 1, 0.36, 1] }}
+              className="my-5 h-px w-20 bg-[#b8ff57] origin-left pointer-events-auto" />
+            <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.68 }}
+              className="font-mono text-[9.5px] tracking-[0.42em] text-white/45 text-left pointer-events-auto">PREMIUM STREETWEAR · EST. 2022</motion.p>
+
+            {/* CTAs with Premium Hover Animations */}
+            <motion.div initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.82 }}
+              className="mt-8 flex flex-wrap items-center gap-4 justify-start pointer-events-auto">
               <Link
                 to="/shop"
-                className="group bg-[#b8ff57] px-9 py-4 font-mono text-[13px] uppercase text-[#080808] transition-all duration-[250ms] hover:bg-[#080808] hover:text-[#b8ff57] dark:hover:bg-white dark:hover:text-[#b8ff57]"
-                style={{ letterSpacing: "3px" }}
+                onClick={() => handleTrack("hero-shop-cta")}
+                className="group relative overflow-hidden px-8 py-3.5 font-mono text-[10px] tracking-[0.38em] text-black transition-all duration-300"
               >
-                SHOP NOW
+                <span className="absolute inset-0 bg-[#b8ff57] rounded-sm transition-all duration-300 group-hover:scale-105 group-hover:shadow-[0_0_35px_rgba(184,255,87,0.4)]" />
+                <span className="absolute inset-0 -translate-x-full rotate-12 bg-white/30 transition-transform duration-700 ease-out group-hover:translate-x-full" />
+                <span className="relative z-10 flex items-center gap-2">
+                  SHOP COLLECTION <ArrowRight className="h-3 w-3 transition-transform duration-300 group-hover:translate-x-1" />
+                </span>
               </Link>
               <a
                 href="https://www.tiktok.com/@sawkem_fashion"
                 target="_blank"
                 rel="noreferrer"
-                className="group flex items-center gap-2 border-[1.5px] border-current px-9 py-4 font-mono text-[13px] uppercase text-[#080808] transition-all duration-[250ms] hover:bg-[#080808] hover:text-[#f0ede8] dark:text-white dark:hover:bg-white dark:hover:text-[#080808]"
-                style={{ letterSpacing: "3px" }}
+                onClick={() => handleTrack("hero-tiktok-cta")}
+                className="group relative flex items-center gap-2.5 border border-white/10 bg-white/5 px-7 py-3.5 font-mono text-[10px] tracking-[0.35em] text-white/75 backdrop-blur-sm rounded-sm transition-all duration-300 hover:border-[#b8ff57]/45 hover:text-white"
               >
-                <svg viewBox="0 0 24 24" fill="currentColor" className="h-[14px] w-[14px]">
-                  <path d="M19.59 6.69a4.83 4.83 0 0 1-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 0 1-5.2 1.74 2.89 2.89 0 0 1 2.31-4.64 2.93 2.93 0 0 1 .88.13V9.4a6.84 6.84 0 0 0-1-.05A6.33 6.33 0 0 0 5.8 20.1a6.34 6.34 0 0 0 10.86-4.43v-7a8.16 8.16 0 0 0 4.77 1.52v-3.4a4.85 4.85 0 0 1-1.84-.1z" />
-                </svg>
-                WATCH US ON TIKTOK
-              </a>
-              <a
-                href="https://www.instagram.com/sawkem_fashion"
-                target="_blank"
-                rel="noreferrer"
-                className="group flex items-center gap-2 border-[1.5px] border-current px-9 py-4 font-mono text-[13px] uppercase text-[#080808] transition-all duration-[250ms] hover:bg-[#080808] hover:text-[#f0ede8] dark:text-white dark:hover:bg-white dark:hover:text-[#080808]"
-                style={{ letterSpacing: "3px" }}
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="h-[14px] w-[14px]">
-                  <rect x="2" y="2" width="20" height="20" rx="5" ry="5" />
-                  <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z" />
-                  <line x1="17.5" y1="6.5" x2="17.51" y2="6.5" />
-                </svg>
-                FOLLOW ON INSTAGRAM
+                <span className="absolute bottom-0 left-0 h-[2px] w-0 bg-[#b8ff57] transition-all duration-300 group-hover:w-full" />
+                <TikTokIcon className="h-[13px] w-[13px] transition-transform duration-300 group-hover:rotate-12" />
+                @SAWKEM_FASHION
               </a>
             </motion.div>
-            <motion.p
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.6, delay: 0.75 }}
-              className="mt-5 font-mono text-[11px] uppercase text-black/45 dark:text-white/45"
-              style={{ letterSpacing: "2px" }}
-            >
-              6,874 followers • 51K+ likes on TikTok
-            </motion.p>
-            </div>
           </div>
-        </motion.div>
 
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0.4 }}
-          animate={{ opacity: [0.4, 1, 0.4] }}
-          transition={{ duration: 2, repeat: Infinity }}
-          className="pointer-events-none absolute bottom-6 left-1/2 z-10 hidden -translate-x-1/2 flex-col items-center gap-2 lg:flex"
-        >
-          <span
-            className="font-mono text-[10px] uppercase text-black/40 dark:text-white/40"
-            style={{ letterSpacing: "4px" }}
-          >
-            SCROLL
-          </span>
-          <span className="block h-10 w-px bg-black/40 scroll-line dark:bg-white/40" />
         </motion.div>
       </section>
 
-      {/* MARQUEE */}
-      <motion.section
-        variants={revealClip}
-        initial="hidden"
-        whileInView="show"
-        viewport={viewportOnce}
-        className="dark-band py-10"
-      >
-        <BrandMarquee />
-      </motion.section>
+      {/* 3D PERSPECTIVE MARQUEE */}
+      <section className="relative w-full overflow-hidden" style={{ height: "clamp(200px, 20vw, 260px)" }}>
+        <PerspectiveMarquee
+          items={BRAND_ITEMS}
+          rotateY={-28}
+          rotateX={8}
+          perspective={1200}
+          pixelsPerFrame={2}
+          fontSize={72}
+          background={isDark ? "#080808" : "#f0ede8"}
+          fadeColor={isDark ? "#080808" : "#f0ede8"}
+          color={isDark ? "#fafafa" : "#171717"}
+        />
+      </section>
 
       {/* NEW DROPS */}
-      <section className="px-6 py-20 md:px-12">
+      <section className="px-6 py-0 md:px-12">
         <motion.div
           variants={revealRise}
           initial="hidden"
@@ -259,7 +271,7 @@ const HomePage = () => {
           <div>
             <h2 className="font-display text-6xl md:text-7xl">NEW DROPS</h2>
             <p className="mt-2 text-xs tracking-[0.3em] text-primary">
-              FRESH INVENTORY — SUMMIT BRANCH — ADDIS ABABA
+              FRESH INVENTORY
             </p>
           </div>
           <div className="hidden gap-2 md:flex">
@@ -273,41 +285,72 @@ const HomePage = () => {
         </motion.div>
 
         <motion.div
+          key={showSkeleton ? "skeleton" : "products"}
           ref={scrollRef}
           variants={staggerParent}
           initial="hidden"
-          whileInView="show"
-          viewport={viewportOnce}
+          animate="show"
           className="mt-10 flex gap-6 overflow-x-auto scroll-smooth pb-4 snap-x snap-mandatory"
         >
-          {FEATURED.map((p) => (
-            <motion.div
-              key={p.id}
-              variants={staggerChild}
-              whileHover={{ y: -6 }}
-              className="group min-w-[280px] md:min-w-[340px] snap-start border border-border bg-card transition-colors hover:border-primary"
-            >
-              <div className="aspect-square overflow-hidden">
-                <img src={p.image} alt={p.name} className="h-full w-full object-cover transition-transform group-hover:scale-105" loading="lazy" />
-              </div>
-              <div className="p-5">
-                <p className="text-[10px] tracking-[0.3em] text-primary uppercase">{p.brand}</p>
-                <h3 className="mt-1 font-display text-2xl">{p.name}</h3>
-                <p className="mt-1 font-mono text-sm text-off-white/80">ETB {p.price.toLocaleString()}</p>
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  {p.sizes.map((s) => (
-                    <span key={s} className="border border-border px-2 py-0.5 text-[10px]">{s}</span>
-                  ))}
+          {showSkeleton ? (
+            Array.from({ length: 6 }).map((_, i) => (
+              <motion.div
+                key={`skel-${i}`}
+                variants={staggerChild}
+                className="group w-[280px] md:w-[340px] flex-shrink-0 snap-start border border-border bg-card"
+              >
+                <div className="aspect-square overflow-hidden">
+                  <Skeleton className="h-full w-full" />
                 </div>
-                <Link
-                  to={`/shop?item=${p.id}`}
-                  className="mt-4 block border border-off-white px-4 py-2 text-center text-[10px] tracking-[0.3em] text-off-white transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary"
-                >
-                  VIEW ITEM
-                </Link>
-              </div>
-            </motion.div>
-          ))}
+                <div className="p-5">
+                  <Skeleton className="h-3 w-1/4 mb-1.5" />
+                  <Skeleton className="h-6 w-3/4 mb-1" />
+                  <Skeleton className="h-4 w-1/3" />
+                  <div className="mt-3 flex gap-1.5">
+                    <Skeleton className="h-5 w-8" />
+                    <Skeleton className="h-5 w-8" />
+                  </div>
+                  <Skeleton className="mt-4 h-9 w-full" />
+                </div>
+              </motion.div>
+            ))
+          ) : (
+            featuredItems.map((p) => (
+              <motion.div
+                key={p.id}
+                variants={staggerChild}
+                whileHover={{ y: -6 }}
+                className="group w-[280px] md:w-[340px] flex-shrink-0 snap-start border border-border bg-card transition-colors hover:border-primary"
+              >
+                {/* Dark bg behind image so white-background product photos look clean */}
+                <div className="aspect-square overflow-hidden bg-[#111] flex items-center justify-center">
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    className="h-full w-full object-contain transition-transform group-hover:scale-105"
+                    loading="lazy"
+                  />
+                </div>
+                <div className="p-5">
+                  <p className="text-[10px] tracking-[0.3em] text-primary uppercase">{p.brand}</p>
+                  <h3 className="mt-1 font-display text-2xl">{p.name}</h3>
+                  <p className="mt-1 font-mono text-sm text-off-white/80">ETB {p.price.toLocaleString()}</p>
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {p.sizes.map((s) => (
+                      <span key={s} className="border border-border px-2 py-0.5 text-[10px]">{s}</span>
+                    ))}
+                  </div>
+                  <Link
+                    to={`/shop?item=${p.id}`}
+                    onClick={() => handleTrack(`home-featured-view-item-${p.id}`)}
+                    className="mt-4 block border border-off-white px-4 py-2 text-center text-[10px] tracking-[0.3em] text-off-white transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                  >
+                    VIEW ITEM
+                  </Link>
+                </div>
+              </motion.div>
+            ))
+          )}
         </motion.div>
       </section>
 
@@ -319,19 +362,17 @@ const HomePage = () => {
             @SAWKEM_FASHION • 51K+ LIKES • ADDIS ABABA
           </p>
         </motion.div>
-        <motion.div
-          variants={staggerParent}
-          initial="hidden"
-          whileInView="show"
-          viewport={viewportOnce}
+        <div
           className="mt-10 grid gap-6 md:grid-cols-3"
         >
-          {TIKTOK_PLACEHOLDERS.map((t, i) => (
-            <motion.div key={i} variants={staggerChild}>
-              <TikTokCard {...t} />
-            </motion.div>
+          {TIKTOK_VIDEOS.map((t) => (
+            <div key={t.id} className="flex justify-center overflow-hidden">
+              <div className="w-full max-w-[325px]" style={{ minWidth: "325px" }}>
+                <TikTokEmbed videoId={t.id} html={t.html} />
+              </div>
+            </div>
           ))}
-        </motion.div>
+        </div>
         <motion.div
           variants={revealScale}
           initial="hidden"
@@ -343,6 +384,7 @@ const HomePage = () => {
             href="https://www.tiktok.com/@sawkem_fashion"
             target="_blank"
             rel="noreferrer"
+            onClick={() => handleTrack("home-tiktok-section-follow")}
             className="inline-block bg-primary px-8 py-4 text-xs tracking-[0.3em] text-primary-foreground hover:bg-off-white transition-colors"
           >
             FOLLOW US FOR NEW DROPS
@@ -363,6 +405,7 @@ const HomePage = () => {
             </p>
             <Link
               to="/about"
+              onClick={() => handleTrack("home-about-teaser-link")}
               className="mt-8 inline-block border border-off-white px-6 py-3 text-xs tracking-[0.25em] hover:bg-off-white hover:text-background transition-all"
             >
               OUR STORY
@@ -373,22 +416,9 @@ const HomePage = () => {
             initial="hidden"
             whileInView="show"
             viewport={viewportOnce}
-            className="relative mx-auto h-[520px] w-full max-w-md overflow-hidden"
+            className="w-full flex justify-center py-10 md:py-0"
           >
-            <img
-              src={ourStoryImg}
-              alt="Sawkem streetwear editorial"
-              width={800}
-              height={1024}
-              loading="lazy"
-              className="h-full w-full object-cover grayscale"
-              style={{
-                WebkitMaskImage:
-                  "linear-gradient(to left, hsl(0 0% 0%) 40%, transparent 100%)",
-                maskImage:
-                  "linear-gradient(to left, hsl(0 0% 0%) 40%, transparent 100%)",
-              }}
-            />
+            <GlowingEdgeLogo />
           </motion.div>
         </div>
       </section>
@@ -437,13 +467,16 @@ const HomePage = () => {
               <p className="mt-3 text-sm text-off-white/80">{b.address}</p>
               <p className="mt-2 text-xs text-muted-foreground">{b.hours}</p>
               <div className="mt-4 space-y-1 text-sm">
-                <p>📞 <a href="tel:+251951077634" className="hover:text-primary">0951 077 634</a></p>
-                <p>💬 <a href="https://t.me/sawkemcollection" target="_blank" rel="noreferrer" className="hover:text-primary">@sawkemcollection</a></p>
+                <p>📞 <a href="tel:+251951077634" onClick={() => handleTrack(`home-call-${b.key}`)} className="hover:text-primary">0951 077 634</a></p>
+                <p>💬 <a href="https://t.me/sawkemcollection" onClick={() => handleTrack(`home-telegram-${b.key}`)} target="_blank" rel="noreferrer" className="hover:text-primary">@sawkemcollection</a></p>
               </div>
               <div className="mt-6 flex flex-wrap gap-3">
                 <button
                   type="button"
-                  onClick={() => setOpenMap(openMap === b.key ? null : b.key)}
+                  onClick={() => {
+                    setOpenMap(openMap === b.key ? null : b.key);
+                    handleTrack(`home-map-toggle-${b.key}`);
+                  }}
                   className="flex items-center gap-2 bg-primary px-5 py-3 text-xs tracking-[0.25em] text-primary-foreground hover:bg-off-white transition-colors"
                 >
                   <MapPin className="h-4 w-4" />
@@ -453,6 +486,7 @@ const HomePage = () => {
                   href={`https://www.google.com/maps/search/${b.mapQuery}`}
                   target="_blank"
                   rel="noreferrer"
+                  onClick={() => handleTrack(`home-directions-${b.key}`)}
                   className="flex items-center gap-2 border border-off-white px-5 py-3 text-xs tracking-[0.25em] hover:bg-off-white hover:text-background transition-all"
                 >
                   <Send className="h-4 w-4" /> DIRECTIONS

@@ -1,28 +1,10 @@
 import { motion, useInView } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { BrandMarquee } from "@/components/BrandMarquee";
-import { TikTokCard, TIKTOK_PLACEHOLDERS } from "@/components/public/TikTokCard";
+import { TikTokEmbed, TIKTOK_VIDEOS } from "@/components/public/TikTokCard";
+import { api } from "@/lib/api";
+import { NigusReveal } from "@/components/public/NigusReveal";
 
-const BLOCKS = [
-  {
-    title: "HOW IT STARTED",
-    body: "What began as a passion for authentic streetwear grew into Addis Ababa's most trusted premium fashion boutique. We noticed a gap — serious drip culture was growing in Ethiopia, but access to authentic pieces was near zero. Sawkem changed that.",
-    image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&h=600&fit=crop",
-    reverse: false,
-  },
-  {
-    title: "WHAT WE STAND FOR",
-    body: "Every item in our store is authentic. No replicas, no compromises. From Rick Owens Geobaskets to SP5DER hoodies — if it's on our rack, it's the real thing. That's the Sawkem promise.",
-    image: "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=800&h=600&fit=crop",
-    reverse: true,
-  },
-  {
-    title: "ADDIS. ALWAYS.",
-    body: "We're not just a store. We're part of the Addis streetwear scene. Our TikTok documents the culture as it grows. Our Summit branch is where the community comes to dress.",
-    image: "https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=600&fit=crop",
-    reverse: false,
-  },
-];
 
 const BRAND_GRID = [
   "RICK OWENS","BALENCIAGA","SP5DER","CHROME HEARTS",
@@ -49,35 +31,38 @@ const CountUp = ({
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true });
   const [n, setN] = useState(0);
-  const [tick, setTick] = useState(0); // triggers per-bump pulse
+  const [tick, setTick] = useState(0);
 
-  // Initial count-up to `to`
   useEffect(() => {
     if (!inView) return;
+    let cancelled = false;
     const dur = 1800;
     const t0 = performance.now();
     let raf = 0;
     const step = (t: number) => {
+      if (cancelled) return;
       const p = Math.min(1, (t - t0) / dur);
       const eased = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
       setN(Math.round(to * eased));
       if (p < 1) raf = requestAnimationFrame(step);
     };
     raf = requestAnimationFrame(step);
-    return () => cancelAnimationFrame(raf);
+    return () => {
+      cancelled = true;
+      cancelAnimationFrame(raf);
+    };
   }, [inView, to]);
 
-  // Continuous live ticker — random small bumps forever
   useEffect(() => {
     if (!inView || !live) return;
     let cancelled = false;
     let timeout: ReturnType<typeof setTimeout>;
     const start = setTimeout(function loop() {
       if (cancelled) return;
-      const bump = Math.floor(Math.random() * 18) + 1; // 1–18 likes
+      const bump = Math.floor(Math.random() * 18) + 1;
       setN((prev) => prev + bump);
       setTick((c) => c + 1);
-      timeout = setTimeout(loop, 700 + Math.random() * 1600); // 0.7s–2.3s
+      timeout = setTimeout(loop, 700 + Math.random() * 1600);
     }, 2200);
     return () => {
       cancelled = true;
@@ -107,8 +92,18 @@ const MagneticLine = ({ text }: { text: string }) => {
     const m = window.matchMedia("(hover: hover) and (pointer: fine) and (min-width: 768px)");
     const update = () => setEnabled(m.matches);
     update();
-    m.addEventListener("change", update);
-    return () => m.removeEventListener("change", update);
+    if (typeof m.addEventListener === "function") {
+      m.addEventListener("change", update);
+    } else if (typeof (m as any).addListener === "function") {
+      (m as any).addListener(update);
+    }
+    return () => {
+      if (typeof m.removeEventListener === "function") {
+        m.removeEventListener("change", update);
+      } else if (typeof (m as any).removeListener === "function") {
+        (m as any).removeListener(update);
+      }
+    };
   }, []);
 
   useEffect(() => {
@@ -117,6 +112,7 @@ const MagneticLine = ({ text }: { text: string }) => {
     const letters = Array.from(container.querySelectorAll<HTMLSpanElement>("[data-letter]"));
     let raf = 0;
     let mx = -9999, my = -9999;
+    let cancelled = false;
 
     const onMove = (e: MouseEvent) => {
       mx = e.clientX;
@@ -128,6 +124,7 @@ const MagneticLine = ({ text }: { text: string }) => {
       if (!raf) raf = requestAnimationFrame(apply);
     };
     const apply = () => {
+      if (cancelled) return;
       raf = 0;
       letters.forEach((el) => {
         const r = el.getBoundingClientRect();
@@ -156,6 +153,7 @@ const MagneticLine = ({ text }: { text: string }) => {
     container.addEventListener("mousemove", onMove);
     container.addEventListener("mouseleave", onLeave);
     return () => {
+      cancelled = true;
       container.removeEventListener("mousemove", onMove);
       container.removeEventListener("mouseleave", onLeave);
       if (raf) cancelAnimationFrame(raf);
@@ -210,47 +208,6 @@ const WordReveal = ({ text, className }: { text: string; className?: string }) =
   );
 };
 
-/* Clip-path reveal + Ken Burns zoom + grayscale→color on scroll */
-const RevealImage = ({
-  src,
-  alt,
-  fromLeft = true,
-}: {
-  src: string;
-  alt: string;
-  fromLeft?: boolean;
-}) => {
-  const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, margin: "-80px" });
-
-  const hidden = fromLeft
-    ? "polygon(0 0, 0 0, 0 100%, 0 100%)"
-    : "polygon(100% 0, 100% 0, 100% 100%, 100% 100%)";
-  const shown = "polygon(0 0, 100% 0, 100% 100%, 0 100%)";
-
-  return (
-    <motion.div
-      ref={ref}
-      className="aspect-[4/3] overflow-hidden border border-border"
-      initial={{ clipPath: hidden }}
-      animate={inView ? { clipPath: shown } : {}}
-      transition={{ duration: 1.1, ease: [0.77, 0, 0.175, 1] }}
-    >
-      <motion.img
-        src={src}
-        alt={alt}
-        loading="lazy"
-        className="h-full w-full object-cover"
-        initial={{ scale: 1.18, filter: "grayscale(100%)" }}
-        animate={inView ? { scale: 1, filter: "grayscale(0%)" } : {}}
-        transition={{
-          scale: { duration: 8, ease: "easeOut" },
-          filter: { duration: 1.4, delay: 0.3, ease: "easeOut" },
-        }}
-      />
-    </motion.div>
-  );
-};
 
 const AboutPage = () => {
   return (
@@ -290,30 +247,37 @@ const AboutPage = () => {
         </div>
       </section>
 
-      <section className="px-6 py-24 md:px-12 space-y-24">
-        {BLOCKS.map((b, i) => (
-          <motion.div
-            key={b.title}
-            initial={{ opacity: 0, y: 40 }}
+      {/* The GSAP NIGUS Reveal Animation */}
+      <NigusReveal />
+
+      {/* WHAT WE STAND FOR - Sleek modern section */}
+      <section className="px-6 py-32 md:px-12 flex justify-center text-center">
+        <div className="max-w-4xl space-y-12">
+          <motion.h2 
+            initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-100px" }}
-            transition={{ duration: 0.7 }}
-            className={`grid gap-10 items-center md:grid-cols-2 ${b.reverse ? "md:[&>div:first-child]:order-2" : ""}`}
+            viewport={{ once: true }}
+            className="font-display text-5xl md:text-7xl leading-[0.9]"
           >
-            <RevealImage src={b.image} alt={b.title} fromLeft={!b.reverse} />
-            <div>
-              <h2 className="font-display text-5xl md:text-6xl leading-[0.9]">{b.title}</h2>
-              <WordReveal text={b.body} className="mt-6 text-sm text-off-white/80 leading-relaxed" />
-            </div>
-          </motion.div>
-        ))}
+            NO REPLICAS. <br className="hidden md:block"/> NO COMPROMISES.
+          </motion.h2>
+          <motion.div 
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.2 }}
+            className="w-full h-px bg-border max-w-sm mx-auto" 
+          />
+          <WordReveal 
+            text="Every item in our store is 100% authentic. From Rick Owens Geobaskets to SP5DER hoodies — if it's on our rack, it's the real thing. That's the Sawkem promise." 
+            className="text-lg md:text-xl text-off-white/80 leading-relaxed max-w-2xl mx-auto" 
+          />
+        </div>
       </section>
 
       <section className="dark-band px-6 py-20 md:px-12">
         <h2 className="text-center font-display text-6xl md:text-7xl">BRANDS WE CARRY</h2>
-        <div className="mt-12">
-          <BrandMarquee />
-        </div>
+
         <div className="mt-12 grid grid-cols-2 gap-3 md:grid-cols-4">
           {BRAND_GRID.map((b) => (
             <motion.div
@@ -333,9 +297,9 @@ const AboutPage = () => {
           51K+ LIKES — GROWING EVERY DROP
         </p>
         <div className="mt-10 flex gap-6 overflow-x-auto pb-4 snap-x snap-mandatory">
-          {TIKTOK_PLACEHOLDERS.map((t, i) => (
-            <div key={i} className="min-w-[280px] md:min-w-[320px] snap-start">
-              <TikTokCard {...t} />
+          {TIKTOK_VIDEOS.map((t) => (
+            <div key={t.id} className="min-w-[325px] max-w-[605px] snap-start">
+              <TikTokEmbed videoId={t.id} html={t.html} />
             </div>
           ))}
         </div>
@@ -344,6 +308,7 @@ const AboutPage = () => {
             href="https://www.tiktok.com/@sawkem_fashion"
             target="_blank"
             rel="noreferrer"
+            onClick={() => api.public.trackClick("about-tiktok-follow", "About").catch(() => {})}
             className="inline-block bg-primary px-8 py-4 text-xs tracking-[0.3em] text-primary-foreground hover:bg-off-white transition-colors"
           >
             FOLLOW @SAWKEM_FASHION ON TIKTOK

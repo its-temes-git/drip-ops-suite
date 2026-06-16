@@ -1,25 +1,31 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { useApp } from "@/context/AppContext";
 import { BrandMarquee } from "@/components/BrandMarquee";
+import { api } from "@/lib/api";
 
 const OwnerLogin = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
   const nav = useNavigate();
-  const { setOwnerLoggedIn } = useApp();
+  const { login } = useApp();
 
-  const submit = (e: React.FormEvent) => {
+  const submit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (email === "owner@sawkem.com" && password === "sawkem2024") {
-      setOwnerLoggedIn(true);
+    setIsLoading(true);
+    try {
+      const response = await api.auth.login({ email, password });
+      login(response.token, response.user);
       toast.success("ACCESS GRANTED");
       setTimeout(() => nav("/owner"), 400);
-    } else {
-      toast.error("INVALID CREDENTIALS");
+    } catch (error: any) {
+      toast.error(error.message || "INVALID CREDENTIALS");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -69,9 +75,10 @@ const OwnerLogin = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             type="submit"
-            className="w-full bg-primary py-4 font-display text-xl tracking-widest text-primary-foreground"
+            disabled={isLoading}
+            className="w-full flex items-center justify-center bg-primary py-4 font-display text-xl tracking-widest text-primary-foreground disabled:opacity-70"
           >
-            ENTER DASHBOARD
+            {isLoading ? <Loader2 className="h-6 w-6 animate-spin" /> : "ENTER DASHBOARD"}
           </motion.button>
         </form>
 
