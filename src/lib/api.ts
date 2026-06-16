@@ -134,5 +134,9 @@ export const api = {
     addStaff: (data: any) => fetchAPI('/api/owner/staff', { method: 'POST', body: JSON.stringify(data) }),
     recentActivities: (limit = 20) => fetchAPI(`/api/owner/activities/recent?limit=${limit}`),
     clearActivities: () => fetchAPI('/api/owner/activities', { method: 'DELETE' }),
+    profitAnalytics: (params?: { startDate?: string; endDate?: string; period?: string }) => {
+      const q = params ? `?${new URLSearchParams(params as any).toString()}` : '';
+      return fetchAPI(`/api/owner/analytics/profit${q}`);
+    },
   }
 };

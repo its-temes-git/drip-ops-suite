@@ -49,6 +49,7 @@ const NewDrop = () => {
   const [newItemSize, setNewItemSize] = useState("");
   const [newItemColor, setNewItemColor] = useState("");
   const [price, setPrice] = useState("");
+  const [costPrice, setCostPrice] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [imgIdx, setImgIdx] = useState(0);
   const [tab, setTab] = useState<"TG" | "TT">("TG");
@@ -117,6 +118,7 @@ const NewDrop = () => {
       setNewItemSize("");
       setNewItemColor("");
       setPrice("");
+      setCostPrice("");
       setImages([]);
       setImgIdx(0);
       queryClient.invalidateQueries({ queryKey: ['public-products'] });
@@ -143,6 +145,7 @@ const NewDrop = () => {
       brand,
       description: `Sizes: ${derivedSizes.join(", ")}, Colors: ${derivedColors}`,
       current_price: Number(price),
+      cost_price: Number(costPrice) || 0,
       category_id: catMap[cat] || catMap["Tops"],
       images: images.filter(Boolean),
       variants: newVariants.map(v => ({ size: v.size || "OS", color: v.color || "Default", qty: Number(v.qty) })),
@@ -251,15 +254,26 @@ const NewDrop = () => {
             </button>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 pt-2">
+          <div className="grid grid-cols-2 gap-4 pt-2">
             <div>
-              <label className="text-[10px] tracking-widest text-muted-foreground uppercase">PRICE (ETB)</label>
-              <input 
-                type="text" 
-                inputMode="numeric" 
-                value={price} 
-                onChange={(e) => setPrice(e.target.value.replace(/[^0-9.]/g, ''))} 
-                className="acid-glow w-full border-0 border-b border-border bg-transparent py-2 outline-none focus:border-primary font-display text-lg text-primary" 
+              <label className="text-[10px] tracking-widest text-muted-foreground uppercase">COST PRICE (ETB) <span className="text-primary/60">— what you paid</span></label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={costPrice}
+                onChange={(e) => setCostPrice(e.target.value.replace(/[^0-9.]/g, ''))}
+                className="acid-glow w-full border-0 border-b border-border bg-transparent py-2 outline-none focus:border-primary font-display text-lg text-muted-foreground"
+                placeholder="0"
+              />
+            </div>
+            <div>
+              <label className="text-[10px] tracking-widest text-muted-foreground uppercase">SELLING PRICE (ETB)</label>
+              <input
+                type="text"
+                inputMode="numeric"
+                value={price}
+                onChange={(e) => setPrice(e.target.value.replace(/[^0-9.]/g, ''))}
+                className="acid-glow w-full border-0 border-b border-border bg-transparent py-2 outline-none focus:border-primary font-display text-lg text-primary"
               />
             </div>
           </div>
