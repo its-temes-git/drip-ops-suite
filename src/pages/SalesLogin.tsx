@@ -82,7 +82,6 @@ const SalesLogin = () => {
           </motion.button>
         </form>
 
-        <p className="mt-8 text-center text-[10px] text-muted-foreground">PIN: 1234</p>
       </motion.div>
     </div>
   );

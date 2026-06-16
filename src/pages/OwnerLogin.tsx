@@ -57,7 +57,7 @@ const OwnerLogin = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               className="acid-glow w-full border-0 border-b border-border bg-transparent py-2 text-off-white outline-none focus:border-primary"
-              placeholder="owner@sawkem.com"
+              placeholder="Enter your email"
             />
           </div>
           <div>
@@ -82,9 +82,7 @@ const OwnerLogin = () => {
           </motion.button>
         </form>
 
-        <p className="mt-8 text-center text-[10px] text-muted-foreground">
-          owner@sawkem.com / sawkem2024
-        </p>
+
       </motion.div>
     </div>
   );
