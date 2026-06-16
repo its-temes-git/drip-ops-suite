@@ -10,6 +10,7 @@ import heroImg3 from "@/assets/images/hero 3.png";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { ParticleCanvas } from "@/components/public/ParticleCanvas";
+import { OnRotation } from "@/components/public/OnRotation";
 import { Skeleton } from "@/components/ui/skeleton";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -258,6 +259,13 @@ const HomePage = () => {
           color={isDark ? "#fafafa" : "#171717"}
         />
       </section>
+
+      {/* ON ROTATION */}
+      <OnRotation
+        products={products}
+        isLoading={isLoading || isFetching}
+        onTrack={handleTrack}
+      />
 
       {/* NEW DROPS */}
       <section className="px-6 py-0 md:px-12">
