@@ -24,7 +24,7 @@ interface OnRotationProps {
   onTrack?: (id: string) => void;
 }
 
-const AUTOPLAY_INTERVAL = 2500;
+const AUTOPLAY_INTERVAL = 5000;
 const MAX_ITEMS = 15;
 
 function shuffleArray<T>(arr: T[]): T[] {
@@ -82,6 +82,7 @@ export const OnRotation = ({ products, isLoading, onTrack }: OnRotationProps) =>
   const [active, setActive] = useState(0);
   const [dir, setDir] = useState(1);
   const [drawerItem, setDrawerItem] = useState<Product | null>(null);
+  const [tick, setTick] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Randomly shuffle and pick max 15 items — stable until products change
@@ -90,17 +91,24 @@ export const OnRotation = ({ products, isLoading, onTrack }: OnRotationProps) =>
     return shuffleArray(products).slice(0, MAX_ITEMS);
   }, [products]);
 
+  const goTo = useCallback((index: number) => {
+    setDir(index >= active ? 1 : -1);
+    setActive(index);
+    setTick((t) => t + 1);
+    if (intervalRef.current) clearInterval(intervalRef.current);
+  }, [active]);
+
   const next = useCallback(() => {
     setDir(1);
     setActive((prev) => (prev + 1) % hotItems.length);
   }, [hotItems.length]);
 
-  // Always auto-cycle — no pause
+  // Always auto-cycle — restarts when tick changes (dot clicked)
   useEffect(() => {
     if (hotItems.length <= 1) return;
     intervalRef.current = setInterval(next, AUTOPLAY_INTERVAL);
     return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
-  }, [next, hotItems.length]);
+  }, [next, hotItems.length, tick]);
 
   if (isLoading) {
     return (
@@ -152,8 +160,34 @@ export const OnRotation = ({ products, isLoading, onTrack }: OnRotationProps) =>
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="mb-10"
         >
-          <h2 className="font-display text-6xl md:text-7xl">HOT SELECTIONS</h2>
-          <p className="mt-2 text-xs tracking-[0.3em] text-primary">CURATED PICKS · ALWAYS FRESH</p>
+          <div className="flex items-end justify-between">
+            <div>
+              <h2 className="font-display text-6xl md:text-7xl">HOT SELECTIONS</h2>
+              <p className="mt-2 text-xs tracking-[0.3em] text-primary">CURATED PICKS · ALWAYS FRESH</p>
+            </div>
+            {/* Progress dots */}
+            <div className="hidden md:flex items-center gap-2 pb-1">
+              {hotItems.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => goTo(i)}
+                  className="relative h-[3px] rounded-full overflow-hidden transition-all duration-300"
+                  style={{ width: i === active ? 32 : 12, background: i === active ? '#b8ff57' : 'rgba(255,255,255,0.18)' }}
+                  aria-label={`Go to item ${i + 1}`}
+                >
+                  {i === active && (
+                    <motion.span
+                      key={`${active}-${tick}`}
+                      className="absolute inset-y-0 left-0 bg-white/35 rounded-full"
+                      initial={{ width: '0%' }}
+                      animate={{ width: '100%' }}
+                      transition={{ duration: AUTOPLAY_INTERVAL / 1000, ease: 'linear' }}
+                    />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
         </motion.div>
 
         {/* Main spotlight */}
@@ -193,33 +227,6 @@ export const OnRotation = ({ products, isLoading, onTrack }: OnRotationProps) =>
                 <p className="font-mono text-xl text-off-white/90">
                   ETB {item.price.toLocaleString()}
                 </p>
-
-                {/* Color */}
-                {colorLabel && (
-                  <div className="flex items-center gap-2.5">
-                    <span className="font-mono text-[9px] tracking-[0.3em] text-muted-foreground">COLOR</span>
-                    <span
-                      className="h-4 w-4 rounded-full border border-border"
-                      style={{ background: colorHex }}
-                    />
-                    <span className="font-mono text-[10px] text-off-white/70 capitalize">{colorLabel}</span>
-                  </div>
-                )}
-
-                {/* Sizes */}
-                {item.sizes?.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-2">
-                    <span className="font-mono text-[9px] tracking-[0.3em] text-muted-foreground mr-1">SIZES</span>
-                    {item.sizes.map((s) => (
-                      <span
-                        key={s}
-                        className="border border-border px-2.5 py-1 font-mono text-[10px] text-off-white/70"
-                      >
-                        {s}
-                      </span>
-                    ))}
-                  </div>
-                )}
 
                 {/* CTA */}
                 <button

@@ -200,7 +200,7 @@ const HomePage = () => {
                     whileHover={{ y: -15, scale: 1.05, color: "#fff" }}
                     transition={{ duration: 0.9, delay: 0.35 + i * 0.06, ease: [0.22, 1, 0.36, 1] }}
                     className="inline-block text-left font-display leading-[0.85] text-[#b8ff57] cursor-crosshair"
-                    style={{ fontSize: "clamp(110px, 22vw, 30px)", letterSpacing: "0.1em" }}
+                    style={{ fontSize: "clamp(110px, 22vw, 30px)", letterSpacing: "-0.01em" }}
                   >
                     {char}
                   </motion.span>
@@ -452,6 +452,7 @@ const HomePage = () => {
               address: "Summit Area, in front of Deborah School, Addis Ababa",
               hours: "Mon–Sat: 9:00 AM – 8:00 PM | Sun: 11:00 AM – 6:00 PM",
               mapQuery: "Summit,Addis+Ababa,Ethiopia",
+              directionsUrl: "https://maps.app.goo.gl/SdnwzWb8FFZiD55e9",
               variant: revealLeft,
             },
             {
@@ -460,6 +461,7 @@ const HomePage = () => {
               address: "Saris, Yekality Taxi Meyaza, Addis Ababa",
               hours: "Mon–Sat: 9:00 AM – 8:00 PM | Sun: 11:00 AM – 6:00 PM",
               mapQuery: "Saris+Yekality+Taxi+Meyaza,Addis+Ababa,Ethiopia",
+              directionsUrl: null,
               variant: revealRight,
             },
           ].map((b) => (
@@ -491,7 +493,7 @@ const HomePage = () => {
                   {openMap === b.key ? "HIDE MAP" : "SHOW MAP"}
                 </button>
                 <a
-                  href={`https://www.google.com/maps/search/${b.mapQuery}`}
+                  href={(b as any).directionsUrl || `https://www.google.com/maps/search/${b.mapQuery}`}
                   target="_blank"
                   rel="noreferrer"
                   onClick={() => handleTrack(`home-directions-${b.key}`)}
