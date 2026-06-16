@@ -66,6 +66,7 @@ const InventoryPage = () => {
         sizes: extractedSizes,
         color: extractedColor,
         price: i.current_price || i.price || 0,
+        cost_price: Number(i.cost_price) || 0,
         qty: i.quantity || i.qty || 0,
         variants: i.variants || [],
         is_visible: i.is_visible !== false,
@@ -108,6 +109,7 @@ const InventoryPage = () => {
   const [isRestocking, setIsRestocking] = useState(false);
   const [isUpdating, setIsUpdating] = useState(false);
   const [editPrice, setEditPrice] = useState<string>("0");
+  const [editCostPrice, setEditCostPrice] = useState<string>("0");
   const [editQty, setEditQty] = useState<string>("0");
   const [editName, setEditName] = useState<string>("");
   const [editBrand, setEditBrand] = useState<string>("");
@@ -124,6 +126,7 @@ const InventoryPage = () => {
     brand: "",
     category: "General",
     price: "",
+    costPrice: "",
     qty: "",
     image: ""
   });
@@ -156,6 +159,7 @@ const InventoryPage = () => {
   useEffect(() => {
     if (selected) {
       setEditPrice(String(selected.price || 0));
+      setEditCostPrice(String((selected as any).cost_price || 0));
       const initialVariants = Array.isArray(selected.variants) 
         ? selected.variants.filter((v: any) => Number(v.qty ?? v.quantity) > 0) 
         : [];
@@ -189,6 +193,7 @@ const InventoryPage = () => {
         brand: editBrand,
         category_id: editCategory,
         current_price: Number(editPrice),
+        cost_price: Number(editCostPrice),
         variants: editVariants,
         images: editImages.filter(Boolean)
       });
@@ -309,6 +314,7 @@ const InventoryPage = () => {
         brand: newItem.brand,
         category_id: newItem.category,
         current_price: Number(newItem.price),
+        cost_price: Number(newItem.costPrice) || 0,
         images: newItem.image ? [newItem.image] : [],
         is_visible: true,
         variants: newVariants
@@ -325,7 +331,7 @@ const InventoryPage = () => {
       queryClient.invalidateQueries({ queryKey: ['inventory'] });
       toast.success("New product added to inventory");
       setIsAdding(false);
-      setNewItem({ name: "", brand: "", category: "General", price: "", qty: "", image: "" });
+      setNewItem({ name: "", brand: "", category: "General", price: "", costPrice: "", qty: "", image: "" });
       setNewVariants([]);
       setNewItemSize("");
       setNewItemColor("");
@@ -738,7 +744,18 @@ const InventoryPage = () => {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
-                      <label className="text-[10px] tracking-widest text-muted-foreground font-bold uppercase">Current Price (ETB)</label>
+                      <label className="text-[10px] tracking-widest text-muted-foreground font-bold uppercase">Cost Price (ETB) <span className="text-primary/50 normal-case">— paid</span></label>
+                      <input
+                        type="text"
+                        inputMode="numeric"
+                        value={editCostPrice}
+                        onChange={(e) => setEditCostPrice(e.target.value.replace(/[^0-9.]/g, ''))}
+                        className="w-full bg-background border border-border px-3 py-2.5 text-lg font-display outline-none focus:border-primary text-muted-foreground"
+                        placeholder="0"
+                      />
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] tracking-widest text-muted-foreground font-bold uppercase">Selling Price (ETB)</label>
                       <input
                         type="text"
                         inputMode="numeric"
@@ -747,16 +764,16 @@ const InventoryPage = () => {
                         className="w-full bg-background border border-border px-3 py-2.5 text-lg font-display outline-none focus:border-primary"
                       />
                     </div>
-                    <div className="space-y-1.5">
-                      <label className="text-[10px] tracking-widest text-muted-foreground font-bold uppercase">Stock Qty</label>
-                      <input
-                        type="text"
-                        readOnly
-                        value={editQty}
-                        className="w-full bg-muted border border-border px-3 py-2.5 text-lg font-display outline-none text-muted-foreground cursor-not-allowed"
-                        title="Quantity is updated automatically when adding variants"
-                      />
-                    </div>
+                  </div>
+                  <div className="space-y-1.5">
+                    <label className="text-[10px] tracking-widest text-muted-foreground font-bold uppercase">Stock Qty</label>
+                    <input
+                      type="text"
+                      readOnly
+                      value={editQty}
+                      className="w-full bg-muted border border-border px-3 py-2.5 text-lg font-display outline-none text-muted-foreground cursor-not-allowed"
+                      title="Quantity is updated automatically when adding variants"
+                    />
                   </div>
                 </div>
 
@@ -989,18 +1006,34 @@ const InventoryPage = () => {
               />
             </div>
  
-            <div className="col-span-2 space-y-2">
-              <label className="text-[10px] tracking-widest text-muted-foreground uppercase">Price (ETB)</label>
-              <input
-                type="text"
-                inputMode="numeric"
-                value={newItem.price}
-                onChange={(e) => {
-                  const val = e.target.value.replace(/[^0-9.]/g, '');
-                  setNewItem(prev => ({ ...prev, price: val }));
-                }}
-                className="w-full bg-background border border-border px-3 py-3 text-2xl font-display outline-none focus:border-primary text-primary"
-              />
+            <div className="col-span-2 grid grid-cols-2 gap-3">
+              <div className="space-y-2">
+                <label className="text-[10px] tracking-widest text-muted-foreground uppercase">Cost Price (ETB) <span className="text-primary/50">— paid</span></label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={newItem.costPrice}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9.]/g, '');
+                    setNewItem(prev => ({ ...prev, costPrice: val }));
+                  }}
+                  className="w-full bg-background border border-border px-3 py-3 text-2xl font-display outline-none focus:border-primary text-muted-foreground"
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-[10px] tracking-widest text-muted-foreground uppercase">Selling Price (ETB)</label>
+                <input
+                  type="text"
+                  inputMode="numeric"
+                  value={newItem.price}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/[^0-9.]/g, '');
+                    setNewItem(prev => ({ ...prev, price: val }));
+                  }}
+                  className="w-full bg-background border border-border px-3 py-3 text-2xl font-display outline-none focus:border-primary text-primary"
+                />
+              </div>
             </div>
 
             {/* VARIANTS FOR NEW ITEM */}
