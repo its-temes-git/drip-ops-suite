@@ -11,6 +11,7 @@ import { useQuery } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { ParticleCanvas } from "@/components/public/ParticleCanvas";
 import { OnRotation } from "@/components/public/OnRotation";
+import { ItemDrawer } from "@/components/public/ItemDrawer";
 import { Skeleton } from "@/components/ui/skeleton";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -94,6 +95,7 @@ const GlowingEdgeLogo = () => {
 
 const HomePage = () => {
   const scrollRef = useRef<HTMLDivElement>(null);
+  const [drawerItem, setDrawerItem] = useState<any | null>(null);
 
   const { data: products = [], isLoading, isFetching } = useQuery({
     queryKey: ['public-products'],
@@ -348,13 +350,15 @@ const HomePage = () => {
                       <span key={s} className="border border-border px-2 py-0.5 text-[10px]">{s}</span>
                     ))}
                   </div>
-                  <Link
-                    to={`/shop?item=${p.id}`}
-                    onClick={() => handleTrack(`home-featured-view-item-${p.id}`)}
-                    className="mt-4 block border border-off-white px-4 py-2 text-center text-[10px] tracking-[0.3em] text-off-white transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary"
+                  <button
+                    onClick={() => {
+                      handleTrack(`home-featured-view-item-${p.id}`);
+                      setDrawerItem(p);
+                    }}
+                    className="mt-4 w-full border border-off-white px-4 py-2 text-center text-[10px] tracking-[0.3em] text-off-white transition-all hover:bg-primary hover:text-primary-foreground hover:border-primary"
                   >
                     VIEW ITEM
-                  </Link>
+                  </button>
                 </div>
               </motion.div>
             ))
@@ -532,6 +536,9 @@ const HomePage = () => {
           ))}
         </div>
       </section>
+
+      {/* Item Drawer — New Drops */}
+      <ItemDrawer item={drawerItem} onClose={() => setDrawerItem(null)} />
     </>
   );
 };
