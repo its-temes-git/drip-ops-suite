@@ -317,6 +317,8 @@ const Analytics = () => {
                   <option value="CASH">CASH</option>
                   <option value="TELEBIRR">TELEBIRR</option>
                   <option value="CBE">CBE</option>
+                  <option value="BOA">BOA</option>
+                  <option value="Awash Bank">AWASH BANK</option>
                 </select>
                 {txTotal > 0 && (
                   <button

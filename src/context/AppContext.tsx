@@ -4,7 +4,7 @@ import { auth } from "@/lib/auth";
 import { User } from "@/lib/api";
 import { toast } from "sonner";
 
-export type PaymentMethod = "Cash" | "Telebirr" | "CBE";
+export type PaymentMethod = "Cash" | "Telebirr" | "CBE" | "BOA" | "Awash Bank";
 
 export interface SaleAuditEntry {
   action: "created" | "edited" | "deleted";

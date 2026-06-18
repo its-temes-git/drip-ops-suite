@@ -18,6 +18,8 @@ const PAYMENTS: { id: PaymentMethod; label: string; icon: typeof Banknote }[] = 
   { id: "Cash", label: "CASH", icon: Banknote },
   { id: "Telebirr", label: "TELEBIRR", icon: Smartphone },
   { id: "CBE", label: "CBE", icon: Building2 },
+  { id: "BOA", label: "BOA", icon: Building2 },
+  { id: "Awash Bank", label: "AWASH BANK", icon: Building2 },
 ];
 
 const COLOR_HEX: Record<string, string> = {
