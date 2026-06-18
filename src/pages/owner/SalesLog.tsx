@@ -20,10 +20,13 @@ const SalesLog = () => {
   const startDate = dateStr;
   const endDate = dateStr;
 
-  const { data: daySales = [], isLoading } = useQuery({
+  const { data: rawSalesData, isLoading } = useQuery({
     queryKey: ['sales-log', startDate, endDate],
     queryFn: () => api.owner.sales({ startDate, endDate })
   });
+
+  // Guard: API may return null/undefined/object when no transactions exist
+  const daySales: any[] = Array.isArray(rawSalesData) ? rawSalesData : [];
 
   const [viewingReason, setViewingReason] = useState<string | null>(null);
 
