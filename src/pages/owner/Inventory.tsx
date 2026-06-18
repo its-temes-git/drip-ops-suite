@@ -846,34 +846,50 @@ const InventoryPage = () => {
                   <p className="text-[9px] text-muted-foreground tracking-wider mb-3 leading-relaxed">
                     Controls visibility on <span className="text-primary font-bold">Sales Portal</span> &amp; <span className="text-primary font-bold">Public Shop</span>
                   </p>
-                  <div className="flex gap-2">
+                  <div className="flex items-center gap-4">
+                    {/* ON/OFF Toggle Switch */}
                     <button
-                      onClick={() => toggleProductVisibility(false)}
-                      disabled={selected.is_visible === false}
-                      className={`flex-1 flex items-center justify-center gap-2 py-3 text-[10px] tracking-widest border transition-all ${
-                        selected.is_visible === false
-                          ? "border-border/30 text-muted-foreground/40 cursor-not-allowed opacity-50"
-                          : "border-destructive/40 text-destructive hover:bg-destructive/10"
-                      }`}
+                      onClick={() => toggleProductVisibility(selected.is_visible === false)}
+                      aria-label={selected.is_visible !== false ? "Hide product" : "Show product"}
+                      className="relative flex-shrink-0 h-10 w-[90px] rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+                      style={{
+                        background: selected.is_visible !== false
+                          ? "linear-gradient(135deg, #22c55e, #16a34a)"
+                          : "rgba(255,255,255,0.06)",
+                        border: selected.is_visible !== false
+                          ? "2px solid #22c55e"
+                          : "2px solid rgba(255,255,255,0.15)",
+                        boxShadow: selected.is_visible !== false
+                          ? "0 0 18px rgba(34,197,94,0.35)"
+                          : "inset 0 1px 3px rgba(0,0,0,0.4)",
+                      }}
                     >
-                      <EyeOff className="h-3.5 w-3.5" /> HIDE
+                      {/* Label text */}
+                      <span
+                        className="absolute inset-0 flex items-center font-black text-[11px] tracking-[0.15em] transition-all duration-300 select-none"
+                        style={{
+                          paddingLeft: selected.is_visible !== false ? "12px" : undefined,
+                          paddingRight: selected.is_visible !== false ? undefined : "12px",
+                          justifyContent: selected.is_visible !== false ? "flex-start" : "flex-end",
+                          color: selected.is_visible !== false ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.4)",
+                        }}
+                      >
+                        {selected.is_visible !== false ? "ON" : "OFF"}
+                      </span>
+                      {/* Knob */}
+                      <span
+                        className="absolute top-[3px] h-7 w-7 rounded-full bg-white shadow-md transition-all duration-300"
+                        style={{
+                          left: selected.is_visible !== false ? "calc(100% - 32px)" : "3px",
+                          boxShadow: "0 2px 6px rgba(0,0,0,0.35)",
+                        }}
+                      />
                     </button>
-                    <button
-                      onClick={() => toggleProductVisibility(true)}
-                      disabled={selected.is_visible !== false}
-                      className={`flex-1 flex items-center justify-center gap-2 py-3 text-[10px] tracking-widest border transition-all ${
-                        selected.is_visible !== false
-                          ? "border-border/30 text-muted-foreground/40 cursor-not-allowed opacity-50"
-                          : "border-primary/40 text-primary hover:bg-primary/10 shadow-[0_0_12px_rgba(var(--primary),0.12)]"
-                      }`}
-                    >
-                      <Eye className="h-3.5 w-3.5" /> UNHIDE
-                    </button>
-                  </div>
-                  <p className="mt-2 text-[9px] text-muted-foreground tracking-wider leading-relaxed">
-                    {selected.is_visible !== false
-                      ? "This product is visible to both sales staff and the public. Click HIDE to remove it from both portals."
-                      : "⚠ This product is hidden from the Sales Portal and Public Shop. Click UNHIDE to make it available again."}
+                    <p className="text-[9px] text-muted-foreground tracking-wider leading-relaxed">
+                      {selected.is_visible !== false
+                        ? <span>Visible on <span className="text-primary font-bold">Sales Portal</span> &amp; <span className="text-primary font-bold">Public Shop</span></span>
+                        : <span className="text-destructive/80">⚠ Hidden from Sales Portal &amp; Public Shop</span>
+                      }
                   </p>
                 </div>
               </div>
