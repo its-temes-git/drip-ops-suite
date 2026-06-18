@@ -31,10 +31,12 @@ const FASHION_COLORS = [
 
 const SHOE_SIZES = ["36","37","38","39","40","41","42","43","44","45","46","47"];
 const CLOTH_SIZES = ["XS","S","M","L","XL","XXL"];
+const WAIST_SIZES = ["28","29","30","31","32","33","34","35","36","37","38"];
 
 const getSizesForCategory = (cat: string): string[] => {
   if (cat === "Shoes") return SHOE_SIZES;
   if (cat === "Accessories") return [];
+  if (cat === "Bottoms") return [...CLOTH_SIZES, ...WAIST_SIZES];
   return CLOTH_SIZES;
 };
 
@@ -70,6 +72,7 @@ const InventoryPage = () => {
         qty: i.quantity || i.qty || 0,
         variants: i.variants || [],
         is_visible: i.is_visible !== false,
+        is_visible_sales: i.is_visible_sales !== false,
         images: (() => {
           try {
             if (Array.isArray(i.images) && i.images.length > 0) return i.images;
@@ -287,12 +290,13 @@ const InventoryPage = () => {
     }
   };
 
-  const toggleProductVisibility = async (isVisible: boolean) => {
+  const toggleVisibility = async (field: 'is_visible' | 'is_visible_sales', value: boolean) => {
     if (!selected) return;
     try {
-      await api.owner.updateProduct(selected.id, { is_visible: isVisible });
+      await api.owner.updateProduct(selected.id, { [field]: value });
       queryClient.invalidateQueries({ queryKey: ['inventory'] });
-      toast.success(isVisible ? "Product is now visible" : "Product hidden from shop");
+      const label = field === 'is_visible' ? 'Public Shop' : 'Sales Portal';
+      toast.success(value ? `Visible on ${label}` : `Hidden from ${label}`);
     } catch (e: any) {
       toast.error("Failed to update visibility");
     }
@@ -842,55 +846,48 @@ const InventoryPage = () => {
 
                 {/* 3. VISIBILITY TOGGLE */}
                 <div className="pt-6 border-t border-border/30">
-                  <label className="text-[10px] tracking-widest text-muted-foreground font-bold block mb-1 uppercase">Store Visibility</label>
-                  <p className="text-[9px] text-muted-foreground tracking-wider mb-3 leading-relaxed">
-                    Controls visibility on <span className="text-primary font-bold">Sales Portal</span> &amp; <span className="text-primary font-bold">Public Shop</span>
-                  </p>
-                  <div className="flex items-center gap-4">
-                    {/* ON/OFF Toggle Switch */}
-                    <button
-                      onClick={() => toggleProductVisibility(selected.is_visible === false)}
-                      aria-label={selected.is_visible !== false ? "Hide product" : "Show product"}
-                      className="relative flex-shrink-0 h-10 w-[90px] rounded-full transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
-                      style={{
-                        background: selected.is_visible !== false
-                          ? "linear-gradient(135deg, #22c55e, #16a34a)"
-                          : "rgba(255,255,255,0.06)",
-                        border: selected.is_visible !== false
-                          ? "2px solid #22c55e"
-                          : "2px solid rgba(255,255,255,0.15)",
-                        boxShadow: selected.is_visible !== false
-                          ? "0 0 18px rgba(34,197,94,0.35)"
-                          : "inset 0 1px 3px rgba(0,0,0,0.4)",
-                      }}
-                    >
-                      {/* Label text */}
-                      <span
-                        className="absolute inset-0 flex items-center font-black text-[11px] tracking-[0.15em] transition-all duration-300 select-none"
+                  <label className="text-[10px] tracking-widest text-muted-foreground font-bold block mb-3 uppercase">Store Visibility</label>
+                  <div className="flex flex-col gap-3">
+                    {/* Public Shop toggle */}
+                    <div className="flex items-center justify-between">
+                      <p className="text-[9px] tracking-widest text-muted-foreground uppercase">Public Shop</p>
+                      <button
+                        onClick={() => toggleVisibility('is_visible', !selected.is_visible)}
+                        className="relative flex-shrink-0 h-6 w-[52px] rounded-full transition-all duration-300 focus:outline-none"
                         style={{
-                          paddingLeft: selected.is_visible !== false ? "12px" : undefined,
-                          paddingRight: selected.is_visible !== false ? undefined : "12px",
-                          justifyContent: selected.is_visible !== false ? "flex-start" : "flex-end",
-                          color: selected.is_visible !== false ? "rgba(0,0,0,0.75)" : "rgba(255,255,255,0.4)",
+                          background: selected.is_visible !== false ? "linear-gradient(135deg,#22c55e,#16a34a)" : "rgba(255,255,255,0.07)",
+                          border: selected.is_visible !== false ? "1.5px solid #22c55e" : "1.5px solid rgba(255,255,255,0.15)",
+                          boxShadow: selected.is_visible !== false ? "0 0 10px rgba(34,197,94,0.3)" : "none",
                         }}
                       >
-                        {selected.is_visible !== false ? "ON" : "OFF"}
-                      </span>
-                      {/* Knob */}
-                      <span
-                        className="absolute top-[3px] h-7 w-7 rounded-full bg-white shadow-md transition-all duration-300"
+                        <span className="absolute inset-0 flex items-center font-black text-[8px] tracking-wider select-none"
+                          style={{ paddingLeft: selected.is_visible !== false ? "7px" : undefined, paddingRight: selected.is_visible !== false ? undefined : "7px", justifyContent: selected.is_visible !== false ? "flex-start" : "flex-end", color: selected.is_visible !== false ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.4)" }}>
+                          {selected.is_visible !== false ? "ON" : "OFF"}
+                        </span>
+                        <span className="absolute top-[2px] h-[18px] w-[18px] rounded-full bg-white shadow transition-all duration-300"
+                          style={{ left: selected.is_visible !== false ? "calc(100% - 20px)" : "2px" }} />
+                      </button>
+                    </div>
+                    {/* Sales Portal toggle */}
+                    <div className="flex items-center justify-between">
+                      <p className="text-[9px] tracking-widest text-muted-foreground uppercase">Sales Portal</p>
+                      <button
+                        onClick={() => toggleVisibility('is_visible_sales', !(selected as any).is_visible_sales)}
+                        className="relative flex-shrink-0 h-6 w-[52px] rounded-full transition-all duration-300 focus:outline-none"
                         style={{
-                          left: selected.is_visible !== false ? "calc(100% - 32px)" : "3px",
-                          boxShadow: "0 2px 6px rgba(0,0,0,0.35)",
+                          background: (selected as any).is_visible_sales !== false ? "linear-gradient(135deg,#22c55e,#16a34a)" : "rgba(255,255,255,0.07)",
+                          border: (selected as any).is_visible_sales !== false ? "1.5px solid #22c55e" : "1.5px solid rgba(255,255,255,0.15)",
+                          boxShadow: (selected as any).is_visible_sales !== false ? "0 0 10px rgba(34,197,94,0.3)" : "none",
                         }}
-                      />
-                    </button>
-                    <p className="text-[9px] text-muted-foreground tracking-wider leading-relaxed">
-                      {selected.is_visible !== false
-                        ? <span>Visible on <span className="text-primary font-bold">Sales Portal</span> &amp; <span className="text-primary font-bold">Public Shop</span></span>
-                        : <span className="text-destructive/80">⚠ Hidden from Sales Portal &amp; Public Shop</span>
-                      }
-                    </p>
+                      >
+                        <span className="absolute inset-0 flex items-center font-black text-[8px] tracking-wider select-none"
+                          style={{ paddingLeft: (selected as any).is_visible_sales !== false ? "7px" : undefined, paddingRight: (selected as any).is_visible_sales !== false ? undefined : "7px", justifyContent: (selected as any).is_visible_sales !== false ? "flex-start" : "flex-end", color: (selected as any).is_visible_sales !== false ? "rgba(0,0,0,0.7)" : "rgba(255,255,255,0.4)" }}>
+                          {(selected as any).is_visible_sales !== false ? "ON" : "OFF"}
+                        </span>
+                        <span className="absolute top-[2px] h-[18px] w-[18px] rounded-full bg-white shadow transition-all duration-300"
+                          style={{ left: (selected as any).is_visible_sales !== false ? "calc(100% - 20px)" : "2px" }} />
+                      </button>
+                    </div>
                   </div>
                 </div>
               </div>
