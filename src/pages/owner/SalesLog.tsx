@@ -22,11 +22,13 @@ const SalesLog = () => {
 
   const { data: rawSalesData, isLoading } = useQuery({
     queryKey: ['sales-log', startDate, endDate],
-    queryFn: () => api.owner.sales({ startDate, endDate })
+    queryFn: () => api.owner.sales({ startDate, endDate, limit: 100 })
   });
 
-  // Guard: API may return null/undefined/object when no transactions exist
-  const daySales: any[] = Array.isArray(rawSalesData) ? rawSalesData : [];
+  // Guard: API may return paginated object with rows or an array directly
+  const daySales: any[] = Array.isArray(rawSalesData) 
+    ? rawSalesData 
+    : (rawSalesData?.rows || []);
 
   const [viewingReason, setViewingReason] = useState<string | null>(null);
 
