@@ -890,7 +890,8 @@ const InventoryPage = () => {
                         ? <span>Visible on <span className="text-primary font-bold">Sales Portal</span> &amp; <span className="text-primary font-bold">Public Shop</span></span>
                         : <span className="text-destructive/80">⚠ Hidden from Sales Portal &amp; Public Shop</span>
                       }
-                  </p>
+                    </p>
+                  </div>
                 </div>
               </div>
 
