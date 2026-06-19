@@ -4,7 +4,7 @@ import noctaAf1 from "@/assets/sales/nocta-af1.jpg";
 import galleryDeptJeans from "@/assets/sales/gallery-dept-jeans.jpg";
 import jordan1Chicago from "@/assets/sales/jordan-1-chicago.jpg";
 
-export type Category = "Shoes" | "Tops" | "Bottoms" | "Accessories";
+export type Category = "Shoes" | "Tops" | "Bottoms" | "Accessories" | "Shirt" | "T-Shirt" | "Hoodie" | "Jacket" | "Jeans" | "Jogger" | "Short";
 
 export interface InventoryItem {
   id: number;

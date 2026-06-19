@@ -37,7 +37,7 @@ const getSizesForCategory = (cat: string): string[] => {
   return CLOTH_SIZES;
 };
 
-const cats = ["Shoes", "Tops", "Bottoms", "Accessories", "Complete"] as const;
+const cats = ["Shoes", "Tops", "Bottoms", "Accessories", "Complete", "Shirt", "T-Shirt", "Hoodie", "Jacket", "Jeans", "Jogger", "Short"] as const;
 
 const NewDrop = () => {
   const { addItem } = useApp();
@@ -137,7 +137,14 @@ const NewDrop = () => {
       "Tops": "44444444-4444-4444-4444-444444444441",
       "Bottoms": "44444444-4444-4444-4444-444444444442",
       "Accessories": "44444444-4444-4444-4444-444444444443",
-      "Shoes": "44444444-4444-4444-4444-444444444444"
+      "Shoes": "44444444-4444-4444-4444-444444444444",
+      "Shirt": "44444444-4444-4444-4444-444444444445",
+      "T-Shirt": "44444444-4444-4444-4444-444444444446",
+      "Hoodie": "44444444-4444-4444-4444-444444444447",
+      "Jacket": "44444444-4444-4444-4444-444444444448",
+      "Jeans": "44444444-4444-4444-4444-444444444449",
+      "Jogger": "44444444-4444-4444-4444-444444444450",
+      "Short": "44444444-4444-4444-4444-444444444451"
     };
 
     addMutation.mutate({
@@ -187,7 +194,7 @@ const NewDrop = () => {
           <div>
             <label className="text-[10px] tracking-widest text-muted-foreground">CATEGORY</label>
             <select value={cat} onChange={(e) => setCat(e.target.value as Category)} className="w-full bg-transparent border-b border-border py-2 text-sm outline-none focus:border-primary">
-              {(["Shoes","Tops","Bottoms","Accessories"] as Category[]).map((c) => <option key={c} className="bg-card">{c}</option>)}
+              {(["Shoes","Tops","Bottoms","Accessories","Shirt","T-Shirt","Hoodie","Jacket","Jeans","Jogger","Short"] as Category[]).map((c) => <option key={c} className="bg-card">{c}</option>)}
             </select>
           </div>
 

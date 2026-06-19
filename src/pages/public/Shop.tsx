@@ -10,13 +10,20 @@ import { ShopCardSkeleton } from "@/components/ui/skeleton";
 
 const PAGE_SIZE = 12;
 
-type Cat = "ALL" | "Shoes" | "Tops" | "Bottoms" | "Accessories";
+type Cat = "ALL" | "Shoes" | "Tops" | "Bottoms" | "Accessories" | "Shirt" | "T-Shirt" | "Hoodie" | "Jacket" | "Jeans" | "Jogger" | "Short";
 const CATS: { key: Cat; label: string }[] = [
   { key: "ALL", label: "ALL" },
   { key: "Shoes", label: "SHOES" },
   { key: "Tops", label: "TOPS & HOODIES" },
   { key: "Bottoms", label: "BOTTOMS" },
   { key: "Accessories", label: "ACCESSORIES & BAGS" },
+  { key: "Shirt", label: "SHIRT" },
+  { key: "T-Shirt", label: "T-SHIRT" },
+  { key: "Hoodie", label: "HOODIE" },
+  { key: "Jacket", label: "JACKET" },
+  { key: "Jeans", label: "JEANS" },
+  { key: "Jogger", label: "JOGGER" },
+  { key: "Short", label: "SHORT" },
 ];
 
 const COLOR_HEX: Record<string, string> = {

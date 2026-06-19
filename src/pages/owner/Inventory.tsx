@@ -29,14 +29,14 @@ const FASHION_COLORS = [
   { name: "Cream", hex: "#F5F0E8" },
 ];
 
-const SHOE_SIZES = ["36","37","38","39","40","41","42","43","44","45","46","47"];
-const CLOTH_SIZES = ["XS","S","M","L","XL","XXL"];
-const WAIST_SIZES = ["28","29","30","31","32","33","34","35","36","37","38"];
+const SHOE_SIZES = ["36", "37", "38", "39", "40", "41", "42", "43", "44", "45", "46", "47"];
+const CLOTH_SIZES = ["XS", "S", "M", "L", "XL", "XXL", "XXXL"];
+const WAIST_SIZES = ["28", "29", "30", "31", "32", "33", "34", "35", "36", "37", "38"];
 
 const getSizesForCategory = (cat: string): string[] => {
   if (cat === "Shoes") return SHOE_SIZES;
   if (cat === "Accessories") return [];
-  if (cat === "Bottoms") return [...CLOTH_SIZES, ...WAIST_SIZES];
+  if (cat === "Bottoms" || cat === "Jeans" || cat === "Jogger" || cat === "Short") return [...CLOTH_SIZES, ...WAIST_SIZES];
   return CLOTH_SIZES;
 };
 
@@ -140,7 +140,7 @@ const InventoryPage = () => {
   const brands = useMemo(() => Array.from(new Set(inventory.map((i) => i.brand))).sort(), [inventory]);
   const cats = useMemo(() => {
     const found = Array.from(new Set(inventory.map((i) => i.category)));
-    const defaults = ["General", "Tops", "Bottoms", "Shoes", "Accessories", "Complete"];
+    const defaults = ["General", "Tops", "Bottoms", "Shoes", "Accessories", "Complete", "Shirt", "T-Shirt", "Hoodie", "Jacket", "Jeans", "Jogger", "Short"];
     return Array.from(new Set([...defaults, ...found]));
   }, [inventory]);
 
@@ -163,8 +163,8 @@ const InventoryPage = () => {
     if (selected) {
       setEditPrice(String(selected.price || 0));
       setEditCostPrice(String((selected as any).cost_price || 0));
-      const initialVariants = Array.isArray(selected.variants) 
-        ? selected.variants.filter((v: any) => Number(v.qty ?? v.quantity) > 0) 
+      const initialVariants = Array.isArray(selected.variants)
+        ? selected.variants.filter((v: any) => Number(v.qty ?? v.quantity) > 0)
         : [];
       setEditVariants(initialVariants);
       if (initialVariants.length > 0) {
@@ -640,10 +640,10 @@ const InventoryPage = () => {
                         )}
                         {/* Delete current */}
                         <button onClick={() => {
-                            const next = editImages.filter((_, i) => i !== editImgIdx);
-                            setEditImages(next);
-                            setEditImgIdx(Math.max(0, editImgIdx - 1));
-                          }}
+                          const next = editImages.filter((_, i) => i !== editImgIdx);
+                          setEditImages(next);
+                          setEditImgIdx(Math.max(0, editImgIdx - 1));
+                        }}
                           className="absolute top-2 right-2 h-7 w-7 flex items-center justify-center bg-destructive/90 text-white hover:bg-destructive rounded-sm">
                           <Trash2 className="h-3.5 w-3.5" />
                         </button>
@@ -724,7 +724,7 @@ const InventoryPage = () => {
                       className="w-full bg-background border border-border px-3 py-2.5 text-sm outline-none focus:border-primary"
                     />
                   </div>
-                  
+
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-1.5">
                       <label className="text-[10px] tracking-widest text-muted-foreground font-bold uppercase">Brand</label>
@@ -815,9 +815,8 @@ const InventoryPage = () => {
                       <div className="flex flex-wrap gap-1.5">
                         {getSizesForCategory(editCategory).map(sz => (
                           <button key={sz} onClick={() => setNewSize(sz)}
-                            className={`px-3 py-1.5 text-xs border transition-all ${
-                              newSize === sz ? "border-primary bg-primary text-black font-bold" : "border-border/50 text-muted-foreground hover:border-primary/50"
-                            }`}>{sz}</button>
+                            className={`px-3 py-1.5 text-xs border transition-all ${newSize === sz ? "border-primary bg-primary text-black font-bold" : "border-border/50 text-muted-foreground hover:border-primary/50"
+                              }`}>{sz}</button>
                         ))}
                       </div>
                     </div>
@@ -828,9 +827,8 @@ const InventoryPage = () => {
                     <div className="flex flex-wrap gap-2">
                       {FASHION_COLORS.map(col => (
                         <button key={col.name} title={col.name} onClick={() => setNewColor(col.name)}
-                          className={`h-7 w-7 rounded-full border-2 transition-all hover:scale-110 ${
-                            newColor === col.name ? "border-primary scale-110 shadow-[0_0_8px_rgba(255,255,255,0.3)]" : "border-transparent"
-                          }`}
+                          className={`h-7 w-7 rounded-full border-2 transition-all hover:scale-110 ${newColor === col.name ? "border-primary scale-110 shadow-[0_0_8px_rgba(255,255,255,0.3)]" : "border-transparent"
+                            }`}
                           style={{ backgroundColor: col.hex }} />
                       ))}
                     </div>
@@ -921,16 +919,16 @@ const InventoryPage = () => {
           </DialogHeader>
           <div className="grid grid-cols-2 gap-6 py-6">
             <div className="col-span-2 space-y-4">
-               <div 
-                 onClick={() => document.getElementById('new-file-input')?.click()}
-                 className="aspect-square w-full bg-muted border border-border overflow-hidden relative group cursor-pointer hover:border-primary transition-all"
-               >
+              <div
+                onClick={() => document.getElementById('new-file-input')?.click()}
+                className="aspect-square w-full bg-muted border border-border overflow-hidden relative group cursor-pointer hover:border-primary transition-all"
+              >
                 {newItem.image ? (
                   <>
-                    <img 
-                      src={newItem.image} 
-                      alt="Preview" 
-                      className="h-full w-full object-cover" 
+                    <img
+                      src={newItem.image}
+                      alt="Preview"
+                      className="h-full w-full object-cover"
                       onError={(e) => {
                         (e.target as HTMLImageElement).style.display = 'none';
                         (e.target as HTMLImageElement).nextElementSibling?.classList.remove('hidden');
@@ -953,32 +951,32 @@ const InventoryPage = () => {
                   </div>
                 )}
                 <div className="absolute inset-0 bg-primary/20 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity">
-                   <span className="text-[10px] tracking-widest text-primary-foreground font-bold bg-primary px-3 py-1.5 shadow-xl">CHANGE PHOTO</span>
+                  <span className="text-[10px] tracking-widest text-primary-foreground font-bold bg-primary px-3 py-1.5 shadow-xl">CHANGE PHOTO</span>
                 </div>
-               </div>
-               <input
+              </div>
+              <input
                 id="new-file-input"
                 type="file"
                 accept="image/*"
                 className="hidden"
                 onChange={(e) => handleFileUpload(e, true)}
               />
-               <div className="relative">
-                 <input
+              <div className="relative">
+                <input
                   placeholder="Or paste Image URL here..."
                   value={newItem.image}
-                  onChange={(e) => setNewItem({...newItem, image: e.target.value.trim()})}
+                  onChange={(e) => setNewItem({ ...newItem, image: e.target.value.trim() })}
                   className="w-full bg-background border border-border px-3 py-2.5 text-xs outline-none focus:border-primary transition-colors pr-10"
                 />
                 {newItem.image && (
-                  <button 
-                    onClick={() => setNewItem({...newItem, image: ""})}
+                  <button
+                    onClick={() => setNewItem({ ...newItem, image: "" })}
                     className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-destructive"
                   >
                     <Trash2 className="h-3 w-3" />
                   </button>
                 )}
-               </div>
+              </div>
             </div>
 
             <div className="space-y-2">
@@ -986,7 +984,7 @@ const InventoryPage = () => {
               <input
                 placeholder="e.g. NIKE"
                 value={newItem.brand}
-                onChange={(e) => setNewItem({...newItem, brand: e.target.value.toUpperCase()})}
+                onChange={(e) => setNewItem({ ...newItem, brand: e.target.value.toUpperCase() })}
                 className="w-full bg-background border border-border px-3 py-3 text-xs outline-none focus:border-primary"
               />
             </div>
@@ -995,16 +993,16 @@ const InventoryPage = () => {
               <input
                 placeholder="e.g. TECH WINDBREAKER"
                 value={newItem.name}
-                onChange={(e) => setNewItem({...newItem, name: e.target.value})}
+                onChange={(e) => setNewItem({ ...newItem, name: e.target.value })}
                 className="w-full bg-background border border-border px-3 py-3 text-xs outline-none focus:border-primary"
               />
             </div>
-            
+
             <div className="space-y-2">
               <label className="text-[10px] tracking-widest text-muted-foreground uppercase">Category</label>
               <select
                 value={newItem.category}
-                onChange={(e) => setNewItem({...newItem, category: e.target.value})}
+                onChange={(e) => setNewItem({ ...newItem, category: e.target.value })}
                 className="w-full bg-background border border-border px-3 py-3 text-xs outline-none focus:border-primary"
               >
                 {cats.map(c => <option key={c} value={c}>{c.toUpperCase()}</option>)}
@@ -1019,7 +1017,7 @@ const InventoryPage = () => {
                 title="Quantity is updated automatically when adding variants"
               />
             </div>
- 
+
             <div className="col-span-2 grid grid-cols-2 gap-3">
               <div className="space-y-2">
                 <label className="text-[10px] tracking-widest text-muted-foreground uppercase">Cost Price (ETB) <span className="text-primary/50">— paid</span></label>
@@ -1084,9 +1082,8 @@ const InventoryPage = () => {
                   <div className="flex flex-wrap gap-1.5">
                     {getSizesForCategory(newItem.category).map(sz => (
                       <button key={sz} onClick={() => setNewItemSize(sz)}
-                        className={`px-3 py-1.5 text-xs border transition-all ${
-                          newItemSize === sz ? "border-primary bg-primary text-black font-bold" : "border-border/50 text-muted-foreground hover:border-primary/50"
-                        }`}>{sz}</button>
+                        className={`px-3 py-1.5 text-xs border transition-all ${newItemSize === sz ? "border-primary bg-primary text-black font-bold" : "border-border/50 text-muted-foreground hover:border-primary/50"
+                          }`}>{sz}</button>
                     ))}
                   </div>
                 </div>
@@ -1097,9 +1094,8 @@ const InventoryPage = () => {
                 <div className="flex flex-wrap gap-2">
                   {FASHION_COLORS.map(col => (
                     <button key={col.name} title={col.name} onClick={() => setNewItemColor(col.name)}
-                      className={`h-7 w-7 rounded-full border-2 transition-all hover:scale-110 ${
-                        newItemColor === col.name ? "border-primary scale-110 shadow-[0_0_8px_rgba(255,255,255,0.3)]" : "border-transparent"
-                      }`}
+                      className={`h-7 w-7 rounded-full border-2 transition-all hover:scale-110 ${newItemColor === col.name ? "border-primary scale-110 shadow-[0_0_8px_rgba(255,255,255,0.3)]" : "border-transparent"
+                        }`}
                       style={{ backgroundColor: col.hex }} />
                   ))}
                 </div>
