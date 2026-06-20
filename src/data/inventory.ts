@@ -4,7 +4,7 @@ import noctaAf1 from "@/assets/sales/nocta-af1.jpg";
 import galleryDeptJeans from "@/assets/sales/gallery-dept-jeans.jpg";
 import jordan1Chicago from "@/assets/sales/jordan-1-chicago.jpg";
 
-export type Category = "Shoes" | "Tops" | "Bottoms" | "Accessories" | "Shirt" | "T-Shirt" | "Hoodie" | "Jacket" | "Jeans" | "Jogger" | "Short";
+export type Category = "Shoes" | "Bag" | "Accessories" | "Shirt" | "T-Shirt" | "Hoodie" | "Jacket" | "Jeans" | "Jogger" | "Short";
 
 export interface InventoryItem {
   id: number;
@@ -44,33 +44,33 @@ export const inventory: InventoryItem[] = [
   { id: 9, brand: "Jordan", name: "1 Retro High Chicago", category: "Shoes", sizes: ["40","41","42","43","44"], color: "Red/White", qty: 4, price: 9500, image: jordan1Chicago },
   { id: 10, brand: "Jordan", name: "1 Retro High Royal", category: "Shoes", sizes: ["41","42","43","44"], color: "Royal Blue", qty: 3, price: 9500, image: `https://images.unsplash.com/photo-1571945153237-4929e783af4a?w=600&h=600&fit=crop&q=85` },
 
-  // TOPS
-  { id: 11, brand: "SP5DER", name: "Hoodie", category: "Tops", sizes: ["S","M","L","XL"], color: "Black", qty: 12, price: 5500, image: sp5derHoodieBlack },
-  { id: 12, brand: "SP5DER", name: "Hoodie Pink Web", category: "Tops", sizes: ["S","M","L","XL","XXL"], color: "Pink", qty: 8, price: 5800, image: `https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&h=400&fit=crop` },
-  { id: 13, brand: "SP5DER", name: "Tracksuit", category: "Tops", sizes: ["M","L","XL"], color: "Red", qty: 5, price: 9200, image: `https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=400&h=400&fit=crop` },
-  { id: 14, brand: "Balenciaga", name: "3XL Hoodie", category: "Tops", sizes: ["S","M","L","XL"], color: "Black", qty: 6, price: 14500, image: `https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop` },
-  { id: 15, brand: "Balenciaga", name: "Track Top", category: "Tops", sizes: ["M","L","XL"], color: "Navy", qty: 4, price: 11200, image: `https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=400&fit=crop` },
-  { id: 16, brand: "Broken Planet", name: "Hoodie", category: "Tops", sizes: ["S","M","L","XL"], color: "Brown", qty: 7, price: 6800, image: `https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=400&h=400&fit=crop` },
-  { id: 17, brand: "Hellstar", name: "Tee Washed", category: "Tops", sizes: ["S","M","L","XL","XXL"], color: "Black", qty: 10, price: 3800, image: `https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400&h=400&fit=crop` },
-  { id: 18, brand: "Nike", name: "Tech Fleece Set", category: "Tops", sizes: ["S","M","L","XL"], color: "Black", qty: 9, price: 7500, image: `https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=400&h=400&fit=crop` },
-  { id: 19, brand: "Nike", name: "Tech Reflective Set", category: "Tops", sizes: ["M","L","XL"], color: "Silver", qty: 6, price: 8200, image: `https://images.unsplash.com/photo-1556906903-7b3d6c8d4c2e?w=400&h=400&fit=crop` },
-  { id: 20, brand: "Nike", name: "Tech Fleece Cleveland", category: "Tops", sizes: ["S","M","L","XL"], color: "Brown", qty: 5, price: 7800, image: `https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?w=400&h=400&fit=crop` },
-  { id: 21, brand: "NOCTA", name: "Full Suit", category: "Tops", sizes: ["S","M","L","XL"], color: "Black", qty: 4, price: 12500, image: `https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=400&h=400&fit=crop` },
-  { id: 22, brand: "Sawkem", name: "Zip-Up Oversized Jacket", category: "Tops", sizes: ["M","L","XL","XXL"], color: "Cream", qty: 8, price: 4500, image: `https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=400&fit=crop` },
+  // BAGS
+  { id: 11, brand: "SP5DER", name: "Hoodie", category: "Bag", sizes: ["S","M","L","XL"], color: "Black", qty: 12, price: 5500, image: sp5derHoodieBlack },
+  { id: 12, brand: "SP5DER", name: "Hoodie Pink Web", category: "Bag", sizes: ["S","M","L","XL","XXL"], color: "Pink", qty: 8, price: 5800, image: `https://images.unsplash.com/photo-1620799140408-edc6dcb6d633?w=400&h=400&fit=crop` },
+  { id: 13, brand: "SP5DER", name: "Tracksuit", category: "Bag", sizes: ["M","L","XL"], color: "Red", qty: 5, price: 9200, image: `https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=400&h=400&fit=crop` },
+  { id: 14, brand: "Balenciaga", name: "3XL Hoodie", category: "Bag", sizes: ["S","M","L","XL"], color: "Black", qty: 6, price: 14500, image: `https://images.unsplash.com/photo-1542272604-787c3835535d?w=400&h=400&fit=crop` },
+  { id: 15, brand: "Balenciaga", name: "Track Top", category: "Bag", sizes: ["M","L","XL"], color: "Navy", qty: 4, price: 11200, image: `https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=400&fit=crop` },
+  { id: 16, brand: "Broken Planet", name: "Hoodie", category: "Bag", sizes: ["S","M","L","XL"], color: "Brown", qty: 7, price: 6800, image: `https://images.unsplash.com/photo-1578587018452-892bacefd3f2?w=400&h=400&fit=crop` },
+  { id: 17, brand: "Hellstar", name: "Tee Washed", category: "Bag", sizes: ["S","M","L","XL","XXL"], color: "Black", qty: 10, price: 3800, image: `https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=400&h=400&fit=crop` },
+  { id: 18, brand: "Nike", name: "Tech Fleece Set", category: "Bag", sizes: ["S","M","L","XL"], color: "Black", qty: 9, price: 7500, image: `https://images.unsplash.com/photo-1544966503-7cc5ac882d5f?w=400&h=400&fit=crop` },
+  { id: 19, brand: "Nike", name: "Tech Reflective Set", category: "Bag", sizes: ["M","L","XL"], color: "Silver", qty: 6, price: 8200, image: `https://images.unsplash.com/photo-1556906903-7b3d6c8d4c2e?w=400&h=400&fit=crop` },
+  { id: 20, brand: "Nike", name: "Tech Fleece Cleveland", category: "Bag", sizes: ["S","M","L","XL"], color: "Brown", qty: 5, price: 7800, image: `https://images.unsplash.com/photo-1620799140188-3b2a02fd9a77?w=400&h=400&fit=crop` },
+  { id: 21, brand: "NOCTA", name: "Full Suit", category: "Bag", sizes: ["S","M","L","XL"], color: "Black", qty: 4, price: 12500, image: `https://images.unsplash.com/photo-1551488831-00ddcb6c6bd3?w=400&h=400&fit=crop` },
+  { id: 22, brand: "Sawkem", name: "Zip-Up Oversized Jacket", category: "Bag", sizes: ["M","L","XL","XXL"], color: "Cream", qty: 8, price: 4500, image: `https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h=400&fit=crop` },
 
-  // BOTTOMS
-  { id: 23, brand: "Gallery Dept", name: "Flared Jeans Vintage", category: "Bottoms", sizes: ["28","30","32","34","36"], color: "Vintage Wash", qty: 7, price: 4800, image: galleryDeptJeans },
-  { id: 24, brand: "Gallery Dept", name: "Flared Jeans Distressed", category: "Bottoms", sizes: ["28","30","32","34"], color: "Black", qty: 4, price: 5200, image: `https://images.unsplash.com/photo-1604176354204-9268737828e4?w=400&h=400&fit=crop` },
-  { id: 25, brand: "Denim Tears", name: "Jogger Pants", category: "Bottoms", sizes: ["S","M","L","XL"], color: "Classic", qty: 8, price: 4500, image: `https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&h=400&fit=crop` },
-  { id: 26, brand: "Denim Tears", name: "Shorts Old Design", category: "Bottoms", sizes: ["S","M","L","XL"], color: "Blue", qty: 5, price: 3800, image: `https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop` },
-  { id: 27, brand: "Denim Tears", name: "Shorts Pink", category: "Bottoms", sizes: ["S","M","L"], color: "Pink", qty: 2, price: 4200, image: `https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop` },
-  { id: 28, brand: "Denim Tears", name: "Shorts Red", category: "Bottoms", sizes: ["M","L","XL"], color: "Red", qty: 3, price: 4200, image: `https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop` },
-  { id: 29, brand: "Denim Tears", name: "Jorts Luxury Drip", category: "Bottoms", sizes: ["S","M","L","XL"], color: "Blue", qty: 6, price: 4500, image: `https://images.unsplash.com/photo-1565084888279-aca607ecce0c?w=400&h=400&fit=crop` },
-  { id: 30, brand: "Purple Brand", name: "Jeans Black", category: "Bottoms", sizes: ["28","30","32","34","36"], color: "Black", qty: 7, price: 6500, image: `https://images.unsplash.com/photo-1582552938357-32b906df40cb?w=400&h=400&fit=crop` },
-  { id: 31, brand: "Purple Brand", name: "Jeans Indigo", category: "Bottoms", sizes: ["30","32","34"], color: "Indigo", qty: 4, price: 6800, image: `https://images.unsplash.com/photo-1604176354204-9268737828e4?w=400&h=400&fit=crop` },
-  { id: 32, brand: "Syna World", name: "Shorts", category: "Bottoms", sizes: ["S","M","L","XL"], color: "Black", qty: 9, price: 3500, image: `https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop` },
-  { id: 33, brand: "Sawkem", name: "Baggy Joggers", category: "Bottoms", sizes: ["S","M","L","XL","XXL"], color: "Gray", qty: 11, price: 2800, image: `https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&h=400&fit=crop` },
-  { id: 34, brand: "Sawkem", name: "Gym Shorts Streetwear", category: "Bottoms", sizes: ["S","M","L","XL","XXL"], color: "Black", qty: 14, price: 1800, image: `https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop` },
+  // MORE BAGS
+  { id: 23, brand: "Gallery Dept", name: "Flared Jeans Vintage", category: "Bag", sizes: ["28","30","32","34","36"], color: "Vintage Wash", qty: 7, price: 4800, image: galleryDeptJeans },
+  { id: 24, brand: "Gallery Dept", name: "Flared Jeans Distressed", category: "Bag", sizes: ["28","30","32","34"], color: "Black", qty: 4, price: 5200, image: `https://images.unsplash.com/photo-1604176354204-9268737828e4?w=400&h=400&fit=crop` },
+  { id: 25, brand: "Denim Tears", name: "Jogger Pants", category: "Bag", sizes: ["S","M","L","XL"], color: "Classic", qty: 8, price: 4500, image: `https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&h=400&fit=crop` },
+  { id: 26, brand: "Denim Tears", name: "Shorts Old Design", category: "Bag", sizes: ["S","M","L","XL"], color: "Blue", qty: 5, price: 3800, image: `https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop` },
+  { id: 27, brand: "Denim Tears", name: "Shorts Pink", category: "Bag", sizes: ["S","M","L"], color: "Pink", qty: 2, price: 4200, image: `https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop` },
+  { id: 28, brand: "Denim Tears", name: "Shorts Red", category: "Bag", sizes: ["M","L","XL"], color: "Red", qty: 3, price: 4200, image: `https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop` },
+  { id: 29, brand: "Denim Tears", name: "Jorts Luxury Drip", category: "Bag", sizes: ["S","M","L","XL"], color: "Blue", qty: 6, price: 4500, image: `https://images.unsplash.com/photo-1565084888279-aca607ecce0c?w=400&h=400&fit=crop` },
+  { id: 30, brand: "Purple Brand", name: "Jeans Black", category: "Bag", sizes: ["28","30","32","34","36"], color: "Black", qty: 7, price: 6500, image: `https://images.unsplash.com/photo-1582552938357-32b906df40cb?w=400&h=400&fit=crop` },
+  { id: 31, brand: "Purple Brand", name: "Jeans Indigo", category: "Bag", sizes: ["30","32","34"], color: "Indigo", qty: 4, price: 6800, image: `https://images.unsplash.com/photo-1604176354204-9268737828e4?w=400&h=400&fit=crop` },
+  { id: 32, brand: "Syna World", name: "Shorts", category: "Bag", sizes: ["S","M","L","XL"], color: "Black", qty: 9, price: 3500, image: `https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop` },
+  { id: 33, brand: "Sawkem", name: "Baggy Joggers", category: "Bag", sizes: ["S","M","L","XL","XXL"], color: "Gray", qty: 11, price: 2800, image: `https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?w=400&h=400&fit=crop` },
+  { id: 34, brand: "Sawkem", name: "Gym Shorts Streetwear", category: "Bag", sizes: ["S","M","L","XL","XXL"], color: "Black", qty: 14, price: 1800, image: `https://images.unsplash.com/photo-1591195853828-11db59a44f6b?w=400&h=400&fit=crop` },
 
   // ACCESSORIES
   { id: 35, brand: "Denim Tears", name: "Backpack", category: "Accessories", sizes: ["OS"], color: "Black", qty: 4, price: 5500, image: `https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=400&fit=crop` },

@@ -4,7 +4,7 @@ import { InventoryItem } from "@/data/inventory";
 import { useState, useEffect } from "react";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-const ALL_SIZES_TOPS = ["XS","S","M","L","XL","XXL"];
+const ALL_SIZES_CLOTHING = ["XS","S","M","L","XL","XXL"];
 const ALL_SIZES_SHOES = ["40","41","42","43","44"];
 
 const COLOR_MAP: Record<string, string> = {
@@ -92,7 +92,7 @@ export const ItemDrawer = ({
     ? ([...new Set(variants.filter((v: any) => v.color === selectedColorLabel).map((v: any) => v.size).filter(Boolean))] as string[])
     : item?.sizes.includes("OS") ? ["OS"]
     : item?.sizes[0]?.match(/^\d/) ? ALL_SIZES_SHOES
-    : ALL_SIZES_TOPS;
+    : ALL_SIZES_CLOTHING;
 
   const tgMessage = item
     ? `Hi, I'm interested in ${item.brand} ${item.name}${size ? ` — Size ${size}` : ""} — ${selectedColorLabel || item.color}`

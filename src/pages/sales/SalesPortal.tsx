@@ -13,7 +13,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 
-const cats = ["ALL", "Shoes", "Tops", "Bottoms", "Accessories", "Complete", "Shirt", "T-Shirt", "Hoodie", "Jacket", "Jeans", "Jogger", "Short"] as const;
+const cats = ["ALL", "Shoes", "Bag", "Accessories", "Complete", "Shirt", "T-Shirt", "Hoodie", "Jacket", "Jeans", "Jogger", "Short"] as const;
 const PAYMENTS: { id: PaymentMethod; label: string; icon: typeof Banknote }[] = [
   { id: "Cash", label: "CASH", icon: Banknote },
   { id: "Telebirr", label: "TELEBIRR", icon: Smartphone },

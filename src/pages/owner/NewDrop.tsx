@@ -37,14 +37,14 @@ const getSizesForCategory = (cat: string): string[] => {
   return CLOTH_SIZES;
 };
 
-const cats = ["Shoes", "Tops", "Bottoms", "Accessories", "Complete", "Shirt", "T-Shirt", "Hoodie", "Jacket", "Jeans", "Jogger", "Short"] as const;
+const cats = ["Shoes", "Bag", "Accessories", "Complete", "Shirt", "T-Shirt", "Hoodie", "Jacket", "Jeans", "Jogger", "Short"] as const;
 
 const NewDrop = () => {
   const { addItem } = useApp();
   const queryClient = useQueryClient();
   const [brand, setBrand] = useState(ALL_BRANDS[0]);
   const [name, setName] = useState("");
-  const [cat, setCat] = useState<Category>("Tops");
+  const [cat, setCat] = useState<Category>("Bag");
   const [newVariants, setNewVariants] = useState<any[]>([]);
   const [newItemSize, setNewItemSize] = useState("");
   const [newItemColor, setNewItemColor] = useState("");
@@ -113,7 +113,7 @@ const NewDrop = () => {
       toast.success(`✓ ${name.toUpperCase()} ADDED`);
       setName("");
       setBrand(ALL_BRANDS[0]);
-      setCat("Tops");
+      setCat("Bag");
       setNewVariants([]);
       setNewItemSize("");
       setNewItemColor("");
@@ -134,8 +134,7 @@ const NewDrop = () => {
     if (Number(price) <= 0) return toast.error("PRICE MUST BE > 0");
 
     const catMap: Record<string, string> = {
-      "Tops": "44444444-4444-4444-4444-444444444441",
-      "Bottoms": "44444444-4444-4444-4444-444444444442",
+      "Bag": "44444444-4444-4444-4444-444444444454",
       "Accessories": "44444444-4444-4444-4444-444444444443",
       "Shoes": "44444444-4444-4444-4444-444444444444",
       "Shirt": "44444444-4444-4444-4444-444444444445",
@@ -155,7 +154,7 @@ const NewDrop = () => {
       description: `Sizes: ${derivedSizes.join(", ")}, Colors: ${derivedColors}`,
       current_price: Number(price),
       cost_price: Number(costPrice) || 0,
-      category_id: catMap[cat] || catMap["Tops"],
+      category_id: catMap[cat] || catMap["Bag"],
       images: images.filter(Boolean),
       variants: newVariants.map(v => ({ size: v.size || "OS", color: v.color || "Default", qty: Number(v.qty) })),
       is_visible: true
@@ -196,7 +195,7 @@ const NewDrop = () => {
           <div>
             <label className="text-[10px] tracking-widest text-muted-foreground">CATEGORY</label>
             <select value={cat} onChange={(e) => setCat(e.target.value as Category)} className="w-full bg-transparent border-b border-border py-2 text-sm outline-none focus:border-primary">
-              {(["Shoes","Tops","Bottoms","Accessories","Shirt","T-Shirt","Hoodie","Jacket","Jeans","Jogger","Short"] as Category[]).map((c) => <option key={c} className="bg-card">{c}</option>)}
+              {(["Shoes","Bag","Accessories","Shirt","T-Shirt","Hoodie","Jacket","Jeans","Jogger","Short"] as Category[]).map((c) => <option key={c} className="bg-card">{c}</option>)}
             </select>
           </div>
 

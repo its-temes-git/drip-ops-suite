@@ -10,12 +10,11 @@ import { ShopCardSkeleton } from "@/components/ui/skeleton";
 
 const PAGE_SIZE = 12;
 
-type Cat = "ALL" | "Shoes" | "Tops" | "Bottoms" | "Accessories" | "Shirt" | "T-Shirt" | "Hoodie" | "Jacket" | "Jeans" | "Jogger" | "Short";
+type Cat = "ALL" | "Shoes" | "Bag" | "Accessories" | "Shirt" | "T-Shirt" | "Hoodie" | "Jacket" | "Jeans" | "Jogger" | "Short";
 const CATS: { key: Cat; label: string }[] = [
   { key: "ALL", label: "ALL" },
   { key: "Shoes", label: "SHOES" },
-  { key: "Tops", label: "TOPS & HOODIES" },
-  { key: "Bottoms", label: "BOTTOMS" },
+  { key: "Bag", label: "BAGS" },
   { key: "Accessories", label: "ACCESSORIES & BAGS" },
   { key: "Shirt", label: "SHIRT" },
   { key: "T-Shirt", label: "T-SHIRT" },

@@ -36,7 +36,7 @@ const WAIST_SIZES = ["28", "29", "30", "31", "32", "33", "34", "35", "36", "37",
 const getSizesForCategory = (cat: string): string[] => {
   if (cat === "Shoes") return SHOE_SIZES;
   if (cat === "Accessories") return [];
-  if (cat === "Bottoms" || cat === "Jeans" || cat === "Jogger" || cat === "Short") return [...CLOTH_SIZES, ...WAIST_SIZES];
+  if (cat === "Jeans" || cat === "Jogger" || cat === "Short") return [...CLOTH_SIZES, ...WAIST_SIZES];
   return CLOTH_SIZES;
 };
 
@@ -140,7 +140,7 @@ const InventoryPage = () => {
   const brands = useMemo(() => Array.from(new Set(inventory.map((i) => i.brand))).sort(), [inventory]);
   const cats = useMemo(() => {
     const found = Array.from(new Set(inventory.map((i) => i.category)));
-    const defaults = ["General", "Tops", "Bottoms", "Shoes", "Accessories", "Complete", "Shirt", "T-Shirt", "Hoodie", "Jacket", "Jeans", "Jogger", "Short"];
+    const defaults = ["General", "Bag", "Shoes", "Accessories", "Complete", "Shirt", "T-Shirt", "Hoodie", "Jacket", "Jeans", "Jogger", "Short"];
     return Array.from(new Set([...defaults, ...found]));
   }, [inventory]);
 
