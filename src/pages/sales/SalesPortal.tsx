@@ -865,10 +865,10 @@ const RecordSaleModal = ({
             </div>
             <button
               onClick={confirm}
-              disabled={qty <= 0 || qty > variantQty}
+              disabled={qty <= 0 || qty > variantQty || success}
               className="w-full bg-primary py-3 font-display text-lg tracking-widest text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {qty > variantQty ? "INSUFFICIENT STOCK" : "CONFIRM SALE"}
+              {success ? "RECORDING..." : qty > variantQty ? "INSUFFICIENT STOCK" : "CONFIRM SALE"}
             </button>
           </div>
         </div>
