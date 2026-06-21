@@ -34,7 +34,7 @@ const Staff = () => {
   const toggleStatusMutation = useMutation({
     mutationFn: ({ id, is_active }: { id: string, is_active: boolean }) => api.owner.toggleStaffStatus(id, is_active),
     onSuccess: (data) => {
-      toast.success(\`Staff member \${data.is_active ? 'activated' : 'deactivated'}\`);
+      toast.success(`Staff member ${data.is_active ? 'activated' : 'deactivated'}`);
       queryClient.invalidateQueries({ queryKey: ['staff'] });
     },
     onError: (err: any) => {
@@ -119,11 +119,11 @@ const Staff = () => {
                     <button
                       onClick={() => toggleStatusMutation.mutate({ id: staff.id, is_active: !staff.is_active })}
                       disabled={toggleStatusMutation.isPending}
-                      className={\`flex items-center gap-2 px-4 py-2 text-xs font-display tracking-widest transition-colors \${
+                      className={`flex items-center gap-2 px-4 py-2 text-xs font-display tracking-widest transition-colors ${
                         staff.is_active 
                           ? 'bg-muted text-muted-foreground hover:bg-destructive hover:text-destructive-foreground' 
                           : 'bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground'
-                      }\`}
+                      }`}
                     >
                       <Power className="h-3 w-3" />
                       {staff.is_active ? 'DEACTIVATE' : 'ACTIVATE'}
