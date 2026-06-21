@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { ArrowLeft, Loader2 } from "lucide-react";
@@ -19,6 +20,9 @@ const SalesLogin = () => {
     setIsLoading(true);
     try {
       const response = await api.auth.login({ email, password: pin });
+      if (response.user.role !== 'sales' && response.user.role !== 'owner' && response.user.role !== 'admin') {
+        throw new Error("ACCESS DENIED: INVALID ROLE");
+      }
       login(response.token, response.user);
       toast.success(`SHIFT STARTED — ${response.user.full_name.toUpperCase()}`);
       setTimeout(() => nav("/sales"), 400);

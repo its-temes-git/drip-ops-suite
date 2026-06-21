@@ -19,6 +19,11 @@ const OwnerLogin = () => {
     setIsLoading(true);
     try {
       const response = await api.auth.login({ email, password });
+      
+      if (response.user.role !== 'owner' && response.user.role !== 'admin') {
+        throw new Error("ACCESS DENIED: OWNER/ADMIN ONLY");
+      }
+
       login(response.token, response.user);
       toast.success("ACCESS GRANTED");
       setTimeout(() => nav("/owner"), 400);

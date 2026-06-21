@@ -1,15 +1,21 @@
 import { useState } from "react";
 import { toast } from "sonner";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
 import { useApp } from "@/context/AppContext";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Power, Shield, User as UserIcon } from "lucide-react";
 
 const Staff = () => {
   const { user } = useApp();
+  const queryClient = useQueryClient();
   const [email, setEmail] = useState("");
   const [fullName, setFullName] = useState("");
   const [password, setPassword] = useState("");
+
+  const { data: staffList = [], isLoading: isLoadingStaff } = useQuery({
+    queryKey: ['staff'],
+    queryFn: () => api.owner.getStaff()
+  });
 
   const addStaffMutation = useMutation({
     mutationFn: (data: any) => api.owner.addStaff(data),
@@ -18,9 +24,21 @@ const Staff = () => {
       setEmail("");
       setFullName("");
       setPassword("");
+      queryClient.invalidateQueries({ queryKey: ['staff'] });
     },
     onError: (err: any) => {
       toast.error(err.message || "Failed to add staff");
+    }
+  });
+
+  const toggleStatusMutation = useMutation({
+    mutationFn: ({ id, is_active }: { id: string, is_active: boolean }) => api.owner.toggleStaffStatus(id, is_active),
+    onSuccess: (data) => {
+      toast.success(\`Staff member \${data.is_active ? 'activated' : 'deactivated'}\`);
+      queryClient.invalidateQueries({ queryKey: ['staff'] });
+    },
+    onError: (err: any) => {
+      toast.error(err.message || "Failed to toggle status");
     }
   });
 
@@ -70,9 +88,51 @@ const Staff = () => {
 
         <div className="lg:col-span-2 border border-border bg-card p-4 sm:p-6">
           <h2 className="font-display text-2xl mb-4">STAFF LIST</h2>
-          <div className="py-12 text-center border border-dashed border-border text-sm text-muted-foreground">
-            Staff list coming in next update
-          </div>
+          
+          {isLoadingStaff ? (
+            <div className="py-12 flex justify-center text-muted-foreground">
+              <Loader2 className="h-8 w-8 animate-spin" />
+            </div>
+          ) : staffList.length === 0 ? (
+            <div className="py-12 text-center border border-dashed border-border text-sm text-muted-foreground">
+              No staff members found
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {staffList.map((staff: any) => (
+                <div key={staff.id} className="flex flex-col sm:flex-row sm:items-center justify-between p-4 border border-border bg-background/50 hover:bg-background transition-colors gap-4">
+                  <div className="flex items-center gap-4">
+                    <div className="h-10 w-10 bg-muted flex items-center justify-center rounded-full">
+                      {staff.role === 'admin' ? <Shield className="h-5 w-5 text-primary" /> : <UserIcon className="h-5 w-5 text-muted-foreground" />}
+                    </div>
+                    <div>
+                      <p className="font-display text-lg flex items-center gap-2">
+                        {staff.full_name}
+                        {!staff.is_active && <span className="text-[10px] tracking-widest text-destructive bg-destructive/10 px-2 py-0.5 rounded">INACTIVE</span>}
+                      </p>
+                      <p className="text-xs text-muted-foreground flex items-center gap-2">
+                        {staff.email} <span className="opacity-50">•</span> {staff.role.toUpperCase()}
+                      </p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => toggleStatusMutation.mutate({ id: staff.id, is_active: !staff.is_active })}
+                      disabled={toggleStatusMutation.isPending}
+                      className={\`flex items-center gap-2 px-4 py-2 text-xs font-display tracking-widest transition-colors \${
+                        staff.is_active 
+                          ? 'bg-muted text-muted-foreground hover:bg-destructive hover:text-destructive-foreground' 
+                          : 'bg-primary/10 text-primary hover:bg-primary hover:text-primary-foreground'
+                      }\`}
+                    >
+                      <Power className="h-3 w-3" />
+                      {staff.is_active ? 'DEACTIVATE' : 'ACTIVATE'}
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>

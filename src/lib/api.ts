@@ -134,6 +134,8 @@ export const api = {
       monthly: (year: string | number, month: string | number) => fetchAPI(`/api/owner/reports/monthly?year=${year}&month=${month}`),
     },
     addStaff: (data: any) => fetchAPI('/api/owner/staff', { method: 'POST', body: JSON.stringify(data) }),
+    getStaff: () => fetchAPI('/api/owner/staff'),
+    toggleStaffStatus: (id: string, is_active: boolean) => fetchAPI(`/api/owner/staff/${id}/status`, { method: 'PUT', body: JSON.stringify({ is_active }) }),
     recentActivities: (limit = 20) => fetchAPI(`/api/owner/activities/recent?limit=${limit}`),
     clearActivities: () => fetchAPI('/api/owner/activities', { method: 'DELETE' }),
     profitAnalytics: (params?: { startDate?: string; endDate?: string; period?: string }) => {
