@@ -20,8 +20,8 @@ const SalesLogin = () => {
     setIsLoading(true);
     try {
       const response = await api.auth.login({ email, password: pin });
-      if (response.user.role !== 'sales' && response.user.role !== 'owner' && response.user.role !== 'admin') {
-        throw new Error("ACCESS DENIED: INVALID ROLE");
+      if (response.user.role !== 'sales') {
+        throw new Error("ACCESS DENIED: SALES STAFF ONLY");
       }
       login(response.token, response.user);
       toast.success(`SHIFT STARTED — ${response.user.full_name.toUpperCase()}`);
