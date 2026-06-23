@@ -39,6 +39,12 @@ const SalesLog = () => {
     return sum + items.reduce((iSum: number, i: any) => iSum + (i.quantity || 0), 0);
   }, 0);
 
+  const totalProfit = activeSales.reduce((sum: number, s: any) => {
+    const items = s.items || [];
+    const saleCost = items.reduce((iSum: number, i: any) => iSum + (Number(i.cost_price) || 0) * (Number(i.quantity) || 0), 0);
+    return sum + (Number(s.total_amount || 0) - saleCost);
+  }, 0);
+
   const getReason = (notes: string) => {
     const match = notes?.match(/\[REFUND REASON\]:\s*(.*)/);
     return match ? match[1] : "No reason provided";
@@ -102,8 +108,8 @@ const SalesLog = () => {
         <StatCard label="ITEMS SOLD" value={`${totalItems}`} sub={<span className="text-muted-foreground">{activeSales.length} active sales</span>} />
         <StatCard label="REVENUE" value={`ETB ${totalRevenue.toLocaleString()}`} accent="primary" />
         <StatCard
-          label="AVG SALE"
-          value={`ETB ${activeSales.length ? Math.round(totalRevenue / activeSales.length).toLocaleString() : 0}`}
+          label="PROFIT"
+          value={`ETB ${totalProfit.toLocaleString()}`}
         />
       </div>
 
