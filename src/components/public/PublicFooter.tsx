@@ -32,7 +32,6 @@ export const PublicFooter = () => {
               ["/shop", "Shop"],
               ["/about", "About"],
               ["/contact", "Contact"],
-              ["/login", "Staff Login"],
             ].map(([to, label]) => (
               <li key={to}>
                 <Link to={to} className="hover:text-primary transition-colors">
@@ -47,7 +46,7 @@ export const PublicFooter = () => {
           <p className="mb-4 text-xs tracking-[0.3em] text-primary">FIND US</p>
           <p className="text-sm leading-relaxed">
             <span className="text-primary">Summit Branch:</span><br />
-            Summit Area, in front of Deborah School<br />
+            Summit in front of Deborah School<br />
             Addis Ababa, Ethiopia
           </p>
           <p className="mt-3 text-sm leading-relaxed">
