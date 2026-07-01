@@ -967,51 +967,66 @@ const EditSaleModal = ({
     return (inventoryItem?.variants || []).filter((v: any) => Number(v.qty ?? v.quantity) > 0);
   }, [inventoryItem]);
 
-  const allColors = useMemo(() => {
-    if (variants.length > 0) {
-      return [...new Set(variants.map((v: any) => v.color))].filter(Boolean) as string[];
-    }
-    return [];
-  }, [variants]);
+  const isAccessory = useMemo(() => 
+    inventoryItem?.category?.toLowerCase() === 'accessories',
+    [inventoryItem]
+  );
 
   const [qty, setQty] = useState(sale.qty);
   const [priceStr, setPriceStr] = useState(String(sale.price));
-  const [size, setSize] = useState(sale.size);
   const [color, setColor] = useState(sale.color);
+  const [size, setSize] = useState(sale.size);
   const [payment, setPayment] = useState<PaymentMethod>(sale.payment);
 
+  const colors = useMemo(() => {
+    let list: string[] = [];
+    if (variants.length > 0) {
+      list = [...new Set(variants.map((v: any) => v.color))].filter(Boolean) as string[];
+    } else if (inventoryItem?.color && inventoryItem.color !== "-") {
+      list = inventoryItem.color.split(/[,\/]/).map((c: string) => c.trim()).filter(Boolean) as string[];
+    } else {
+      list = ["-"];
+    }
+    
+    // If it's an accessory, the variant is just the color. So exclude the current color.
+    if (isAccessory) {
+      list = list.filter(c => c !== sale.color);
+    }
+    return list;
+  }, [variants, inventoryItem, sale.color, isAccessory]);
+
   const availableSizes = useMemo(() => {
+    if (isAccessory) return []; // No sizes for accessories
+
+    let list: string[] = [];
     if (variants.length > 0) {
       const raw = variants
         .filter((v: any) => !color || color === "-" || v.color === color)
         .map((v: any) => v.size || "-");
-      return [...new Set(raw)] as string[];
+      list = [...new Set(raw)] as string[];
+    } else if (inventoryItem?.sizes) {
+      list = (inventoryItem.sizes || []).map((s: any) => s || "-");
     }
-    return [];
-  }, [variants, color]);
 
-  // Cycle to next color
-  const cycleColor = () => {
-    if (allColors.length < 2) return;
-    const idx = allColors.indexOf(color);
-    const next = allColors[(idx + 1) % allColors.length];
-    setColor(next);
-    // Reset size if it doesn't exist for new color
-    const newSizes = variants
-      .filter((v: any) => v.color === next)
-      .map((v: any) => v.size || "-");
-    const uniqueSizes = [...new Set(newSizes)] as string[];
-    if (uniqueSizes.length > 0 && !uniqueSizes.includes(size)) {
-      setSize(uniqueSizes[0]);
+    // Don't show the current sold item variant: if selected color is the sale's color, exclude the sale's size
+    if (color === sale.color) {
+      list = list.filter(s => s !== sale.size);
     }
-  };
+    return list;
+  }, [variants, color, inventoryItem, sale.color, sale.size, isAccessory]);
 
-  // Cycle to next size
-  const cycleSize = () => {
-    if (availableSizes.length < 2) return;
-    const idx = availableSizes.indexOf(size);
-    setSize(availableSizes[(idx + 1) % availableSizes.length]);
-  };
+  // Reset size if it's no longer available when color changes, but preserve original sale.size if color matches sale.color
+  useEffect(() => {
+    if (color === sale.color) {
+      if (size !== sale.size && !availableSizes.includes(size)) {
+        setSize(availableSizes[0] || "-");
+      }
+    } else {
+      if (!availableSizes.includes(size)) {
+        setSize(availableSizes[0] || "-");
+      }
+    }
+  }, [color, availableSizes, size, sale.color, sale.size]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -1026,9 +1041,6 @@ const EditSaleModal = ({
     if (qty <= 0) { toast.error("Quantity must be at least 1"); return; }
     onSave({ qty, price, size, color, payment });
   };
-
-  const hasColorOptions = allColors.length > 0;
-  const hasSizeOptions = availableSizes.length > 0;
 
   return (
     <motion.div
@@ -1079,70 +1091,69 @@ const EditSaleModal = ({
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {/* SIZE */}
-            <div>
-              <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">SIZE</p>
-              {hasSizeOptions ? (
-                <button
-                  onClick={cycleSize}
-                  className="group relative w-full flex items-center justify-between border border-primary/40 bg-primary/5 px-3 py-2.5 text-sm font-medium tracking-wider transition-all hover:border-primary hover:bg-primary/10"
-                >
-                  <span className="font-display text-lg">{size}</span>
-                  <span className="flex flex-col items-center">
-                    <ChevronLeft className="h-3 w-3 -rotate-90 text-primary/60" />
-                    <ChevronRight className="h-3 w-3 -rotate-90 text-primary/60" />
-                  </span>
-                  {availableSizes.length > 1 && (
-                    <span className="absolute -top-1.5 right-2 text-[8px] tracking-widest text-primary/60 bg-card px-1">
-                      {availableSizes.indexOf(size) + 1}/{availableSizes.length}
-                    </span>
-                  )}
-                </button>
-              ) : (
-                <input value={size} onChange={(e) => setSize(e.target.value)} className="w-full border border-border bg-background px-3 py-2 outline-none" />
-              )}
-            </div>
-            {/* COLOR */}
-            <div>
-              <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">COLOR</p>
-              {hasColorOptions ? (
-                <button
-                  onClick={cycleColor}
-                  className="group relative w-full flex items-center justify-between border border-primary/40 bg-primary/5 px-3 py-2.5 text-sm font-medium tracking-wider transition-all hover:border-primary hover:bg-primary/10"
-                >
-                  <div className="flex items-center gap-2">
-                    <span
-                      className="h-4 w-4 flex-shrink-0 rounded-full border border-white/20"
-                      style={{ backgroundColor:
-                        color === 'Black' ? '#000' : color === 'White' ? '#FFF' :
-                        color === 'Navy' ? '#1B2A4A' : color === 'Grey' ? '#808080' :
-                        color === 'Beige' ? '#C8AD8F' : color === 'Brown' ? '#7B4F2E' :
-                        color === 'Red' ? '#CC2200' : color === 'Burgundy' ? '#800020' :
-                        color === 'Forest' ? '#2D5A27' : color === 'Olive' ? '#6B7C35' :
-                        color === 'Blue' ? '#2255CC' : color === 'Sky' ? '#87CEEB' :
-                        color === 'Yellow' ? '#F5C400' : color === 'Orange' ? '#E8621A' :
-                        color === 'Pink' ? '#F4A0B0' : color === 'Purple' ? '#6A0DAD' :
-                        color === 'Camel' ? '#C19A6B' : color === 'Cream' ? '#F5F0E8' : '#555'
-                      }}
-                    />
-                    <span className="font-display text-sm truncate">{color}</span>
-                  </div>
-                  <span className="flex flex-col items-center">
-                    <ChevronLeft className="h-3 w-3 -rotate-90 text-primary/60" />
-                    <ChevronRight className="h-3 w-3 -rotate-90 text-primary/60" />
-                  </span>
-                  {allColors.length > 1 && (
-                    <span className="absolute -top-1.5 right-2 text-[8px] tracking-widest text-primary/60 bg-card px-1">
-                      {allColors.indexOf(color) + 1}/{allColors.length}
-                    </span>
-                  )}
-                </button>
-              ) : (
-                <input value={color} onChange={(e) => setColor(e.target.value)} className="w-full border border-border bg-background px-3 py-2 outline-none" />
+          {/* CURRENT SELECTION INFO */}
+          <div className="rounded-sm border border-border/50 bg-muted/30 px-3 py-2 text-xs">
+            <span className="text-[10px] tracking-widest text-muted-foreground uppercase">CURRENT SOLD VARIANT:</span>
+            <div className="mt-1 flex items-center gap-2">
+              <span
+                className="h-3 w-3 rounded-full border border-white/20"
+                style={{ backgroundColor: COLOR_HEX[sale.color] || "#555" }}
+              />
+              <span className="font-display font-medium">{sale.color}</span>
+              {!isAccessory && sale.size && (
+                <>
+                  <span className="text-muted-foreground">•</span>
+                  <span className="font-display font-medium">SIZE {sale.size}</span>
+                </>
               )}
             </div>
           </div>
+
+          {/* COLOR SELECTOR */}
+          {colors.some(c => c && c !== "-") && (
+            <div>
+              <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">SWAP COLOR TO</p>
+              <div className="flex flex-wrap gap-2">
+                {colors.filter(c => c && c !== "-").map((c) => (
+                  <button
+                    key={c}
+                    type="button"
+                    onClick={() => setColor(c)}
+                    className={`flex items-center gap-2 border px-3 py-1.5 text-xs transition-all ${
+                      color === c ? "border-primary bg-primary/10 text-primary" : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    <span
+                      className="h-4 w-4 rounded-full border border-white/20 flex-shrink-0"
+                      style={{ backgroundColor: COLOR_HEX[c] || "#555" }}
+                    />
+                    {c}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* SIZE SELECTOR (Hidden for Accessories) */}
+          {!isAccessory && availableSizes.length > 0 && (
+            <div>
+              <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">SWAP SIZE TO</p>
+              <div className="flex flex-wrap gap-2">
+                {availableSizes.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => setSize(s)}
+                    className={`min-w-[40px] border px-3 py-1.5 text-xs transition-colors ${
+                      size === s ? "border-primary bg-primary text-primary-foreground" : "border-border hover:border-primary/50"
+                    }`}
+                  >
+                    {s}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div>
             <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">PAYMENT METHOD</p>
