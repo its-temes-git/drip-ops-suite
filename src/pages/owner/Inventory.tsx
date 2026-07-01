@@ -105,6 +105,7 @@ const InventoryPage = () => {
   const [cat, setCat] = useState("ALL");
   const [brand, setBrand] = useState("ALL");
   const [status, setStatus] = useState("ALL");
+  const [page, setPage] = useState(1);
   const [open, setOpen] = useState<number | null>(null);
   const [restockItem, setRestockItem] = useState<any | null>(null);
   const [restockQty, setRestockQty] = useState(5);
@@ -144,6 +145,10 @@ const InventoryPage = () => {
     return Array.from(new Set([...defaults, ...found]));
   }, [inventory]);
 
+  useEffect(() => {
+    setPage(1);
+  }, [q, cat, brand, status]);
+
   const filtered = useMemo(() => {
     return inventory.filter((i) => {
       if (q && !`${i.brand} ${i.name}`.toLowerCase().includes(q.toLowerCase())) return false;
@@ -158,6 +163,13 @@ const InventoryPage = () => {
   }, [inventory, q, cat, brand, status]);
 
   const selected = useMemo(() => inventory.find((i: any) => i.id === open), [inventory, open]);
+
+  const itemsPerPage = 10;
+  const paginatedItems = useMemo(() => {
+    const start = (page - 1) * itemsPerPage;
+    return filtered.slice(start, start + itemsPerPage);
+  }, [filtered, page]);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   useEffect(() => {
     if (selected) {
@@ -481,7 +493,7 @@ const InventoryPage = () => {
 
       {/* MOBILE CARDS */}
       <div className="grid grid-cols-1 gap-3 sm:hidden">
-        {filtered.map((i, idx) => {
+        {paginatedItems.map((i, idx) => {
           const s = statusOf(i.qty);
           return (
             <motion.button
@@ -539,7 +551,7 @@ const InventoryPage = () => {
             </tr>
           </thead>
           <tbody className="divide-y divide-border/20">
-            {filtered.map((i, idx) => {
+            {paginatedItems.map((i, idx) => {
               const s = statusOf(i.qty);
               return (
                 <motion.tr
@@ -550,7 +562,7 @@ const InventoryPage = () => {
                   onClick={() => setOpen(i.id)}
                   className={`group cursor-pointer hover:bg-primary/5 transition-all ${!i.is_visible ? 'opacity-50' : ''}`}
                 >
-                  <td className="px-4 py-4 text-muted-foreground/60 text-xs tabular-nums border-r border-border/10">{idx + 1}</td>
+                  <td className="px-4 py-4 text-muted-foreground/60 text-xs tabular-nums border-r border-border/10">{(page - 1) * itemsPerPage + idx + 1}</td>
                   <td className="px-4 py-4 border-r border-border/10">
                     <div className="h-10 w-10 bg-muted border border-border/30 overflow-hidden group-hover:border-primary/40 transition-colors">
                       {i.image ? (
@@ -582,6 +594,52 @@ const InventoryPage = () => {
           </tbody>
         </table>
       </div>
+
+      {/* PAGINATION CONTROLS */}
+      {totalPages > 1 && (
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-border/50">
+          <span className="text-[10px] text-muted-foreground tracking-widest uppercase">
+            SHOWING {((page - 1) * itemsPerPage) + 1}–{Math.min(page * itemsPerPage, filtered.length)} OF {filtered.length} ITEMS
+          </span>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => setPage(p => Math.max(1, p - 1))}
+              disabled={page === 1}
+              className="h-8 w-8 flex items-center justify-center border border-border hover:border-primary/50 disabled:opacity-30 transition-colors"
+            >
+              <ChevronLeft className="h-4 w-4" />
+            </button>
+            {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+              const p = page <= 3
+                ? i + 1
+                : page >= totalPages - 2
+                  ? totalPages - 4 + i
+                  : page - 2 + i;
+              if (p < 1 || p > totalPages) return null;
+              return (
+                <button
+                  key={p}
+                  onClick={() => setPage(p)}
+                  className={`h-8 w-8 text-xs font-mono border transition-colors ${
+                    p === page
+                      ? "bg-primary text-primary-foreground border-primary"
+                      : "border-border text-muted-foreground hover:border-primary/50"
+                  }`}
+                >
+                  {p}
+                </button>
+              );
+            })}
+            <button
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+              disabled={page === totalPages}
+              className="h-8 w-8 flex items-center justify-center border border-border hover:border-primary/50 disabled:opacity-30 transition-colors"
+            >
+              <ChevronRight className="h-4 w-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       <Sheet open={!!selected} onOpenChange={(o) => !o && setOpen(null)}>
         <SheetContent className="bg-card border-border text-off-white overflow-y-auto w-full sm:max-w-md custom-scrollbar">
