@@ -121,12 +121,16 @@ const SalesPortal = () => {
       // Improved regex to extract size and color from notes
       const sizeMatch = s.notes?.match(/Size:\s*([^,]+)/);
       const colorMatch = s.notes?.match(/Color:\s*([^,]+)/);
+
+      // Look up the brand from the backend join, then fall back to the already-loaded inventory list
+      const inventoryMatch = inventory.find((i: any) => String(i.id) === String(firstItem.product_id));
+      const brand = firstItem.brand || inventoryMatch?.brand || "SAWKEM";
       
       return {
         id: s.id || Math.random().toString(),
         itemId: firstItem.product_id,
         itemName: firstItem.product_name_snap || "Item",
-        brand: firstItem.brand || "SAWKEM", // Default to SAWKEM if no brand
+        brand,
         size: sizeMatch ? sizeMatch[1].trim() : "-",
         color: colorMatch ? colorMatch[1].trim() : "-",
         qty: totalQty || 1,
@@ -138,7 +142,7 @@ const SalesPortal = () => {
         audit: []
       };
     }) : [];
-  }, [realSales, staffName]);
+  }, [realSales, staffName, inventory]);
 
   useEffect(() => {
     const t = setInterval(() => setNow(new Date()), 1000);
