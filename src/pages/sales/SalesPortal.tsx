@@ -126,7 +126,7 @@ const SalesPortal = () => {
         id: s.id || Math.random().toString(),
         itemId: firstItem.product_id,
         itemName: firstItem.product_name_snap || "Item",
-        brand: "SAWKEM", // Default brand
+        brand: firstItem.brand || "SAWKEM", // Default to SAWKEM if no brand
         size: sizeMatch ? sizeMatch[1].trim() : "-",
         color: colorMatch ? colorMatch[1].trim() : "-",
         qty: totalQty || 1,
