@@ -196,7 +196,6 @@ const SalesPortal = () => {
     { id: "catalog", label: "CATALOG", icon: LayoutGrid },
     { id: "log", label: "TODAY'S LOG", icon: ListOrdered, badge: todayActive.length },
     { id: "week", label: "WEEK STATS", icon: TrendingUp },
-    { id: "lowstock", label: "LOW STOCK", icon: AlertTriangle, badge: lowStock.length + outStock.length },
   ];
 
   const Sidebar = () => (
@@ -265,8 +264,10 @@ const SalesPortal = () => {
     <div className="grain min-h-screen bg-charcoal text-off-white">
       <div className="flex min-h-screen">
         {/* DESKTOP SIDEBAR */}
-        <div className="hidden md:block sticky top-0 h-screen">
-          <Sidebar />
+        <div className="hidden md:block w-64 flex-shrink-0">
+          <div className="fixed top-0 left-0 h-screen w-64 z-20">
+            <Sidebar />
+          </div>
         </div>
 
         {/* MOBILE DRAWER */}
