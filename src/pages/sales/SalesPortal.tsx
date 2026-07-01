@@ -634,6 +634,7 @@ const SalesPortal = () => {
           <EditSaleModal
             sale={editing}
             editor={staffName}
+            inventory={inventory}
             onClose={() => setEditing(null)}
             onSave={(changes) => {
               editSaleMutation.mutate({ id: editing.id, changes }, {
@@ -946,19 +947,71 @@ const RecordSaleModal = ({
 const EditSaleModal = ({
   sale,
   editor,
+  inventory,
   onClose,
   onSave,
 }: {
   sale: Sale;
   editor: string;
+  inventory: any[];
   onClose: () => void;
   onSave: (changes: { qty: number; price: number; size: string; color: string; payment: PaymentMethod }) => void;
 }) => {
+  // Find matching inventory item to get variants
+  const inventoryItem = useMemo(() =>
+    inventory.find((i: any) => String(i.id) === String(sale.itemId)),
+    [inventory, sale.itemId]
+  );
+
+  const variants = useMemo(() => {
+    return (inventoryItem?.variants || []).filter((v: any) => Number(v.qty ?? v.quantity) > 0);
+  }, [inventoryItem]);
+
+  const allColors = useMemo(() => {
+    if (variants.length > 0) {
+      return [...new Set(variants.map((v: any) => v.color))].filter(Boolean) as string[];
+    }
+    return [];
+  }, [variants]);
+
   const [qty, setQty] = useState(sale.qty);
   const [priceStr, setPriceStr] = useState(String(sale.price));
   const [size, setSize] = useState(sale.size);
   const [color, setColor] = useState(sale.color);
   const [payment, setPayment] = useState<PaymentMethod>(sale.payment);
+
+  const availableSizes = useMemo(() => {
+    if (variants.length > 0) {
+      const raw = variants
+        .filter((v: any) => !color || color === "-" || v.color === color)
+        .map((v: any) => v.size || "-");
+      return [...new Set(raw)] as string[];
+    }
+    return [];
+  }, [variants, color]);
+
+  // Cycle to next color
+  const cycleColor = () => {
+    if (allColors.length < 2) return;
+    const idx = allColors.indexOf(color);
+    const next = allColors[(idx + 1) % allColors.length];
+    setColor(next);
+    // Reset size if it doesn't exist for new color
+    const newSizes = variants
+      .filter((v: any) => v.color === next)
+      .map((v: any) => v.size || "-");
+    const uniqueSizes = [...new Set(newSizes)] as string[];
+    if (uniqueSizes.length > 0 && !uniqueSizes.includes(size)) {
+      setSize(uniqueSizes[0]);
+    }
+  };
+
+  // Cycle to next size
+  const cycleSize = () => {
+    if (availableSizes.length < 2) return;
+    const idx = availableSizes.indexOf(size);
+    setSize(availableSizes[(idx + 1) % availableSizes.length]);
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
@@ -973,6 +1026,9 @@ const EditSaleModal = ({
     if (qty <= 0) { toast.error("Quantity must be at least 1"); return; }
     onSave({ qty, price, size, color, payment });
   };
+
+  const hasColorOptions = allColors.length > 0;
+  const hasSizeOptions = availableSizes.length > 0;
 
   return (
     <motion.div
@@ -1001,9 +1057,13 @@ const EditSaleModal = ({
           <div>
             <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">QUANTITY</p>
             <div className="flex items-center gap-3">
-              <button onClick={() => setQty(Math.max(1, qty - 1))} className="flex h-10 w-10 items-center justify-center border border-border"><Minus className="h-4 w-4" /></button>
+              <button onClick={() => setQty(Math.max(1, qty - 1))} className="flex h-10 w-10 items-center justify-center border border-border">
+                <Minus className="h-4 w-4" />
+              </button>
               <span className="w-10 text-center font-display text-2xl">{qty}</span>
-              <button onClick={() => setQty(qty + 1)} className="flex h-10 w-10 items-center justify-center border border-border"><Plus className="h-4 w-4" /></button>
+              <button onClick={() => setQty(qty + 1)} className="flex h-10 w-10 items-center justify-center border border-border">
+                <Plus className="h-4 w-4" />
+              </button>
             </div>
           </div>
 
@@ -1020,13 +1080,67 @@ const EditSaleModal = ({
           </div>
 
           <div className="grid grid-cols-2 gap-3">
+            {/* SIZE */}
             <div>
               <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">SIZE</p>
-              <input value={size} onChange={(e) => setSize(e.target.value)} className="w-full border border-border bg-background px-3 py-2 outline-none" />
+              {hasSizeOptions ? (
+                <button
+                  onClick={cycleSize}
+                  className="group relative w-full flex items-center justify-between border border-primary/40 bg-primary/5 px-3 py-2.5 text-sm font-medium tracking-wider transition-all hover:border-primary hover:bg-primary/10"
+                >
+                  <span className="font-display text-lg">{size}</span>
+                  <span className="flex flex-col items-center">
+                    <ChevronLeft className="h-3 w-3 -rotate-90 text-primary/60" />
+                    <ChevronRight className="h-3 w-3 -rotate-90 text-primary/60" />
+                  </span>
+                  {availableSizes.length > 1 && (
+                    <span className="absolute -top-1.5 right-2 text-[8px] tracking-widest text-primary/60 bg-card px-1">
+                      {availableSizes.indexOf(size) + 1}/{availableSizes.length}
+                    </span>
+                  )}
+                </button>
+              ) : (
+                <input value={size} onChange={(e) => setSize(e.target.value)} className="w-full border border-border bg-background px-3 py-2 outline-none" />
+              )}
             </div>
+            {/* COLOR */}
             <div>
               <p className="mb-2 text-[10px] tracking-widest text-muted-foreground">COLOR</p>
-              <input value={color} onChange={(e) => setColor(e.target.value)} className="w-full border border-border bg-background px-3 py-2 outline-none" />
+              {hasColorOptions ? (
+                <button
+                  onClick={cycleColor}
+                  className="group relative w-full flex items-center justify-between border border-primary/40 bg-primary/5 px-3 py-2.5 text-sm font-medium tracking-wider transition-all hover:border-primary hover:bg-primary/10"
+                >
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="h-4 w-4 flex-shrink-0 rounded-full border border-white/20"
+                      style={{ backgroundColor:
+                        color === 'Black' ? '#000' : color === 'White' ? '#FFF' :
+                        color === 'Navy' ? '#1B2A4A' : color === 'Grey' ? '#808080' :
+                        color === 'Beige' ? '#C8AD8F' : color === 'Brown' ? '#7B4F2E' :
+                        color === 'Red' ? '#CC2200' : color === 'Burgundy' ? '#800020' :
+                        color === 'Forest' ? '#2D5A27' : color === 'Olive' ? '#6B7C35' :
+                        color === 'Blue' ? '#2255CC' : color === 'Sky' ? '#87CEEB' :
+                        color === 'Yellow' ? '#F5C400' : color === 'Orange' ? '#E8621A' :
+                        color === 'Pink' ? '#F4A0B0' : color === 'Purple' ? '#6A0DAD' :
+                        color === 'Camel' ? '#C19A6B' : color === 'Cream' ? '#F5F0E8' : '#555'
+                      }}
+                    />
+                    <span className="font-display text-sm truncate">{color}</span>
+                  </div>
+                  <span className="flex flex-col items-center">
+                    <ChevronLeft className="h-3 w-3 -rotate-90 text-primary/60" />
+                    <ChevronRight className="h-3 w-3 -rotate-90 text-primary/60" />
+                  </span>
+                  {allColors.length > 1 && (
+                    <span className="absolute -top-1.5 right-2 text-[8px] tracking-widest text-primary/60 bg-card px-1">
+                      {allColors.indexOf(color) + 1}/{allColors.length}
+                    </span>
+                  )}
+                </button>
+              ) : (
+                <input value={color} onChange={(e) => setColor(e.target.value)} className="w-full border border-border bg-background px-3 py-2 outline-none" />
+              )}
             </div>
           </div>
 
