@@ -314,8 +314,8 @@ const Analytics = () => {
                   className="border border-border bg-background px-3 py-1.5 text-[10px] tracking-widest uppercase outline-none focus:border-primary"
                 >
                   <option value="ALL">ALL PAYMENTS</option>
-                  <option value="CASH">CASH</option>
-                  <option value="TELEBIRR">TELEBIRR</option>
+                  <option value="Cash">CASH</option>
+                  <option value="Telebirr">TELEBIRR</option>
                   <option value="CBE">CBE</option>
                   <option value="BOA">BOA</option>
                   <option value="Awash Bank">AWASH BANK</option>
