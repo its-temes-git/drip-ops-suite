@@ -5,6 +5,7 @@ import {
   Search, X, Plus, Minus, Check, LogOut, LayoutGrid, ListOrdered,
   TrendingUp, Calendar, Package, Menu, AlertTriangle, DollarSign,
   Pencil, Trash2, History, Banknote, Smartphone, Building2,
+  ChevronLeft, ChevronRight,
 } from "lucide-react";
 import { SalesCardSkeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -55,6 +56,7 @@ const SalesPortal = () => {
   const [now, setNow] = useState(new Date());
   const [q, setQ] = useState("");
   const [cat, setCat] = useState<string>("ALL");
+  const [page, setPage] = useState(1);
   const [sel, setSel] = useState<InventoryItem | null>(null);
   const [view, setView] = useState<View>("catalog");
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -156,6 +158,17 @@ const SalesPortal = () => {
       }),
     [inventory, q, cat],
   );
+
+  useEffect(() => {
+    setPage(1);
+  }, [q, cat]);
+
+  const itemsPerPage = 12;
+  const paginatedItems = useMemo(() => {
+    const start = (page - 1) * itemsPerPage;
+    return filtered.slice(start, start + itemsPerPage);
+  }, [filtered, page]);
+  const totalPages = Math.ceil(filtered.length / itemsPerPage);
 
   // ---- Stats ----
   const startOfToday = new Date(now); startOfToday.setHours(0, 0, 0, 0);
@@ -322,8 +335,9 @@ const SalesPortal = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
-                    {filtered.map((it, i) => {
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-2 gap-4 md:grid-cols-3 lg:grid-cols-4">
+                      {paginatedItems.map((it, i) => {
                       const qty = it.qty || 0;
                       const low = qty <= 3;
                       const out = qty === 0;
@@ -367,6 +381,53 @@ const SalesPortal = () => {
                         </motion.div>
                       );
                     })}
+                  </div>
+
+                  {/* PAGINATION CONTROLS */}
+                  {totalPages > 1 && (
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 pt-4 border-t border-border/50">
+                      <span className="text-[10px] text-muted-foreground tracking-widest uppercase">
+                        SHOWING {((page - 1) * itemsPerPage) + 1}–{Math.min(page * itemsPerPage, filtered.length)} OF {filtered.length} ITEMS
+                      </span>
+                      <div className="flex items-center gap-1">
+                        <button
+                          onClick={() => setPage(p => Math.max(1, p - 1))}
+                          disabled={page === 1}
+                          className="h-8 w-8 flex items-center justify-center border border-border hover:border-primary/50 disabled:opacity-30 transition-colors"
+                        >
+                          <ChevronLeft className="h-4 w-4" />
+                        </button>
+                        {Array.from({ length: Math.min(5, totalPages) }, (_, idx) => {
+                          const p = page <= 3
+                            ? idx + 1
+                            : page >= totalPages - 2
+                              ? totalPages - 4 + idx
+                              : page - 2 + idx;
+                          if (p < 1 || p > totalPages) return null;
+                          return (
+                            <button
+                              key={p}
+                              onClick={() => setPage(p)}
+                              className={`h-8 w-8 text-xs font-mono border transition-colors ${
+                                p === page
+                                  ? "bg-primary text-primary-foreground border-primary"
+                                  : "border-border text-muted-foreground hover:border-primary/50"
+                              }`}
+                            >
+                              {p}
+                            </button>
+                          );
+                        })}
+                        <button
+                          onClick={() => setPage(p => Math.min(totalPages, p + 1))}
+                          disabled={page === totalPages}
+                          className="h-8 w-8 flex items-center justify-center border border-border hover:border-primary/50 disabled:opacity-30 transition-colors"
+                        >
+                          <ChevronRight className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </div>
+                  )}
                   </div>
                 )}
               </>
